@@ -28,8 +28,8 @@ class OTPCodeInline(admin.TabularInline):
     
     model = OTPCode
     extra = 0
-    readonly_fields = ['code', 'purpose', 'is_used', 'expires_at', 'created_at']
-    fields = ['code', 'purpose', 'is_used', 'expires_at']
+    readonly_fields = ['code', 'otp_type', 'is_used', 'expires_at', 'created_at']
+    fields = ['code', 'otp_type', 'is_used', 'expires_at']
     
     def has_add_permission(self, request, obj=None):
         return False
@@ -113,10 +113,10 @@ class UserActivityAdmin(admin.ModelAdmin):
     
     list_display = [
         'user', 'activity_type', 'description', 'ip_address', 
-        'created_at', 'is_successful'
+        'created_at'
     ]
     list_filter = [
-        'activity_type', 'is_successful', 'created_at'
+        'activity_type', 'created_at'
     ]
     search_fields = [
         'user__username', 'user__email', 'description', 'ip_address'
@@ -124,12 +124,12 @@ class UserActivityAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     readonly_fields = [
         'user', 'activity_type', 'description', 'ip_address', 
-        'user_agent', 'is_successful', 'created_at'
+        'user_agent', 'created_at'
     ]
     
     fieldsets = (
         (_('Activity Information'), {
-            'fields': ('user', 'activity_type', 'description', 'is_successful')
+            'fields': ('user', 'activity_type', 'description')
         }),
         (_('Technical Details'), {
             'fields': ('ip_address', 'user_agent'),
@@ -157,23 +157,23 @@ class OTPCodeAdmin(admin.ModelAdmin):
     """Admin for OTPCode model."""
     
     list_display = [
-        'user', 'code', 'purpose', 'is_used', 'is_expired', 
+        'user', 'code', 'otp_type', 'is_used', 'is_expired', 
         'created_at', 'expires_at'
     ]
     list_filter = [
-        'purpose', 'is_used', 'created_at', 'expires_at'
+        'otp_type', 'is_used', 'created_at', 'expires_at'
     ]
     search_fields = [
         'user__username', 'user__email', 'code'
     ]
     ordering = ['-created_at']
     readonly_fields = [
-        'user', 'code', 'purpose', 'is_used', 'expires_at', 'created_at'
+        'user', 'code', 'otp_type', 'is_used', 'expires_at', 'created_at'
     ]
     
     fieldsets = (
         (_('OTP Information'), {
-            'fields': ('user', 'code', 'purpose', 'is_used')
+            'fields': ('user', 'code', 'otp_type', 'is_used')
         }),
         (_('Timestamps'), {
             'fields': ('created_at', 'expires_at'),
@@ -183,8 +183,7 @@ class OTPCodeAdmin(admin.ModelAdmin):
     
     def is_expired(self, obj):
         """Check if OTP is expired."""
-        from django.utils import timezone
-        return timezone.now() > obj.expires_at
+        return obj.is_expired
     is_expired.boolean = True
     is_expired.short_description = _('Expired')
     

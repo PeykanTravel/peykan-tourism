@@ -62,7 +62,6 @@ class EventCategoryAdmin(TranslatableAdmin):
     list_display = ['name', 'icon', 'color', 'event_count', 'is_active']
     list_filter = ['is_active']
     search_fields = ['name', 'description']
-    ordering = ['name']
     
     fieldsets = (
         (_('Basic Information'), {
@@ -91,7 +90,6 @@ class VenueAdmin(TranslatableAdmin):
     ]
     list_filter = ['country', 'city', 'is_active']
     search_fields = ['name', 'description', 'address', 'city', 'country']
-    ordering = ['name']
     
     fieldsets = (
         (_('Basic Information'), {
@@ -121,7 +119,6 @@ class ArtistAdmin(TranslatableAdmin):
     list_display = ['name', 'event_count', 'is_active']
     list_filter = ['is_active']
     search_fields = ['name', 'bio']
-    ordering = ['name']
     
     fieldsets = (
         (_('Basic Information'), {

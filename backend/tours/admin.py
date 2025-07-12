@@ -61,7 +61,6 @@ class TourCategoryAdmin(TranslatableAdmin):
     list_display = ['name', 'icon', 'color', 'tour_count', 'is_active']
     list_filter = ['is_active']
     search_fields = ['name', 'description']
-    ordering = ['name']
     
     fieldsets = (
         (_('Basic Information'), {

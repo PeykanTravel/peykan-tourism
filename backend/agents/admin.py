@@ -10,18 +10,6 @@ from django.db.models import Count, Sum, Avg
 from .models import Agent, AgentProfile
 
 
-class AgentProfileInline(admin.StackedInline):
-    """Inline admin for AgentProfile."""
-    
-    model = AgentProfile
-    extra = 1
-    fields = [
-        'company_name', 'license_number', 'business_address', 'business_phone',
-        'business_email', 'website', 'commission_rate', 'min_commission',
-        'max_commission', 'is_verified', 'total_orders', 'total_revenue'
-    ]
-
-
 @admin.register(Agent)
 class AgentAdmin(admin.ModelAdmin):
     """Admin for Agent model."""
@@ -39,8 +27,6 @@ class AgentAdmin(admin.ModelAdmin):
     ]
     ordering = ['-created_at']
     readonly_fields = ['id', 'created_at', 'updated_at']
-    
-    inlines = [AgentProfileInline]
     
     fieldsets = (
         (_('Agent Information'), {

@@ -4,8 +4,8 @@ djangorestframework==3.14.0
 django-cors-headers==4.3.1
 django-filter==23.5
 
-# Database - Using SQLite for development
-# psycopg2-binary==2.9.9  # Commented out for development
+# Database - PostgreSQL for production
+psycopg2-binary==2.9.9
 dj-database-url==2.1.0
 
 # Caching and Sessions

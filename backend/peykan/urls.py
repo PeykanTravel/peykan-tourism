@@ -6,10 +6,23 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+
+def health_check(request):
+    """Simple health check endpoint for Docker."""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Peykan Tourism API is running',
+        'version': '1.0.0'
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Health check endpoint
+    path('api/v1/health/', health_check, name='health_check'),
+    path('health/', health_check, name='health_check_alt'),
     
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

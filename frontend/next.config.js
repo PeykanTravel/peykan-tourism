@@ -13,15 +13,20 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    // Use environment variable to determine API URL
+    const apiUrl = process.env.NODE_ENV === 'production' 
+      ? 'http://backend:8000'  // Docker service name
+      : 'http://localhost:8000'; // Local development
+    
     return [
       // Handle API routes with trailing slash to match Django requirements
       {
         source: '/api/v1/:path*',
-        destination: 'http://localhost:8000/api/v1/:path*/',
+        destination: `${apiUrl}/api/v1/:path*/`,
       },
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*/',
+        destination: `${apiUrl}/api/:path*/`,
       },
     ];
   },

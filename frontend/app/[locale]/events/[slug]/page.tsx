@@ -25,7 +25,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { getEventBySlug, calculateEventPricing } from '@/lib/api/events';
-import { addEventSeatsToCart } from '@/lib/api/cart';
+import { addEventSeatsToCart } from '../../../../lib/api/cart';
 import { tokenService } from '@/lib/services/tokenService';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Event, EventPricingBreakdown, EventBookingRequest, EventPerformance, EventSection, TicketType } from '@/lib/types/api';

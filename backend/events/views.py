@@ -218,21 +218,21 @@ class EventViewSet(viewsets.ModelViewSet):
         return EventDetailSerializer
     
     def get_queryset(self):
-        queryset = Event.objects.filter(is_active=True)
-        
-        # Add aggregations for ratings and reviews
-        queryset = queryset.annotate(
-            average_rating=Avg('reviews__rating'),
-            review_count=Count('reviews')
-        )
-        
-        # Prefetch related objects for better performance
-        queryset = queryset.select_related(
+        """Get queryset with proper filtering."""
+        queryset = Event.objects.filter(is_active=True).select_related(
             'category', 'venue'
         ).prefetch_related(
-            'artists', 'ticket_types', 'options', 'performances',
-            'reviews', 'performances__sections', 'performances__sections__ticket_types'
+            'artists', 'ticket_types', 'options', 'performances__sections__ticket_types'
         )
+        
+        # Apply filters
+        category = self.request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category__slug=category)
+        
+        venue = self.request.query_params.get('venue')
+        if venue:
+            queryset = queryset.filter(venue__slug=venue)
         
         return queryset
     
@@ -549,25 +549,8 @@ class EventViewSet(viewsets.ModelViewSet):
         
         # If still not found, raise 404
         raise Http404("Event not found")
-    
-    def get_queryset(self):
-        """Get queryset with proper filtering."""
-        queryset = Event.objects.filter(is_active=True).select_related(
-            'category', 'venue'
-        ).prefetch_related(
-            'artists', 'ticket_types', 'options', 'performances__sections__ticket_types'
-        )
-        
-        # Apply filters
-        category = self.request.query_params.get('category')
-        if category:
-            queryset = queryset.filter(category__slug=category)
-        
-        venue = self.request.query_params.get('venue')
-        if venue:
-            queryset = queryset.filter(venue__slug=venue)
-        
-        return queryset
+
+
 
 
 class EventReviewViewSet(viewsets.ModelViewSet):

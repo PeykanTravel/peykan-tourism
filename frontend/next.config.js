@@ -15,7 +15,7 @@ const nextConfig = {
   async rewrites() {
     // Use environment variable to determine API URL
     const apiUrl = process.env.NODE_ENV === 'production' 
-      ? 'http://backend:8000'  // Docker service name
+      ? 'https://peykantravelistanbul.com'  // دامنه اصلی
       : 'http://localhost:8000'; // Local development
     
     return [

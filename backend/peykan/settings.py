@@ -4,11 +4,13 @@ Django settings for Peykan Tourism Ecommerce Platform.
 
 import os
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
 import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
@@ -16,7 +18,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='peykantravelistanbul.com,www.peykantravelistanbul.com,localhost,127.0.0.1', cast=Csv())
 
 # Application definition
 DJANGO_APPS = [
@@ -60,15 +62,15 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',  # Temporarily disabled
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # Temporarily disabled
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',  # Re-enabled for production
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Temporarily disabled
 ]
 
 if DEBUG:
@@ -157,14 +159,7 @@ AUTH_USER_MODEL = 'users.User'
 SITE_ID = 1
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'https://peykantravelistanbul.com',
-    'https://www.peykantravelistanbul.com',
-    'http://peykantravelistanbul.com',
-    'http://www.peykantravelistanbul.com',
-]
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://peykantravelistanbul.com,https://www.peykantravelistanbul.com,http://localhost:3000', cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
 CORS_ALLOWED_HEADERS = [
@@ -320,6 +315,6 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_SECONDS = 31536000
     SECURE_REDIRECT_EXEMPT = []
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = None
     CSRF_COOKIE_SECURE = True 

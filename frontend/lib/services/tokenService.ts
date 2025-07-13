@@ -11,7 +11,7 @@ export interface TokenData {
 
 class TokenService {
   private static instance: TokenService;
-  private tokenCheckInterval: NodeJS.Timeout | null = null;
+  private tokenCheckInterval: any = null;
 
   private constructor() {
     // Start token validation check
@@ -106,7 +106,8 @@ class TokenService {
     if (!token) return false;
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/profile/', {
+      const apiUrl = typeof window !== 'undefined' ? (window as any).__NEXT_PUBLIC_API_URL__ || 'http://localhost:8000/api/v1' : 'http://localhost:8000/api/v1';
+      const response = await fetch(`${apiUrl}/auth/profile/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -136,7 +137,8 @@ class TokenService {
     if (!refreshToken) return false;
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/token/refresh/', {
+      const apiUrl = typeof window !== 'undefined' ? (window as any).__NEXT_PUBLIC_API_URL__ || 'http://localhost:8000/api/v1' : 'http://localhost:8000/api/v1';
+      const response = await fetch(`${apiUrl}/auth/token/refresh/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

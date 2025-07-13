@@ -24,7 +24,7 @@ def create_test_users():
             'is_staff': True,
             'is_superuser': True,
             'is_active': True,
-            'phone': '+989123456789'
+            'phone_number': '+989123456789'
         }
     )
     if created:
@@ -40,7 +40,7 @@ def create_test_users():
             'first_name': 'Test',
             'last_name': 'Customer',
             'is_active': True,
-            'phone': '+989123456790'
+            'phone_number': '+989123456790'
         }
     )
     if created:
@@ -56,7 +56,7 @@ def create_test_users():
             'first_name': 'Test',
             'last_name': 'Agent',
             'is_active': True,
-            'phone': '+989123456791',
+            'phone_number': '+989123456791',
             'role': 'agent'
         }
     )

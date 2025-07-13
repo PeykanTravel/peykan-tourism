@@ -7,8 +7,8 @@ import { tokenService } from '../services/tokenService';
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
-  timeout: 10000,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1',
+  timeout: 15000, // Increased timeout
   headers: {
     'Content-Type': 'application/json',
   },

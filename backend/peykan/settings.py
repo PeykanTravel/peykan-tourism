@@ -161,7 +161,7 @@ SITE_ID = 1
 # CORS Settings
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://peykantravelistanbul.com,https://www.peykantravelistanbul.com,http://localhost:3000', cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for now
 CORS_ALLOWED_HEADERS = [
     'accept',
     'accept-encoding',
@@ -172,10 +172,17 @@ CORS_ALLOWED_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-forwarded-for',
+    'x-forwarded-proto',
+]
+CORS_EXPOSE_HEADERS = [
+    'content-type',
+    'content-length',
+    'x-total-count',
 ]
 
 # URL Settings
-APPEND_SLASH = True
+APPEND_SLASH = False  # Disable for API endpoints
 PREPEND_WWW = False
 
 # REST Framework Settings

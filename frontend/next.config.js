@@ -28,6 +28,15 @@ const nextConfig = {
         source: '/api/:path*',
         destination: `${apiUrl}/api/:path*`,
       },
+      // Add specific rewrites for events and tours
+      {
+        source: '/api/v1/events/:path*',
+        destination: `${apiUrl}/api/v1/events/:path*`,
+      },
+      {
+        source: '/api/v1/tours/:path*',
+        destination: `${apiUrl}/api/v1/tours/:path*`,
+      },
     ];
   },
   // Disable trailing slash for API routes to avoid conflicts with PUT/POST requests

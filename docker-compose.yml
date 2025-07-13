@@ -42,7 +42,7 @@ services:
       - DEBUG=True
       - SECURE_SSL_REDIRECT=False
       - USE_X_FORWARDED_HOST=True
-      - SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https
+      - SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,http
       - DJANGO_SETTINGS_MODULE=peykan.settings_production
     volumes:
       - static_volume:/app/staticfiles
@@ -90,18 +90,15 @@ services:
       - "443:443"
     volumes:
       - nginx_logs:/var/log/nginx
-      - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
       - backend
       - frontend
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "https://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    profiles:
-      - production
 
 volumes:
   postgres_data:

@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
 
-// Export all hooks for easy importing
-export { useAuth } from './useAuth';
-export { useCart, useCartSummary, useCartCount } from './useCart';
-
 // Simple hooks implementation without complex imports
 export const useTours = (params?: any) => {
   const [tours, setTours] = useState([]);
@@ -14,7 +10,8 @@ export const useTours = (params?: any) => {
     const fetchTours = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:8000/api/v1/tours/tours/');
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+        const response = await fetch(`${API_URL}/tours/tours/`);
         if (response.ok) {
           const data = await response.json();
           setTours(data.results || []);
@@ -43,12 +40,13 @@ export const useTourDetail = (slug: string) => {
     const fetchTour = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:8000/api/v1/tours/tours/${slug}/`);
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+        const response = await fetch(`${API_URL}/tours/${slug}/`);
         if (response.ok) {
           const data = await response.json();
           setTour(data);
         } else {
-          setError('Tour not found');
+          setError('Failed to fetch tour');
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -74,7 +72,8 @@ export const useTourCategories = () => {
     const fetchCategories = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:8000/api/v1/tours/categories/');
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+        const response = await fetch(`${API_URL}/tours/categories/`);
         if (response.ok) {
           const data = await response.json();
           setCategories(data);
@@ -94,19 +93,5 @@ export const useTourCategories = () => {
   return { categories, isLoading, error };
 };
 
-// Mock hooks for other features - will be implemented later
-export const useTourSearch = () => ({ tours: [], isLoading: false, error: null });
-export const useTourStats = () => ({ stats: null, isLoading: false, error: null });
-export const useTourAvailability = () => ({ availability: null, isLoading: false, error: null });
-
-export const useOrders = () => ({ orders: [], isLoading: false, error: null });
-export const useOrderDetail = () => ({ order: null, isLoading: false, error: null });
-
-// Re-export types for convenience
-export type {
-  User, UserProfile, AuthResponse, LoginPayload, RegisterPayload,
-  Tour, TourCategory, TourSearchParams, TourBookingPayload,
-  Cart, CartItem, AddToCartPayload, UpdateCartItemPayload,
-  Order, CreateOrderPayload, Payment, CreatePaymentPayload,
-  Agent, AgentSummary
-} from '../types/api'; 
+// Export useCart from the correct location
+export { useCart } from '../../../lib/hooks/useCart'; 

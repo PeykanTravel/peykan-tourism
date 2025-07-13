@@ -87,7 +87,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/cart/', {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+      const response = await fetch(`${API_URL}/cart/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

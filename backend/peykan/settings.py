@@ -160,7 +160,7 @@ SITE_ID = 1
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://peykantravelistanbul.com,https://www.peykantravelistanbul.com,http://localhost:3000', cast=Csv())
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = False  # Disable credentials for cross-origin requests
 CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for now
 CORS_ALLOWED_HEADERS = [
     'accept',

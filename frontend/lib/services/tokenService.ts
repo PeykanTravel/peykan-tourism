@@ -106,8 +106,8 @@ class TokenService {
     if (!token) return false;
 
     try {
-      const apiUrl = typeof window !== 'undefined' ? (window as any).__NEXT_PUBLIC_API_URL__ || 'http://localhost:8000/api/v1' : 'http://localhost:8000/api/v1';
-      const response = await fetch(`${apiUrl}/auth/profile/`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+      const response = await fetch(`${API_URL}/auth/profile/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -137,8 +137,8 @@ class TokenService {
     if (!refreshToken) return false;
 
     try {
-      const apiUrl = typeof window !== 'undefined' ? (window as any).__NEXT_PUBLIC_API_URL__ || 'http://localhost:8000/api/v1' : 'http://localhost:8000/api/v1';
-      const response = await fetch(`${apiUrl}/auth/token/refresh/`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+      const response = await fetch(`${API_URL}/auth/token/refresh/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

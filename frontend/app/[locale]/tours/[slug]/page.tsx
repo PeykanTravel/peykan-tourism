@@ -200,7 +200,8 @@ export default function TourDetailPage() {
     const fetchTour = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:8000/api/v1/tours/${slug}/`);
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://peykantravelistanbul.com/api/v1';
+        const response = await fetch(`${API_URL}/tours/${slug}/`);
         if (response.ok) {
           const data = await response.json();
           setTour(data);

@@ -22,11 +22,11 @@ const nextConfig = {
       // Handle API routes with trailing slash to match Django requirements
       {
         source: '/api/v1/:path*',
-        destination: `${apiUrl}/api/v1/:path*/`,
+        destination: `${apiUrl}/api/v1/:path*`,
       },
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/api/:path*/`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ];
   },

@@ -48,7 +48,6 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-      - ./backend/logs:/app/logs
     ports:
       - "8000:8000"
     depends_on:

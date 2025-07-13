@@ -16,12 +16,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Create virtual environment
-RUN python -m venv /opt/venv
+RUN rm -rf /opt/venv && python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.txt
 
 # Production stage
 FROM python:3.11-slim as production

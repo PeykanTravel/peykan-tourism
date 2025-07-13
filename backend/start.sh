@@ -22,7 +22,7 @@ echo "Starting Gunicorn..."
 exec gunicorn peykan.wsgi:application \
     --bind 0.0.0.0:8000 \
     --workers 3 \
-    --worker-class gevent \
+    --worker-class sync \
     --worker-connections 1000 \
     --max-requests 1000 \
     --max-requests-jitter 100 \

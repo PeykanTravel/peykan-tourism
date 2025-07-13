@@ -100,13 +100,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': LOGS_DIR / 'django.log',
-            'formatter': 'verbose',
-            'mode': 'a',  # Append mode
-        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -114,17 +107,17 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'django.security': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'WARNING',
             'propagate': False,
         },

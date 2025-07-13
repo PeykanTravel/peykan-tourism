@@ -160,6 +160,10 @@ SITE_ID = 1
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://peykantravelistanbul.com',
+    'https://www.peykantravelistanbul.com',
+    'http://peykantravelistanbul.com',
+    'http://www.peykantravelistanbul.com',
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only in development

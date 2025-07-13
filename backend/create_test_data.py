@@ -557,12 +557,20 @@ def create_transfer_test_data():
             origin=route_data['origin'],
             destination=route_data['destination'],
             defaults={
-                'name_en': route_data['name_en'],
-                'name_fa': route_data['name_fa'],
-                'name_tr': route_data['name_tr'],
                 'is_active': True
             }
         )
+        
+        if created:
+            # Set translations for each language
+            route.set_current_language('en')
+            route.name = route_data['name_en']
+            route.set_current_language('fa')
+            route.name = route_data['name_fa']
+            route.set_current_language('tr')
+            route.name = route_data['name_tr']
+            route.save()
+            
         transfer_routes.append(route)
     
     # Create pricing for each route and vehicle type

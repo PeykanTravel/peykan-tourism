@@ -135,34 +135,92 @@ frontend/
 
 ## 📦 Installation & Setup
 
-### راه‌اندازی سریع لوکال (ویندوز/لینوکس)
+### 🔧 Environment Configuration
 
-1. **PostgreSQL را نصب کنید** و یک دیتابیس با نام `peykan_tourism` بسازید (مثلاً با pgAdmin یا دستور SQL).
-2. فایل `backend/env.example` را به `backend/.env` کپی کنید (مقادیر پیش‌فرض برای لوکال آماده است).
-3. مطمئن شوید فایل `.env` با encoding UTF-8 ذخیره شده باشد.
-4. محیط مجازی را فعال کنید و پکیج‌ها را نصب کنید:
+#### Backend Environment Setup
+1. **Copy environment file:**
+   ```bash
+   cd backend
+   cp env.development .env
+   ```
+
+2. **Environment variables for development:**
+   ```env
+   # Django Settings
+   DEBUG=True
+   SECRET_KEY=dev-secret-key-change-in-production
+   ALLOWED_HOSTS=localhost,127.0.0.1
+
+   # Database - SQLite for development
+   DATABASE_URL=sqlite:///db.sqlite3
+
+   # Email Configuration - Console backend for development
+   EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+   EMAIL_HOST=localhost
+   EMAIL_PORT=1025
+   EMAIL_USE_TLS=False
+   DEFAULT_FROM_EMAIL=noreply@peykantravelistanbul.com
+
+   # Kavenegar SMS - Mock for development
+   KAVENEGAR_API_KEY=mock-api-key-for-development
+
+   # JWT Settings
+   JWT_SECRET_KEY=dev-jwt-secret-key
+   JWT_ACCESS_TOKEN_LIFETIME=30
+   JWT_REFRESH_TOKEN_LIFETIME=1440
+   ```
+
+#### Frontend Environment Setup
+1. **Create environment file:**
+   ```bash
+   cd frontend
+   echo NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 > .env.local
+   echo NEXT_PUBLIC_SITE_URL=http://localhost:3000 >> .env.local
+   echo NODE_ENV=development >> .env.local
+   ```
+
+2. **Important:** The frontend must be configured to use localhost for development, not production URLs.
+
+### 🚀 Quick Local Setup (Windows/Linux)
+
+1. **Install PostgreSQL** and create a database named `peykan_tourism` (using pgAdmin or SQL command).
+2. Copy `backend/env.development` to `backend/.env` (default values for local are ready).
+3. Make sure the `.env` file is saved with UTF-8 encoding.
+4. Activate virtual environment and install packages:
    ```sh
    cd backend
    python -m venv venv
-   venv\Scripts\activate  # ویندوز
-   # یا
-   source venv/bin/activate  # لینوکس/مک
+   venv\Scripts\activate  # Windows
+   # or
+   source venv/bin/activate  # Linux/Mac
    pip install -r requirements.txt
-   # اگر خطای psycopg2-binary داشتید:
+   # If you get psycopg2-binary error:
    pip install psycopg2-binary
    ```
-5. مهاجرت دیتابیس:
+5. Database migration:
    ```sh
    python manage.py migrate
    ```
-6. اجرای سرور:
+6. Create test user:
+   ```sh
+   python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user(username='testuser', email='testuser@example.com', password='Test@123456')"
+   ```
+7. Run server:
    ```sh
    python manage.py runserver
    ```
 
-> **نکته مهم:**
-> - اگر با خطای encoding یا psycopg2 مواجه شدید، راهنما را در بخش FAQ و DEVELOPMENT_GUIDE.md ببینید.
-> - فقط کافیست PostgreSQL نصب باشد و دیتابیس ساخته شود. نیازی به تغییر دیگر نیست.
+8. **Frontend setup:**
+   ```sh
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+> **Important Notes:**
+> - If you encounter encoding or psycopg2 errors, see the FAQ and DEVELOPMENT_GUIDE.md sections.
+> - You only need PostgreSQL installed and database created. No other changes needed.
+> - **Always use localhost URLs for development, not production URLs.**
 
 ### Docker Setup
 ```bash
@@ -176,8 +234,47 @@ docker-compose logs -f
 docker-compose down
 ```
 
-### Environment Variables
-Create `.env` files based on `env.example` in the backend directory.
+## 🔧 Development Configuration
+
+### API Configuration
+- **Development**: All API calls go to `http://localhost:8000/api/v1`
+- **Production**: API calls go to `https://peykantravelistanbul.com/api/v1`
+- **Environment switching**: Controlled by `NEXT_PUBLIC_API_URL` in frontend `.env.local`
+
+### CORS Settings
+- **Development**: Allows `http://localhost:3000` and `http://127.0.0.1:3000`
+- **Production**: Allows production domains
+- **Configuration**: In `backend/peykan/settings.py`
+
+### OTP Configuration
+- **Email OTP**: Uses console backend in development (prints to terminal)
+- **SMS OTP**: Uses mock service in development
+- **Production**: Configure real email/SMS services
+
+### Commented Settings
+Some settings are temporarily commented for development ease:
+
+1. **Security Middleware** (in `backend/peykan/settings.py`):
+   ```python
+   # 'django.middleware.security.SecurityMiddleware',  # Temporarily disabled
+   # 'whitenoise.middleware.WhiteNoiseMiddleware',  # Temporarily disabled
+   # 'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Temporarily disabled
+   ```
+   **Reason**: Disabled for easier development (no HTTPS redirects)
+
+2. **ViewSets** (in `backend/users/urls.py`):
+   ```python
+   # API Router - Commented out until ViewSets are implemented
+   ```
+   **Reason**: ViewSets not yet implemented, using regular API Views
+
+3. **Active Filter** (in `backend/tours/views.py`):
+   ```python
+   queryset = Tour.objects.all()  # Remove is_active filter temporarily
+   ```
+   **Reason**: Shows all tours for testing, including inactive ones
+
+**Note**: These should be enabled in production for security and proper functionality.
 
 ## 📚 Documentation
 
@@ -251,169 +348,4 @@ docker-compose down -v
 4. **Add to Cart**: User adds product to cart with "Add to Cart" button
 5. **Review Cart**: User visits `/cart` to review items and make changes
 6. **Checkout**: User proceeds to `/checkout` to complete purchase
-7. **Order Confirmation**: User receives order confirmation at `/orders/[orderNumber]`
-
-## 🎨 UI/UX Features
-
-- **Responsive design** for all screen sizes
-- **Modern, clean interface** with TailwindCSS
-- **Loading states** and error handling
-- **Form validation** with real-time feedback
-- **Currency switching** without page reload
-- **Language switching** with proper RTL support
-- **Accessibility** features for screen readers
-
-## 🔒 Security Features
-
-- **JWT authentication** with secure token storage
-- **CSRF protection** on all forms
-- **Input validation** and sanitization
-- **Rate limiting** on API endpoints
-- **Secure payment** processing
-- **Data encryption** for sensitive information
-
-## 📈 Performance Optimizations
-
-- **SWR caching** for API responses
-- **Image optimization** with Next.js
-- **Code splitting** and lazy loading
-- **Database indexing** on frequently queried fields
-- **Redis caching** for expensive operations
-- **CDN-ready** static assets
-
-## 🧪 Testing Strategy
-
-- **Unit tests** for domain logic
-- **Integration tests** for API endpoints
-- **End-to-end tests** for complete user flows
-- **Performance tests** for critical operations
-
-## 📚 Documentation
-
-### Development Guides
-- [**DEVELOPMENT_GUIDE.md**](./DEVELOPMENT_GUIDE.md) - راهنمای کامل توسعه و استقرار
-- [**CONTRIBUTING.md**](./CONTRIBUTING.md) - راهنمای مشارکت در پروژه
-- [**DEPLOYMENT_CHECKLIST.md**](./DEPLOYMENT_CHECKLIST.md) - چک‌لیست استقرار تولید
-
-### Project Documentation
-- [**CHANGELOG.md**](./CHANGELOG.md) - تاریخچه تغییرات
-- [**CONTRIBUTORS.md**](./CONTRIBUTORS.md) - لیست مشارکت‌کنندگان
-- [**SECURITY.md**](./SECURITY.md) - سیاست‌های امنیتی
-- [**CODE_OF_CONDUCT.md**](./CODE_OF_CONDUCT.md) - قوانین رفتار
-- [**SUPPORT.md**](./SUPPORT.md) - راهنمای پشتیبانی
-
-### Quick References
-- [**API Documentation**](./API_DOCUMENTATION.md) - مستندات API
-- [**Architecture Guide**](./ARCHITECTURE.md) - راهنمای معماری
-- [**Troubleshooting**](./TROUBLESHOOTING.md) - راهنمای عیب‌یابی
-- **E2E tests** for critical user flows
-- **Type safety** with TypeScript
-- **Linting** and code formatting
-
-## 🚀 Deployment
-
-### Quick Deployment
-```bash
-# Automated deployment
-./deploy.sh
-```
-
-### Manual Deployment
-```bash
-# On production server
-ssh djangouser@167.235.140.125
-cd /home/djangouser/peykan-tourism
-git pull origin main
-docker-compose -f docker-compose.production.yml up -d --build
-```
-
-## 📚 Documentation
-
-### Development Guides
-- **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** - راهنمای کامل توسعه و استقرار
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - راهنمای مشارکت در پروژه
-- **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** - چک‌لیست استقرار
-
-### Project Documentation
-- **[CHANGELOG.md](CHANGELOG.md)** - تاریخچه تغییرات
-- **[CONTRIBUTORS.md](CONTRIBUTORS.md)** - لیست مشارکت‌کنندگان
-- **[SECURITY.md](SECURITY.md)** - سیاست‌های امنیتی
-- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - قوانین رفتار
-- **[SUPPORT.md](SUPPORT.md)** - راهنمای پشتیبانی
-- **[FAQ.md](FAQ.md)** - سوالات متداول
-- **[ROADMAP.md](ROADMAP.md)** - نقشه راه پروژه
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - معماری سیستم
-- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - مستندات API
-
-### Setup Scripts
-- **[setup-dev.sh](setup-dev.sh)** - اسکریپت راه‌اندازی محیط توسعه (Linux/Mac)
-- **[setup-dev.ps1](setup-dev.ps1)** - اسکریپت راه‌اندازی محیط توسعه (Windows)
-- **[deploy.sh](deploy.sh)** - اسکریپت استقرار خودکار
-
-### Production Checklist
-See [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) for a comprehensive deployment checklist.
-
-### Docker Support
-```bash
-# Development
-docker-compose up -d
-
-# Production
-docker-compose -f docker-compose.production.yml up -d
-```
-
-## 📝 API Documentation
-
-The API follows RESTful principles with comprehensive endpoints for:
-- **Authentication**: Login, register, password reset
-- **Products**: Tours, events, transfers with filtering
-- **Cart**: Add, update, remove items
-- **Orders**: Create, view, update orders
-- **Payments**: Process payments and refunds
-- **Users**: Profile management and preferences
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for detailed information on how to:
-
-1. Set up your development environment
-2. Follow our coding standards
-3. Submit pull requests
-4. Report bugs and request features
-
-### Quick Start for Contributors
-```bash
-# Fork and clone the repository
-git clone https://github.com/YOUR_USERNAME/peykan-tourism.git
-cd peykan-tourism
-
-# Setup development environment
-.\setup-dev.ps1  # Windows
-# ./setup-dev.sh  # Linux/Mac
-
-# Create a feature branch
-git checkout -b feature/your-feature-name
-
-# Make your changes and submit a PR
-```
-
-## 📚 Documentation
-
-- [Development Guide](./DEVELOPMENT_GUIDE.md) - Complete guide for development and deployment
-- [Contributing Guide](./CONTRIBUTING.md) - How to contribute to the project
-- [Deployment Checklist](./DEPLOYMENT_CHECKLIST.md) - Production deployment checklist
-- [API Documentation](./API_DOCUMENTATION.md) - Complete API documentation
-- [Architecture Guide](./ARCHITECTURE.md) - System architecture documentation
-- [Product Roadmap](./ROADMAP.md) - Product development roadmap
-- [Security Policy](./SECURITY.md) - Security guidelines and procedures
-- [Support Guide](./SUPPORT.md) - Getting help and support
-- [FAQ](./FAQ.md) - Frequently asked questions
-- [Code of Conduct](./CODE_OF_CONDUCT.md) - Community guidelines
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-**Peykan Tourism** - Building the future of travel booking with modern technology and user-centric design. 
+7. **Order Confirmation**: User receives order confirmation at `/orders/[orderNumber]` 

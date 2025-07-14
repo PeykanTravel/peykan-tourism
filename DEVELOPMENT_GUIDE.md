@@ -1,6 +1,7 @@
 # راهنمای توسعه و استقرار پروژه Peykan Tourism
 
 ## 📋 فهرست مطالب
+- [تنظیمات محیط توسعه](#تنظیمات-محیط-توسعه)
 - [راه‌اندازی محیط توسعه](#راه‌اندازی-محیط-توسعه)
 - [گردش کار توسعه محلی](#گردش-کار-توسعه-محلی)
 - [استفاده از Docker](#استفاده-از-docker)
@@ -9,6 +10,124 @@
 - [عیب‌یابی و رفع مشکل](#عیب‌یابی-و-رفع-مشکل)
 - [نظارت و مانیتورینگ](#نظارت-و-مانیتورینگ)
 - [به‌روزرسانی پروژه](#به‌روزرسانی-پروژه)
+
+## 🔧 تنظیمات محیط توسعه
+
+### ⚠️ نکات مهم برای توسعه
+
+#### 1. تنظیمات API در فرانت‌اند
+**مشکل رایج**: درخواست‌ها به سرور production به جای localhost می‌روند.
+
+**راه‌حل**:
+```bash
+# در پوشه frontend
+echo NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 > .env.local
+echo NEXT_PUBLIC_SITE_URL=http://localhost:3000 >> .env.local
+echo NODE_ENV=development >> .env.local
+```
+
+**فایل‌های مهم**:
+- `frontend/lib/api/client.ts` - تنظیمات axios
+- `frontend/next.config.js` - تنظیمات rewrites
+- `frontend/.env.local` - متغیرهای محیطی
+
+#### 2. تنظیمات بک‌اند
+```bash
+# در پوشه backend
+cp env.development .env
+```
+
+**تنظیمات مهم در `.env`**:
+```env
+# Django Settings
+DEBUG=True
+SECRET_KEY=dev-secret-key-change-in-production
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database - SQLite for development
+DATABASE_URL=sqlite:///db.sqlite3
+
+# Email Configuration - Console backend for development
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+EMAIL_HOST=localhost
+EMAIL_PORT=1025
+EMAIL_USE_TLS=False
+DEFAULT_FROM_EMAIL=noreply@peykantravelistanbul.com
+
+# Kavenegar SMS - Mock for development
+KAVENEGAR_API_KEY=mock-api-key-for-development
+
+# JWT Settings
+JWT_SECRET_KEY=dev-jwt-secret-key
+JWT_ACCESS_TOKEN_LIFETIME=30
+JWT_REFRESH_TOKEN_LIFETIME=1440
+```
+
+#### 3. تنظیمات CORS
+در `backend/peykan/settings.py`:
+```python
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', 
+    default='http://localhost:3000,http://127.0.0.1:3000,https://peykantravelistanbul.com,https://www.peykantravelistanbul.com', 
+    cast=Csv())
+```
+
+#### 4. تنظیمات کامنت شده
+برخی تنظیمات برای توسعه راحت‌تر غیرفعال شده‌اند:
+
+**Security Middleware** (در `backend/peykan/settings.py`):
+```python
+# 'django.middleware.security.SecurityMiddleware',  # Temporarily disabled
+# 'whitenoise.middleware.WhiteNoiseMiddleware',  # Temporarily disabled
+# 'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Temporarily disabled
+```
+**دلیل**: برای توسعه راحت‌تر (بدون HTTPS redirects)
+
+**ViewSets** (در `backend/users/urls.py`):
+```python
+# API Router - Commented out until ViewSets are implemented
+```
+**دلیل**: ViewSets هنوز پیاده‌سازی نشده‌اند
+
+**Active Filter** (در `backend/tours/views.py`):
+```python
+queryset = Tour.objects.all()  # Remove is_active filter temporarily
+```
+**دلیل**: نمایش همه تورها برای تست
+
+**نکته**: این تنظیمات در production باید فعال شوند.
+
+### 🔍 عیب‌یابی مشکلات رایج
+
+#### مشکل: درخواست‌ها به production می‌روند
+**علت**: تنظیمات API در فرانت‌اند
+**راه‌حل**:
+1. فایل `.env.local` در فرانت‌اند بسازید
+2. سرور Next.js را ری‌استارت کنید
+3. کش مرورگر را پاک کنید
+
+#### مشکل: خطای CORS
+**علت**: تنظیمات CORS در بک‌اند
+**راه‌حل**: مطمئن شوید `localhost:3000` در `CORS_ALLOWED_ORIGINS` باشد
+
+#### مشکل: OTP ارسال نمی‌شود
+**علت**: تنظیمات ایمیل/SMS
+**راه‌حل**: در development، OTP در کنسول نمایش داده می‌شود
+
+### 🧪 تست محیط توسعه
+
+#### ایجاد یوزر تستی
+```bash
+cd backend
+python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user(username='testuser', email='testuser@example.com', password='Test@123456')"
+```
+
+#### تست API
+```bash
+# تست لاگین
+curl -X POST http://localhost:8000/api/v1/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"Test@123456"}'
+```
 
 ## 🚀 راه‌اندازی محیط توسعه
 
@@ -48,7 +167,7 @@ venv\Scripts\activate
 source venv/bin/activate
 
 pip install -r requirements.txt
-cp env.example .env
+cp env.development .env
 # ویرایش فایل .env با مقادیر مناسب
 python manage.py migrate
 python manage.py collectstatic --noinput
@@ -60,15 +179,16 @@ python manage.py runserver
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local
-# ویرایش فایل .env.local
+echo NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1 > .env.local
+echo NEXT_PUBLIC_SITE_URL=http://localhost:3000 >> .env.local
+echo NODE_ENV=development >> .env.local
 npm run dev
 ```
 
 ### راه‌اندازی سریع لوکال (ویندوز/لینوکس)
 
 1. **PostgreSQL را نصب کنید** و یک دیتابیس با نام `peykan_tourism` بسازید (مثلاً با pgAdmin یا دستور SQL).
-2. فایل `backend/env.example` را به `backend/.env` کپی کنید (مقادیر پیش‌فرض برای لوکال آماده است).
+2. فایل `backend/env.development` را به `backend/.env` کپی کنید (مقادیر پیش‌فرض برای لوکال آماده است).
 3. مطمئن شوید فایل `.env` با encoding UTF-8 ذخیره شده باشد.
 4. محیط مجازی را فعال کنید و پکیج‌ها را نصب کنید:
    ```sh
@@ -85,7 +205,11 @@ npm run dev
    ```sh
    python manage.py migrate
    ```
-6. اجرای سرور:
+6. ایجاد یوزر تستی:
+   ```sh
+   python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user(username='testuser', email='testuser@example.com', password='Test@123456')"
+   ```
+7. اجرای سرور:
    ```sh
    python manage.py runserver
    ```
@@ -93,6 +217,7 @@ npm run dev
 > **نکته مهم:**
 > - اگر با خطای encoding یا psycopg2 مواجه شدید، راهنما را در بخش FAQ و پایین همین فایل ببینید.
 > - فقط کافیست PostgreSQL نصب باشد و دیتابیس ساخته شود. نیازی به تغییر دیگر نیست.
+> - **همیشه از localhost URLs برای توسعه استفاده کنید، نه production URLs.**
 
 ## 🔄 گردش کار توسعه محلی
 

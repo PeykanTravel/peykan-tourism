@@ -15,7 +15,7 @@ const nextConfig = {
   async rewrites() {
     // Use environment variable to determine API URL
     const apiUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://peykantravelistanbul.com'  // دامنه اصلی
+      ? 'https://peykantravelistanbul.com'  // Production domain
       : 'http://localhost:8000'; // Local development
     
     return [

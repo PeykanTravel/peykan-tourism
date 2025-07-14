@@ -11,7 +11,7 @@ import type { Locale } from '@/i18n/config';
 export const metadata: Metadata = {
   title: 'Peykan Tourism Platform',
   description: 'Book tours, events, and transfers with ease',
-  viewport: 'width=device-width, initial-scale=1',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   icons: {
     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎭</text></svg>',
   },
@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     description: 'Book tours, events, and transfers with ease',
     type: 'website',
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 type Props = {

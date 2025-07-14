@@ -135,27 +135,106 @@ frontend/
 
 ## 📦 Installation & Setup
 
-### Backend Setup
+### Quick Start (Recommended)
 ```bash
-cd backend
-python3 -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
-pip install --upgrade pip && pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
+# Clone the repository
+git clone https://github.com/PeykanTravel/peykan-tourism.git
+cd peykan-tourism
+
+# Setup development environment
+# Windows:
+.\setup-dev.ps1
+
+# Linux/Mac:
+./setup-dev.sh
 ```
 
-### Frontend Setup
+### Manual Setup
 ```bash
+# Backend
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# یا venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+cp env.example .env
+# ویرایش فایل .env
+python manage.py migrate
+python manage.py runserver
+
+# Frontend (در ترمینال جدید)
 cd frontend
 npm install
+cp .env.example .env.local
+# ویرایش فایل .env.local
 npm run dev
+```
+
+### Docker Setup
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
 ```
 
 ### Environment Variables
 Create `.env` files based on `env.example` in the backend directory.
+
+## 📚 Documentation
+
+### 🚀 Quick Start
+- **[setup-dev.sh](setup-dev.sh)** - اسکریپت راه‌اندازی خودکار (Linux/Mac)
+- **[setup-dev.ps1](setup-dev.ps1)** - اسکریپت راه‌اندازی خودکار (Windows)
+
+### 📖 Development Guides
+- **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** - راهنمای کامل توسعه و استقرار
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - راهنمای مشارکت در پروژه
+- **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** - چک‌لیست استقرار تولید
+
+### 📋 Additional Documentation
+- **[CHANGELOG.md](CHANGELOG.md)** - تاریخچه تغییرات پروژه
+- **[CONTRIBUTORS.md](CONTRIBUTORS.md)** - لیست مشارکت‌کنندگان
+- **[SECURITY.md](SECURITY.md)** - سیاست‌های امنیتی
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - قوانین رفتار
+- **[SUPPORT.md](SUPPORT.md)** - راهنمای پشتیبانی
+
+## 🚀 Deployment
+
+### Production Deployment
+```bash
+# Deploy to production server
+./deploy.sh
+
+# Or manually:
+git pull origin main
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d --build
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py collectstatic --noinput
+```
+
+### Docker Commands
+```bash
+# Build images
+docker-compose build
+
+# Start services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f [service_name]
+
+# Execute commands in containers
+docker-compose exec backend python manage.py shell
+docker-compose exec frontend npm run build
+
+# Stop and remove containers
+docker-compose down -v
+```
 
 ## 🔄 Complete User Flow
 
@@ -199,24 +278,82 @@ Create `.env` files based on `env.example` in the backend directory.
 
 - **Unit tests** for domain logic
 - **Integration tests** for API endpoints
+- **End-to-end tests** for complete user flows
+- **Performance tests** for critical operations
+
+## 📚 Documentation
+
+### Development Guides
+- [**DEVELOPMENT_GUIDE.md**](./DEVELOPMENT_GUIDE.md) - راهنمای کامل توسعه و استقرار
+- [**CONTRIBUTING.md**](./CONTRIBUTING.md) - راهنمای مشارکت در پروژه
+- [**DEPLOYMENT_CHECKLIST.md**](./DEPLOYMENT_CHECKLIST.md) - چک‌لیست استقرار تولید
+
+### Project Documentation
+- [**CHANGELOG.md**](./CHANGELOG.md) - تاریخچه تغییرات
+- [**CONTRIBUTORS.md**](./CONTRIBUTORS.md) - لیست مشارکت‌کنندگان
+- [**SECURITY.md**](./SECURITY.md) - سیاست‌های امنیتی
+- [**CODE_OF_CONDUCT.md**](./CODE_OF_CONDUCT.md) - قوانین رفتار
+- [**SUPPORT.md**](./SUPPORT.md) - راهنمای پشتیبانی
+
+### Quick References
+- [**API Documentation**](./API_DOCUMENTATION.md) - مستندات API
+- [**Architecture Guide**](./ARCHITECTURE.md) - راهنمای معماری
+- [**Troubleshooting**](./TROUBLESHOOTING.md) - راهنمای عیب‌یابی
 - **E2E tests** for critical user flows
 - **Type safety** with TypeScript
 - **Linting** and code formatting
 
 ## 🚀 Deployment
 
-### Docker Support
+### Quick Deployment
 ```bash
-docker-compose up -d
+# Automated deployment
+./deploy.sh
 ```
 
+### Manual Deployment
+```bash
+# On production server
+ssh djangouser@167.235.140.125
+cd /home/djangouser/peykan-tourism
+git pull origin main
+docker-compose -f docker-compose.production.yml up -d --build
+```
+
+## 📚 Documentation
+
+### Development Guides
+- **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** - راهنمای کامل توسعه و استقرار
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - راهنمای مشارکت در پروژه
+- **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** - چک‌لیست استقرار
+
+### Project Documentation
+- **[CHANGELOG.md](CHANGELOG.md)** - تاریخچه تغییرات
+- **[CONTRIBUTORS.md](CONTRIBUTORS.md)** - لیست مشارکت‌کنندگان
+- **[SECURITY.md](SECURITY.md)** - سیاست‌های امنیتی
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - قوانین رفتار
+- **[SUPPORT.md](SUPPORT.md)** - راهنمای پشتیبانی
+- **[FAQ.md](FAQ.md)** - سوالات متداول
+- **[ROADMAP.md](ROADMAP.md)** - نقشه راه پروژه
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - معماری سیستم
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - مستندات API
+
+### Setup Scripts
+- **[setup-dev.sh](setup-dev.sh)** - اسکریپت راه‌اندازی محیط توسعه (Linux/Mac)
+- **[setup-dev.ps1](setup-dev.ps1)** - اسکریپت راه‌اندازی محیط توسعه (Windows)
+- **[deploy.sh](deploy.sh)** - اسکریپت استقرار خودکار
+
 ### Production Checklist
-- [ ] Environment variables configured
-- [ ] Database migrations applied
-- [ ] Static files collected
-- [ ] SSL certificates installed
-- [ ] CDN configured
-- [ ] Monitoring and logging setup
+See [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) for a comprehensive deployment checklist.
+
+### Docker Support
+```bash
+# Development
+docker-compose up -d
+
+# Production
+docker-compose -f docker-compose.production.yml up -d
+```
 
 ## 📝 API Documentation
 
@@ -230,11 +367,41 @@ The API follows RESTful principles with comprehensive endpoints for:
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes following DDD principles
-4. Add tests for new functionality
-5. Submit a pull request
+We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for detailed information on how to:
+
+1. Set up your development environment
+2. Follow our coding standards
+3. Submit pull requests
+4. Report bugs and request features
+
+### Quick Start for Contributors
+```bash
+# Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/peykan-tourism.git
+cd peykan-tourism
+
+# Setup development environment
+.\setup-dev.ps1  # Windows
+# ./setup-dev.sh  # Linux/Mac
+
+# Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Make your changes and submit a PR
+```
+
+## 📚 Documentation
+
+- [Development Guide](./DEVELOPMENT_GUIDE.md) - Complete guide for development and deployment
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute to the project
+- [Deployment Checklist](./DEPLOYMENT_CHECKLIST.md) - Production deployment checklist
+- [API Documentation](./API_DOCUMENTATION.md) - Complete API documentation
+- [Architecture Guide](./ARCHITECTURE.md) - System architecture documentation
+- [Product Roadmap](./ROADMAP.md) - Product development roadmap
+- [Security Policy](./SECURITY.md) - Security guidelines and procedures
+- [Support Guide](./SUPPORT.md) - Getting help and support
+- [FAQ](./FAQ.md) - Frequently asked questions
+- [Code of Conduct](./CODE_OF_CONDUCT.md) - Community guidelines
 
 ## 📄 License
 

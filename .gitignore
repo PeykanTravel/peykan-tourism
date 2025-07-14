@@ -1,53 +1,57 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual Environments
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-.venv/
-backend/venv/
-backend/env/
-frontend/node_modules/
-node_modules/
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
-static/
-
-# Environment variables
+# Environment files
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.development
+.env.production
+.env.test
+backend/.env
+backend/env.production
+backend/env.local
+frontend/.env.local
+frontend/.env.production
+frontend/.env.development
+
+# SSL Certificates
+nginx/ssl/
+*.pem
+*.key
+*.crt
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Logs
+logs/
+*.log
+backend/logs/
+nginx/logs/
+
+# Database
+*.sqlite3
+*.db
+postgres_data/
+
+# Media files
+backend/media/
+uploads/
+
+# Static files
+backend/staticfiles/
+frontend/.next/
+frontend/out/
+
+# Dependencies
+node_modules/
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
 
 # IDE
 .vscode/
@@ -65,25 +69,41 @@ static/
 ehthumbs.db
 Thumbs.db
 
-# Next.js
-.next/
-out/
+# Build outputs
+dist/
 build/
+*.egg-info/
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
 
-# Testing
-coverage/
-.nyc_output/
-.pytest_cache/
+# Jupyter Notebook
+.ipynb_checkpoints
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
+# pyenv
+.python-version
+
+# Backup files
+*.bak
+*.backup
+*_backup
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Cache
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
 
 # Runtime data
 pids
@@ -91,25 +111,8 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# Dependency directories
-node_modules/
-jspm_packages/
-
 # Optional npm cache directory
 .npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
 
 # Optional REPL history
 .node_repl_history
@@ -120,50 +123,40 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
+# dotenv environment variables file
+.env.test
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
 
-# Next.js build output
+# next.js build output
 .next
 
-# Nuxt.js build / generate output
+# nuxt.js build output
 .nuxt
-dist
 
-# Gatsby files
-.cache/
-# public  # Commented out to allow frontend/public folder
+# vuepress build output
+.vuepress/dist
 
-# Storybook build outputs
-.out
-.storybook-out
+# Serverless directories
+.serverless
 
-# Temporary folders
-tmp/
-temp/
+# FuseBox cache
+.fusebox/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# DynamoDB Local files
+.dynamodb/
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# TernJS port file
+.tern-port
 
-# Backup files
-*.bak
-*.backup
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
 
-# Local development
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local nginx/ssl/
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*

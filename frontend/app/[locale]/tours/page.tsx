@@ -16,6 +16,7 @@ import {
   X
 } from 'lucide-react';
 import TourCard from '../../../components/tours/TourCard';
+import { SkeletonLoader } from '../../../components/ui/SkeletonLoader';
 
 interface Tour {
   id: string;
@@ -164,34 +165,21 @@ export default function ToursListPage() {
     </div>
   );
 
-  if (isLoading) {
+    if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Page Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-900 dark:to-purple-900 text-white py-12 md:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Tour Packages</h1>
-              <p className="text-xl opacity-90">Discover amazing destinations with our curated tours</p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">Tour Packages</h1>
+              <p className="text-lg md:text-xl opacity-90">Discover amazing destinations with our curated tours</p>
             </div>
           </div>
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md p-6">
-                  <div className="h-48 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-10 bg-gray-200 rounded"></div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <SkeletonLoader variant="card" count={6} />
         </div>
       </div>
     );

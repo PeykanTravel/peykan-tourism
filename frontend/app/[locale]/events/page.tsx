@@ -24,6 +24,7 @@ import {
   Eye
 } from 'lucide-react';
 import EventCard from '@/components/events/EventCard';
+import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 
 interface EventFilters {
   search: string;

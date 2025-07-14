@@ -11,9 +11,18 @@ import type { Locale } from '@/i18n/config';
 export const metadata: Metadata = {
   title: 'Peykan Tourism Platform',
   description: 'Book tours, events, and transfers with ease',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  viewport: 'width=device-width, initial-scale=1',
   icons: {
     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎭</text></svg>',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: 'Peykan Tourism Platform',
+    description: 'Book tours, events, and transfers with ease',
+    type: 'website',
   },
 };
 

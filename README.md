@@ -198,6 +198,19 @@ Create `.env` files based on `env.example` in the backend directory.
 
 ### 📋 Additional Documentation
 - **[CHANGELOG.md](CHANGELOG.md)** - تاریخچه تغییرات پروژه
+- **[frontend/DESIGN_SYSTEM.md](frontend/DESIGN_SYSTEM.md)** - راهنمای Design System
+
+## 🎨 Design System
+
+این پروژه از یک Design System منسجم استفاده می‌کند که شامل:
+
+- **کامپوننت‌های پایه**: Button, Card, Input, Loading
+- **سیستم رنگ‌بندی**: Primary, Secondary, Semantic colors
+- **تایپوگرافی**: Font families, sizes, weights
+- **فاصله‌گذاری**: 4px grid system
+- **ریسپانسیو**: Mobile-first approach
+
+برای اطلاعات بیشتر، فایل `frontend/DESIGN_SYSTEM.md` را مطالعه کنید.
 - **[CONTRIBUTORS.md](CONTRIBUTORS.md)** - لیست مشارکت‌کنندگان
 - **[SECURITY.md](SECURITY.md)** - سیاست‌های امنیتی
 - **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - قوانین رفتار

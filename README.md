@@ -135,40 +135,34 @@ frontend/
 
 ## 📦 Installation & Setup
 
-### Quick Start (Recommended)
-```bash
-# Clone the repository
-git clone https://github.com/PeykanTravel/peykan-tourism.git
-cd peykan-tourism
+### راه‌اندازی سریع لوکال (ویندوز/لینوکس)
 
-# Setup development environment
-# Windows:
-.\setup-dev.ps1
+1. **PostgreSQL را نصب کنید** و یک دیتابیس با نام `peykan_tourism` بسازید (مثلاً با pgAdmin یا دستور SQL).
+2. فایل `backend/env.example` را به `backend/.env` کپی کنید (مقادیر پیش‌فرض برای لوکال آماده است).
+3. مطمئن شوید فایل `.env` با encoding UTF-8 ذخیره شده باشد.
+4. محیط مجازی را فعال کنید و پکیج‌ها را نصب کنید:
+   ```sh
+   cd backend
+   python -m venv venv
+   venv\Scripts\activate  # ویندوز
+   # یا
+   source venv/bin/activate  # لینوکس/مک
+   pip install -r requirements.txt
+   # اگر خطای psycopg2-binary داشتید:
+   pip install psycopg2-binary
+   ```
+5. مهاجرت دیتابیس:
+   ```sh
+   python manage.py migrate
+   ```
+6. اجرای سرور:
+   ```sh
+   python manage.py runserver
+   ```
 
-# Linux/Mac:
-./setup-dev.sh
-```
-
-### Manual Setup
-```bash
-# Backend
-cd backend
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# یا venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-cp env.example .env
-# ویرایش فایل .env
-python manage.py migrate
-python manage.py runserver
-
-# Frontend (در ترمینال جدید)
-cd frontend
-npm install
-cp .env.example .env.local
-# ویرایش فایل .env.local
-npm run dev
-```
+> **نکته مهم:**
+> - اگر با خطای encoding یا psycopg2 مواجه شدید، راهنما را در بخش FAQ و DEVELOPMENT_GUIDE.md ببینید.
+> - فقط کافیست PostgreSQL نصب باشد و دیتابیس ساخته شود. نیازی به تغییر دیگر نیست.
 
 ### Docker Setup
 ```bash

@@ -348,3 +348,21 @@ docker-compose exec frontend npm audit fix
 ---
 
 **نکته**: اگر سوال شما در اینجا پاسخ داده نشده، لطفاً [Support Guide](./SUPPORT.md) را مطالعه کنید یا با تیم تماس بگیرید. 
+
+### **Q: خطاهای رایج راه‌اندازی لوکال (PostgreSQL/ویندوز) و راه‌حل آن‌ها؟**
+**A**:
+- اگر با خطای psycopg2 یا psycopg2-binary مواجه شدید:
+  1. مطمئن شوید محیط مجازی فعال است.
+  2. دستور زیر را اجرا کنید:
+     ```sh
+     pip install psycopg2-binary
+     ```
+- اگر با خطای UnicodeDecodeError یا embedded null character در فایل .env مواجه شدید:
+  1. فایل .env را با ویرایشگر متن (مثل VSCode یا Notepad++) باز کنید.
+  2. از منوی Save with Encoding، گزینه UTF-8 (بدون BOM) را انتخاب و ذخیره کنید.
+- اگر پروژه به دیتابیس متصل نمی‌شود:
+  1. مطمئن شوید PostgreSQL نصب است و دیتابیس peykan_tourism ساخته شده.
+  2. مقادیر یوزر و پسورد را در .env درست وارد کنید.
+- اگر با خطای فعال‌سازی venv مواجه شدید:
+  - در ویندوز: `venv\Scripts\activate`
+  - در لینوکس/مک: `source venv/bin/activate` 

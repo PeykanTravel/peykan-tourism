@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { apiClient } from '../../../lib/api/client';
+import { API_CONFIG } from '../../../lib/config/api';
 
 // Export all hooks for easy importing
-export { useAuth } from './useAuth';
 export { useCart, useCartSummary, useCartCount } from './useCart';
 
 // Simple hooks implementation without complex imports
@@ -14,15 +15,10 @@ export const useTours = (params?: any) => {
     const fetchTours = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:8000/api/v1/tours/tours/');
-        if (response.ok) {
-          const data = await response.json();
-          setTours(data.results || []);
-        } else {
-          setError('Failed to fetch tours');
-        }
+        const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOURS.LIST);
+        setTours(response.data.results || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : 'Failed to fetch tours');
       } finally {
         setIsLoading(false);
       }
@@ -43,15 +39,10 @@ export const useTourDetail = (slug: string) => {
     const fetchTour = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`http://localhost:8000/api/v1/tours/tours/${slug}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setTour(data);
-        } else {
-          setError('Tour not found');
-        }
+        const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOURS.DETAIL(slug));
+        setTour(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : 'Tour not found');
       } finally {
         setIsLoading(false);
       }
@@ -74,15 +65,10 @@ export const useTourCategories = () => {
     const fetchCategories = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:8000/api/v1/tours/categories/');
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
-        } else {
-          setError('Failed to fetch categories');
-        }
+        const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOURS.CATEGORIES);
+        setCategories(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : 'Failed to fetch categories');
       } finally {
         setIsLoading(false);
       }

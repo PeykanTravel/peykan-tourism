@@ -4,7 +4,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+<<<<<<< Updated upstream
 import { useCart, TransferCartItem } from '@/lib/hooks/useCart';
+=======
+import { useCart } from '../../../../lib/hooks/useCart';
+import { CartItem } from '../../../../lib/contexts/UnifiedCartContext';
+import { API_CONFIG, buildApiUrl, getAuthHeaders } from '../../../../lib/config/api';
+import { apiClient } from '../../../../lib/api/client';
+>>>>>>> Stashed changes
 import { 
   MapPin, 
   Clock, 
@@ -332,9 +339,9 @@ export default function CustomTransferBooking() {
     if (bookingData.origin && bookingData.destination) {
       setLoading(true);
       setError('');
-      fetch(`/api/v1/transfers/routes/available_vehicles/?origin=${encodeURIComponent(bookingData.origin)}&destination=${encodeURIComponent(bookingData.destination)}`)
-        .then(res => res.json())
-        .then(data => {
+      apiClient.get(`${API_CONFIG.ENDPOINTS.TRANSFERS.AVAILABLE_VEHICLES}?origin=${encodeURIComponent(bookingData.origin)}&destination=${encodeURIComponent(bookingData.destination)}`)
+        .then(response => {
+          const data = response.data;
           setAvailableVehicles(data.vehicles || []);
           if (!data.route_found || (data.vehicles || []).length === 0) {
             setError('خودرویی برای این مسیر موجود نیست.');

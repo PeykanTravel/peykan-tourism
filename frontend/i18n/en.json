@@ -14,7 +14,10 @@
     "profile": "Profile",
     "orders": "Orders",
     "wishlist": "Wishlist",
-    "logout": "Logout"
+    "logout": "Logout",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDescription": "Sorry, the page you are looking for does not exist.",
+    "goHome": "Go Home"
   },
   "navigation": {
     "home": "Home",
@@ -40,7 +43,73 @@
     "featuredTransfers": "Featured Transfers",
     "viewAll": "View All",
     "bookNow": "Book Now",
-    "popularDestinations": "Popular Destinations"
+    "popularDestinations": "Popular Destinations",
+    "heroTitle": "Unforgettable Adventures",
+    "heroSubtitle": "Experience the best tours, events, and transfers in Istanbul with competitive prices and 24/7 support",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "testimonials": "Customer Reviews",
+    "whyChooseUs": "Why Choose Us",
+    "bestPrices": "Best Prices",
+    "bestPricesDesc": "Competitive prices and special discounts",
+    "expertGuides": "Expert Guides",
+    "expertGuidesDesc": "Experienced and professional guides",
+    "safeTravel": "Safe Travel",
+    "safeTravelDesc": "Safe and secure travels",
+    "customerSupport": "Customer Support",
+    "customerSupportDesc": "24/7 support",
+    "newsletter": "Newsletter",
+    "newsletterSubtitle": "Stay updated with latest tours and discounts",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "serviceTypes": {
+      "tours": "Sightseeing Tours",
+      "events": "Events & Concerts",
+      "transfers": "Transfer Services"
+    },
+    "slide2": {
+      "title": "Istanbul Tours",
+      "subtitle": "Unforgettable experiences in the heart of Turkey",
+      "tags": {
+        "daily": "Daily Tours",
+        "nightly": "Night Tours",
+        "cruise": "Cruise Tours",
+        "private": "Private Tours"
+      }
+    },
+    "slide3": {
+      "title": "Events & Concerts",
+      "subtitle": "Best cultural and artistic events in Istanbul",
+      "tags": {
+        "concerts": "Concerts",
+        "shows": "Shows",
+        "festivals": "Festivals",
+        "special": "Special Events"
+      }
+    },
+    "searchForm": {
+      "destination": "Destination...",
+      "participants": "{count, plural, one {# person} other {# people}}",
+      "searchButton": "Search & Book"
+    },
+    "cta": {
+      "title": "Ready to Explore the World?",
+      "subtitle": "Let us create unforgettable memories for you with our special tours and destinations.",
+      "button": "Book Now",
+      "features": {
+        "support": "24/7 Support",
+        "pricing": "Best Price Guarantee",
+        "cancellation": "Free Cancellation"
+      }
+    },
+    "footer": {
+      "about": "About Us",
+      "contact": "Contact Us",
+      "terms": "Terms & Conditions",
+      "privacy": "Privacy Policy",
+      "help": "Help",
+      "support": "Support"
+    }
   },
   "tours": {
     "title": "Tours",
@@ -145,9 +214,13 @@
     "proceedToCheckout": "Proceed to Checkout",
     "guestCheckoutNote": "You're checking out as a guest. Login to save your information for future orders.",
     "participants": "Participants",
+    "adult": "Adult",
     "adults": "Adults",
+    "child": "Child",
     "children": "Children",
+    "infant": "Infant",
     "infants": "Infants",
+    "totalParticipants": "Total Participants",
     "options": "Options",
     "selected": "selected",
     "quantity": "Quantity",
@@ -426,6 +499,7 @@
     "selectDate": "Select Date",
     "selectSchedule": "Select Schedule",
     "selectVariant": "Select Variant",
+    "selectPackage": "Select Package",
     "selectOptions": "Select Options",
     "passengers": "Passengers",
     "adults": "Adults",
@@ -459,6 +533,36 @@
     "writeAReview": "Write a Review",
     "tourVariants": "Tour Variants",
     "cancellationPolicyText": "Cancellation Policy",
+    "bookThisTour": "Book This Tour",
+    "bookingNotAvailable": "Booking Not Available",
+    "availableSpots": "Available spots",
+    "spots": "spots",
+    "noAvailableDates": "No available dates",
+    "additionalOptions": "Additional Options",
+    "specialRequests": "Special Requests",
+    "specialRequestsPlaceholder": "Any special requests or notes...",
+    "priceSummary": "Price Summary",
+    "free": "Free",
+    "options": "Options",
+    "total": "Total",
+    "booking": "Booking...",
+    "notAvailable": "Not Available",
+    "addToCart": "Add to Cart",
+    "guestUser": "Guest User",
+    "guestUserMessage": "Items will be saved in your session.",
+    "loginToSync": "Login to sync",
+    "overview": "Overview",
+    "pricing": "Pricing",
+    "hours": "hours",
+    "loading": "Loading...",
+    "backToTours": "Back to Tours",
+    "shareThis": "Share This",
+    "addToWishlist": "Add to Wishlist",
+    "duration": "Duration",
+    "pickup": "Pickup",
+    "location": "Location",
+    "rating": "Rating",
+        "bookNow": "Book Now",
     "hoursBeforeTour": "hours before tour",
     "refund": "refund",
     "lessThan": "Less than",

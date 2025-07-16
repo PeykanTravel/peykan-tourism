@@ -3,6 +3,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User } from '../types/api';
 import { tokenService } from '../services/tokenService';
+import { useToast } from './ToastContext';
+import { errorHandler } from '../utils/errorHandler';
+import { useTranslations } from 'next-intl';
 
 interface AuthContextType {
   user: User | null;
@@ -19,6 +22,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { showError, showSuccess } = useToast();
+  const t = useTranslations();
+
+  // Initialize error handler
+  useEffect(() => {
+    errorHandler.initialize(showError, showSuccess, t);
+  }, [showError, showSuccess, t]);
 
   useEffect(() => {
     // Check authentication status on mount
@@ -57,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('Error checking auth status:', error);
+      errorHandler.handle(error, 'AUTH_CHECK');
       setUser(null);
       setIsAuthenticated(false);
     } finally {

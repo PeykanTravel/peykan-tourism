@@ -39,7 +39,73 @@
     "featuredEvents": "Öne Çıkan Etkinlikler",
     "featuredTransfers": "Öne Çıkan Transferler",
     "viewAll": "Tümünü Gör",
-    "bookNow": "Şimdi Rezervasyon Yap"
+    "bookNow": "Şimdi Rezervasyon Yap",
+    "heroTitle": "Unutulmaz Maceralar",
+    "heroSubtitle": "İstanbul'da en iyi turlar, etkinlikler ve transferleri rekabetçi fiyatlarla ve 7/24 destekle deneyimleyin",
+    "getStarted": "Başlayın",
+    "learnMore": "Daha Fazla Bilgi",
+    "testimonials": "Müşteri Yorumları",
+    "whyChooseUs": "Neden Bizi Seçmelisiniz",
+    "bestPrices": "En İyi Fiyatlar",
+    "bestPricesDesc": "Rekabetçi fiyatlar ve özel indirimler",
+    "expertGuides": "Uzman Rehberler",
+    "expertGuidesDesc": "Deneyimli ve profesyonel rehberler",
+    "safeTravel": "Güvenli Seyahat",
+    "safeTravelDesc": "Güvenli ve emniyetli seyahatler",
+    "customerSupport": "Müşteri Desteği",
+    "customerSupportDesc": "7/24 destek",
+    "newsletter": "Bülten",
+    "newsletterSubtitle": "En son turlar ve indirimler hakkında güncel kalın",
+    "emailPlaceholder": "E-posta adresinizi girin",
+    "subscribe": "Abone Ol",
+    "serviceTypes": {
+      "tours": "Gezinti Turları",
+      "events": "Etkinlikler ve Konserler",
+      "transfers": "Transfer Hizmetleri"
+    },
+    "slide2": {
+      "title": "İstanbul Turları",
+      "subtitle": "Türkiye'nin kalbinde unutulmaz deneyimler",
+      "tags": {
+        "daily": "Günlük Turlar",
+        "nightly": "Gece Turları",
+        "cruise": "Gemi Turları",
+        "private": "Özel Turlar"
+      }
+    },
+    "slide3": {
+      "title": "Etkinlikler ve Konserler",
+      "subtitle": "İstanbul'da en iyi kültürel ve sanatsal etkinlikler",
+      "tags": {
+        "concerts": "Konserler",
+        "shows": "Gösteriler",
+        "festivals": "Festivaller",
+        "special": "Özel Etkinlikler"
+      }
+    },
+    "searchForm": {
+      "destination": "Hedef...",
+      "participants": "{count} kişi",
+      "searchButton": "Ara ve Rezervasyon Yap"
+    },
+    "cta": {
+      "title": "Dünyayı Keşfetmeye Hazır mısınız?",
+      "subtitle": "Özel turlarımız ve destinasyonlarımızla sizin için unutulmaz anılar yaratmamıza izin verin.",
+      "button": "Şimdi Rezervasyon Yap",
+      "features": {
+        "support": "7/24 Destek",
+        "pricing": "En İyi Fiyat Garantisi",
+        "cancellation": "Ücretsiz İptal"
+      }
+    },
+    "footer": {
+      "about": "Hakkımızda",
+      "contact": "İletişim",
+      "terms": "Şartlar ve Koşullar",
+      "privacy": "Gizlilik Politikası",
+      "help": "Yardım",
+      "support": "Destek"
+    }
   },
   "tours": {
     "title": "Turlar",
@@ -422,9 +488,13 @@
     "tax": "Vergi",
     "cancel": "İptal",
     "participants": "Katılımcılar",
+    "adult": "Yetişkin",
     "adults": "Yetişkinler",
+    "child": "Çocuk",
     "children": "Çocuklar",
+    "infant": "Bebek",
     "infants": "Bebekler",
+    "totalParticipants": "Toplam Katılımcılar",
     "decreaseAdults": "Yetişkin sayısını azalt",
     "increaseAdults": "Yetişkin sayısını artır",
     "decreaseChildren": "Çocuk sayısını azalt",
@@ -624,6 +694,7 @@
     "selectDate": "Tarih Seç",
     "selectSchedule": "Program Seç",
     "selectVariant": "Varyant Seç",
+    "selectPackage": "Paket Seç",
     "selectOptions": "Seçenekleri Seç",
     "passengers": "Yolcular",
     "adults": "Yetişkinler",
@@ -661,6 +732,22 @@
     "discount": "İndirim",
     "finalPrice": "Son Fiyat",
     "bookThisTour": "Bu Turu Rezervasyon Yap",
+    "bookingNotAvailable": "Rezervasyon Mevcut Değil",
+    "availableSpots": "Mevcut yer",
+    "spots": "yer",
+    "noAvailableDates": "Mevcut tarih yok",
+    "additionalOptions": "Ek Seçenekler",
+    "priceSummary": "Fiyat Özeti",
+    "booking": "Rezervasyon yapılıyor...",
+    "notAvailable": "Mevcut Değil",
+    "guestUser": "Misafir Kullanıcı",
+    "guestUserMessage": "Öğeler oturumunuzda kaydedilecek.",
+    "loginToSync": "Senkronize etmek için giriş yapın",
+    "participants": "Katılımcılar",
+    "shareThis": "Bunu Paylaş",
+    "addToWishlist": "İstek Listesine Ekle",
+    "pickup": "Toplama",
+    "rating": "Değerlendirme",
     "addToCartSuccess": "Tur sepete eklendi",
     "addToCartError": "Sepete eklenirken hata oluştu",
     "backToTours": "Turlara Dön",
@@ -884,7 +971,10 @@
     "whewellite": "Vevellit",
     "moolooite": "Moluit",
     "humboldtine": "Humboldtin",
-    "oxammite": "Oksamit"
+    "oxammite": "Oksamit",
+    "transferService": "Transfer Hizmeti",
+    "professionalGuide": "Profesyonel Rehber",
+    "mealIncluded": "Yemek Dahil"
   },
   "style": {
     "music": "Müzik",

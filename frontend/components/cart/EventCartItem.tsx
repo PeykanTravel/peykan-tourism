@@ -4,16 +4,14 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import { EventCartItem as EventCartItemType } from '../../lib/hooks/useCart';
 import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Users, 
   Ticket,
-  Trash2,
   Star,
   Info,
-  Tag
+  Tag,
+  MapPin,
+  Users
 } from 'lucide-react';
+import BaseCartItem from './BaseCartItem';
 
 interface EventCartItemProps {
   item: EventCartItemType;
@@ -34,6 +32,7 @@ export default function EventCartItem({
 }: EventCartItemProps) {
   const t = useTranslations('Cart');
 
+<<<<<<< Updated upstream
   // Extract data directly from API response
   const seats = Array.isArray(item.booking_data?.seats)
     ? item.booking_data.seats.map((seat: any) => ({
@@ -127,9 +126,20 @@ export default function EventCartItem({
           >
             <Trash2 className="w-5 h-5" />
           </button>
+=======
+  // Custom details section for event-specific information
+  const customDetails = (
+    <div className="space-y-3">
+      {/* Event Venue */}
+      {item.location && (
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <MapPin className="h-4 w-4" />
+          <span>{item.location}</span>
+>>>>>>> Stashed changes
         </div>
-      </div>
+      )}
 
+<<<<<<< Updated upstream
       {/* Content */}
       <div className="p-6 space-y-6">
         {/* Section and Variant badges */}
@@ -146,8 +156,17 @@ export default function EventCartItem({
               Section: {section}
             </span>
           )}
+=======
+      {/* Event Rating */}
+      {(item as any).rating && (
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Star className="h-4 w-4 text-yellow-500" />
+          <span>{(item as any).rating}/5</span>
+>>>>>>> Stashed changes
         </div>
+      )}
 
+<<<<<<< Updated upstream
         {/* Seats Information */}
         {seats.length > 0 && (
           <div className="bg-gray-50 rounded-lg p-4">
@@ -378,7 +397,62 @@ export default function EventCartItem({
             ))}
           </div>
         </div>
+=======
+      {/* Event Capacity */}
+      {(item as any).capacity && (
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Users className="h-4 w-4" />
+          <span>{t('capacity')}: {(item as any).capacity}</span>
+        </div>
+      )}
+
+      {/* Selected Options */}
+      {item.selected_options && item.selected_options.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700">{t('selectedOptions')}:</h4>
+          <div className="space-y-1">
+            {item.selected_options.map((option, index) => (
+              <div key={index} className="flex justify-between items-center p-2 bg-purple-50 rounded">
+                <span className="text-sm">{(option as any).name || `Option ${option.option_id}`}</span>
+                <span className="text-sm font-medium text-purple-600">
+                  {option.price && option.price > 0 ? `+${formatPrice(option.price, item.currency)}` : t('free')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+>>>>>>> Stashed changes
       )}
     </div>
+  );
+
+  // Custom footer for event-specific actions
+  const customFooter = (
+    <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Ticket className="h-4 w-4 text-purple-600" />
+          <span className="text-sm font-medium text-purple-600">{t('eventTicket')}</span>
+        </div>
+        <div className="text-sm text-gray-600">
+          {t('quantity')}: {item.quantity}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <BaseCartItem
+      item={item}
+      isUpdating={isUpdating}
+      onQuantityChange={onQuantityChange}
+      onRemove={onRemove}
+      formatPrice={formatPrice}
+      formatDate={formatDate}
+      customIcon={<Ticket className="h-5 w-5" />}
+      customDetails={customDetails}
+      customFooter={customFooter}
+      className="border-l-4 border-purple-500"
+    />
   );
 } 

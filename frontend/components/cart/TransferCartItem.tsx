@@ -4,24 +4,27 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import { TransferCartItem as TransferCartItemType } from '../../lib/hooks/useCart';
 import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Users, 
   Car,
   ArrowRight,
-  Trash2,
-  Percent,
-  CreditCard,
-  Star,
   Shield,
   Wifi,
   Snowflake,
   Coffee,
   Music,
   Phone,
+<<<<<<< Updated upstream
   Zap
+=======
+  Zap,
+  Bus,
+  Timer,
+  Settings,
+  MessageSquare,
+  MapPin,
+  Users
+>>>>>>> Stashed changes
 } from 'lucide-react';
+import BaseCartItem from './BaseCartItem';
 
 interface TransferCartItemProps {
   item: TransferCartItemType;
@@ -42,6 +45,7 @@ export default function TransferCartItem({
 }: TransferCartItemProps) {
   const t = useTranslations('Cart');
 
+<<<<<<< Updated upstream
   // Extract route info from route_data
   const origin = item.route_data.origin || 'Unknown';
   const destination = item.route_data.destination || 'Unknown';
@@ -225,8 +229,45 @@ export default function TransferCartItem({
               </div>
             </div>
           )}
-        </div>
+=======
+  // Vehicle features mapping
+  const featureIcons = {
+    wifi: Wifi,
+    air_conditioning: Snowflake,
+    refreshments: Coffee,
+    music: Music,
+    phone_charger: Phone,
+    gps: Zap,
+    professional_driver: Shield,
+    extra_luggage: Settings,
+    child_seats: Users,
+    meet_and_greet: MessageSquare
+  };
 
+  // Custom details section for transfer-specific information
+  const customDetails = (
+    <div className="space-y-3">
+      {/* Route Information */}
+      <div className="bg-blue-50 rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-900">
+              {(item as any).origin || t('pickupLocation')}
+            </span>
+          </div>
+          <ArrowRight className="h-4 w-4 text-blue-600" />
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-900">
+              {(item as any).destination || t('dropoffLocation')}
+            </span>
+          </div>
+>>>>>>> Stashed changes
+        </div>
+      </div>
+
+<<<<<<< Updated upstream
         {/* Right Column - Options & Pricing */}
         <div className="space-y-4">
           {/* Selected Options */}
@@ -327,9 +368,90 @@ export default function TransferCartItem({
                 <span>Premium</span>
               </div>
             </div>
+=======
+      {/* Vehicle Information */}
+      {(item as any).vehicle_type && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700">{t('vehicleDetails')}:</h4>
+          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+            <Car className="h-4 w-4 text-gray-600" />
+            <span className="text-sm">{(item as any).vehicle_type}</span>
           </div>
+        </div>
+      )}
+
+      {/* Distance and Duration */}
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        {(item as any).distance && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <Timer className="h-4 w-4" />
+            <span>{t('distance')}: {(item as any).distance}</span>
+>>>>>>> Stashed changes
+          </div>
+        )}
+        {(item as any).estimated_duration && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <Timer className="h-4 w-4" />
+            <span>{t('duration')}: {(item as any).estimated_duration}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Vehicle Features */}
+      {(item as any).features && (item as any).features.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700">{t('includedFeatures')}:</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {(item as any).features.map((feature: string, index: number) => {
+              const IconComponent = featureIcons[feature as keyof typeof featureIcons] || Settings;
+              return (
+                <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                  <IconComponent className="h-3 w-3" />
+                  <span>{feature.replace('_', ' ')}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Passengers */}
+      {(item as any).passengers && (
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Users className="h-4 w-4" />
+          <span>{t('passengers')}: {(item as any).passengers}</span>
+        </div>
+      )}
+    </div>
+  );
+
+  // Custom footer for transfer-specific actions
+  const customFooter = (
+    <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bus className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-medium text-green-600">{t('transferService')}</span>
+        </div>
+        <div className="text-sm text-gray-600">
+          {t('bookingId')}: {item.id.substring(0, 8)}...
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <BaseCartItem
+      item={item}
+      isUpdating={isUpdating}
+      onQuantityChange={onQuantityChange}
+      onRemove={onRemove}
+      formatPrice={formatPrice}
+      formatDate={formatDate}
+      customIcon={<Car className="h-5 w-5" />}
+      customDetails={customDetails}
+      customFooter={customFooter}
+      className="border-l-4 border-green-500"
+    />
   );
 } 

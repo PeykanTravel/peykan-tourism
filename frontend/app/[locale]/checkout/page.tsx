@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl';
 import { useCart } from '../../../lib/hooks/useCart';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import { apiClient } from '../../../lib/api/client';
+import { API_CONFIG } from '../../../lib/config/api';
 import { 
   CreditCard, 
   Ban, 
@@ -147,20 +149,9 @@ export default function CheckoutPage() {
         payment_method: selectedPaymentMethod
       };
 
-      const response = await fetch('/api/v1/orders/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(orderData)
-      });
+      const response = await apiClient.post(API_CONFIG.ENDPOINTS.ORDERS.CREATE, orderData);
 
-      if (!response.ok) {
-        throw new Error(t('orderCreateError'));
-      }
-
-      const order = await response.json();
+      const order = response.data;
       
       // Clear cart after successful order
       clearCart();

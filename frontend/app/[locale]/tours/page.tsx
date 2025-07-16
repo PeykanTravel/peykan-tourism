@@ -3,6 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+<<<<<<< Updated upstream
+=======
+import { API_CONFIG, buildApiUrl, getAuthHeaders } from '../../../lib/config/api';
+import { apiClient } from '../../../lib/api/client';
+>>>>>>> Stashed changes
 import { 
   Search, 
   Filter, 
@@ -60,11 +65,18 @@ export default function ToursListPage() {
     const fetchTours = async () => {
       try {
         setIsLoading(true);
+<<<<<<< Updated upstream
         const response = await fetch('http://localhost:8000/api/v1/tours/tours/');
         if (response.ok) {
           const data = await response.json();
           // Enhance tour data with mock information for better display
           const enhancedTours = (Array.isArray(data) ? data : []).map((tour: Tour) => ({
+=======
+        const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOURS.LIST);
+        const data = response.data;
+        // Enhance tour data with mock information for better display
+        const enhancedTours = (Array.isArray(data) ? data : []).map((tour: Tour) => ({
+>>>>>>> Stashed changes
             ...tour,
             title: tour.title || `Tour: ${tour.slug}`,
             description: tour.description || 'Experience the beauty and culture of this amazing destination with our carefully crafted tour package.',
@@ -74,9 +86,6 @@ export default function ToursListPage() {
             category: tour.category || categories[Math.floor(Math.random() * categories.length)].id
           }));
           setTours(enhancedTours);
-        } else {
-          setError('Failed to load tours');
-        }
       } catch (error) {
         setError('Failed to load tours');
       } finally {

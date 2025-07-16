@@ -61,16 +61,29 @@ backend/
 ```
 frontend/
 ├── app/
-│   ├── components/     # Reusable UI components
-│   ├── lib/
-│   │   ├── api/        # API utilities with type safety
-│   │   ├── hooks/      # SWR hooks for data fetching
-│   │   └── types/      # TypeScript type definitions
-│   ├── i18n/           # Internationalization (EN, FA, TR)
-│   ├── tours/[slug]/   # Product detail pages
-│   ├── cart/           # Shopping cart
-│   ├── checkout/       # Checkout process
-│   └── orders/         # Order management
+│   ├── [locale]/       # Localized routes (en, fa, tr)
+│   │   ├── tours/      # Tour pages
+│   │   ├── events/     # Event pages
+│   │   ├── transfers/  # Transfer pages
+│   │   ├── cart/       # Shopping cart
+│   │   ├── checkout/   # Checkout process
+│   │   └── orders/     # Order management
+│   └── lib/
+│       ├── api/        # API utilities with type safety
+│       ├── hooks/      # SWR hooks for data fetching
+│       ├── contexts/   # React contexts (Auth, Cart, Theme, Toast)
+│       ├── services/   # Business logic services
+│       └── utils/      # Utility functions
+├── components/
+│   ├── ui/             # Base UI components
+│   ├── cart/           # Cart-specific components
+│   ├── home/           # Homepage components
+│   ├── events/         # Event components
+│   └── tours/          # Tour components
+├── i18n/               # Internationalization (EN, FA, TR)
+└── lib/
+    ├── design-system/  # Design tokens and themes
+    └── types/          # TypeScript type definitions
 ```
 
 ## 🚀 Key Features
@@ -111,6 +124,27 @@ frontend/
 - **Variant and option selection**
 - **Date-based availability**
 - **Order status tracking**
+
+### ✅ Modern Component Architecture
+- **Reusable base components** with composition patterns
+- **BaseCartItem** component for consistent cart UI
+- **Specialized components** for different product types
+- **Error boundary** system for graceful error handling
+- **Toast notification** system for user feedback
+
+### ✅ Enhanced Error Handling
+- **Centralized error processing** with categorization
+- **User-friendly error messages** with internationalization
+- **Automatic retry mechanisms** for failed operations
+- **Development vs production** error modes
+- **Toast notifications** for all user actions
+
+### ✅ Performance Optimizations
+- **Unified API client** with automatic token refresh
+- **Centralized configuration** management
+- **Consistent state management** across components
+- **Reduced code duplication** through refactoring
+- **Optimized re-renders** with React patterns
 
 ## 🛠️ Technology Stack
 

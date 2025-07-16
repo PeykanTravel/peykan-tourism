@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+<<<<<<< Updated upstream
 import { useState, useEffect } from 'react'
 import { FaPlay, FaPlane, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
@@ -12,6 +13,16 @@ export default function HeroSection() {
     price: '$1,000 - $2,000'
   })
 
+=======
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { MdEvent, MdDirectionsCar, MdTour } from 'react-icons/md'
+import Image from 'next/image'
+
+export default function HeroSection() {
+  const t = useTranslations('home')
+  
+>>>>>>> Stashed changes
   // Carousel states
   const [currentSlide, setCurrentSlide] = useState(0)
   const totalSlides = 3
@@ -28,43 +39,79 @@ export default function HeroSection() {
   const initialBottomText = 'WITH OUR'
   const newText = 'EASY ACCESS AND FREE TO SHOP'
 
+<<<<<<< Updated upstream
   // Auto-slide carousel
+=======
+  // Refs for cleanup
+  const slideIntervalRef = useRef<NodeJS.Timeout>()
+  const animationTimeoutRef = useRef<NodeJS.Timeout>()
+  const cursorIntervalRef = useRef<NodeJS.Timeout>()
+
+  // Hero background images
+  const heroImages = [
+    {
+      src: '/images/hero-main.jpg',
+      alt: 'Istanbul skyline - Hero main',
+      title: 'استانبول'
+    },
+    {
+      src: '/images/istanbul-fallback.jpg', 
+      alt: 'Istanbul tours - Fallback image',
+      title: 'تورهای استانبول'
+    },
+    {
+      src: '/images/event-center-image.jpg',
+      alt: 'Istanbul events - Event center',
+      title: 'رویدادهای استانبول'
+    }
+  ]
+
+  // Auto-slide carousel with cleanup
+>>>>>>> Stashed changes
   useEffect(() => {
     const slideInterval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % totalSlides)
-    }, 12000) // Change slide every 12 seconds
+    }, 12000)
 
     return () => clearInterval(slideInterval)
   }, [])
 
   // Text animation for first slide
   useEffect(() => {
-    if (currentSlide !== 0) return // Only animate on first slide
+    if (currentSlide !== 0) return
 
     let timeout: NodeJS.Timeout
 
     const runAnimation = () => {
       switch (animationPhase) {
         case 'initial':
+<<<<<<< Updated upstream
           // Show initial text for 2 seconds
           timeout = setTimeout(() => {
+=======
+          animationTimeoutRef.current = setTimeout(() => {
+>>>>>>> Stashed changes
             setAnimationPhase('waiting')
           }, 2000)
           break
 
         case 'waiting':
+<<<<<<< Updated upstream
           // Wait 1 second before starting to delete
           timeout = setTimeout(() => {
+=======
+          animationTimeoutRef.current = setTimeout(() => {
+>>>>>>> Stashed changes
             setAnimationPhase('deleting')
           }, 1000)
           break
 
         case 'deleting':
-          // Delete bottom text first
           if (bottomText.length > 0) {
             timeout = setTimeout(() => {
               setBottomText(prev => prev.slice(0, -1))
             }, 100)
+<<<<<<< Updated upstream
           }
           // Then delete middle text
           else if (middleText.length > 0) {
@@ -80,26 +127,39 @@ export default function HeroSection() {
           }
           // All text deleted, start typing new text
           else {
+=======
+          } else if (middleText.length > 0) {
+            animationTimeoutRef.current = setTimeout(() => {
+              setMiddleText(prev => prev.slice(0, -1))
+            }, 100)
+          } else if (topText.length > 0) {
+            animationTimeoutRef.current = setTimeout(() => {
+              setTopText(prev => prev.slice(0, -1))
+            }, 100)
+          } else {
+>>>>>>> Stashed changes
             setAnimationPhase('typing')
           }
           break
 
         case 'typing':
-          // Type the new text in top position
           if (topText.length < newText.length) {
             timeout = setTimeout(() => {
               setTopText(prev => newText.slice(0, prev.length + 1))
             }, 150)
           } else {
+<<<<<<< Updated upstream
             // Animation complete, restart after 5 seconds
             timeout = setTimeout(() => {
+=======
+            animationTimeoutRef.current = setTimeout(() => {
+>>>>>>> Stashed changes
               setAnimationPhase('resetting')
             }, 5000)
           }
           break
 
         case 'resetting':
-          // Reset to initial state
           setTopText(initialTopText)
           setMiddleText(initialMiddleText)
           setBottomText(initialBottomText)
@@ -124,6 +184,7 @@ export default function HeroSection() {
     return () => clearInterval(cursorInterval)
   }, [])
 
+<<<<<<< Updated upstream
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setSearchForm(prev => ({ ...prev, [name]: value }))
@@ -135,6 +196,9 @@ export default function HeroSection() {
   }
 
   const nextSlide = () => {
+=======
+  const nextSlide = useCallback(() => {
+>>>>>>> Stashed changes
     setCurrentSlide((prev) => (prev + 1) % totalSlides)
   }
 
@@ -149,31 +213,28 @@ export default function HeroSection() {
   const renderSlideContent = () => {
     switch (currentSlide) {
       case 0:
-        // First slide - Animated text
         return (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center text-white px-6">
-              {/* Top text line */}
               {topText && (
                 <h3 className="text-2xl md:text-3xl font-light mb-2 tracking-wide min-h-[2rem]">
                   {topText}
                 </h3>
               )}
               
-              {/* Middle text line */}
               {middleText && (
                 <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight min-h-[4rem]">
                   {middleText}
                 </h1>
               )}
               
-              {/* Bottom text line */}
               {bottomText && (
                 <h3 className="text-2xl md:text-3xl font-light mb-2 tracking-wide min-h-[2rem]">
                   {bottomText}
                 </h3>
               )}
               
+<<<<<<< Updated upstream
               {/* PEYKAN with cursor */}
               <div className="flex items-center justify-center gap-2 mt-4">
                 <span 
@@ -187,11 +248,17 @@ export default function HeroSection() {
                   PEYKAN
                 </h1>
               </div>
+=======
+              <p className="text-lg md:text-xl text-gray-200 mt-6 max-w-2xl mx-auto">
+                {t('heroSubtitle')}
+              </p>
+>>>>>>> Stashed changes
             </div>
           </div>
         )
 
       case 1:
+<<<<<<< Updated upstream
         // Second slide - Istanbul video
         return (
           <div className="absolute inset-0">
@@ -222,12 +289,29 @@ export default function HeroSection() {
                 <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto">
                   تجربه‌ای فراموش‌نشدنی از شهر دو قاره
                 </p>
+=======
+        return (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-white px-6">
+              <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
+                {t('slide2.title')}
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-200 mb-6">
+                {t('slide2.subtitle')}
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide2.tags.daily')}</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide2.tags.nightly')}</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide2.tags.cruise')}</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide2.tags.private')}</span>
+>>>>>>> Stashed changes
               </div>
             </div>
           </div>
         )
 
       case 2:
+<<<<<<< Updated upstream
         // Third slide - Concert hall
         return (
           <>
@@ -248,6 +332,22 @@ export default function HeroSection() {
                 <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto">
                   بهترین ایونت‌ها و کنسرت‌های دنیا
                 </p>
+=======
+        return (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-white px-6">
+              <h1 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
+                {t('slide3.title')}
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-200 mb-6">
+                {t('slide3.subtitle')}
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide3.tags.concerts')}</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide3.tags.shows')}</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide3.tags.festivals')}</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">{t('slide3.tags.special')}</span>
+>>>>>>> Stashed changes
               </div>
             </div>
           </>
@@ -256,6 +356,7 @@ export default function HeroSection() {
       default:
         return null
     }
+<<<<<<< Updated upstream
   }
 
   return (
@@ -277,6 +378,28 @@ export default function HeroSection() {
               
               {/* Slide Content */}
               {renderSlideContent()}
+=======
+  }, [currentSlide, topText, middleText, bottomText, showCursor, t])
+
+  return (
+    <section className="relative h-screen overflow-hidden" role="banner" aria-label="Hero Section">
+      {/* Background Images */}
+      <div className="absolute inset-0">
+        {heroImages.map((image, index) => (
+          <Image
+            key={index}
+            src={image.src}
+            alt={image.alt}
+            fill
+            className={`object-cover transition-opacity duration-1000 ${currentSlide === index ? 'opacity-100' : 'opacity-0'}`}
+            priority={index === 0}
+            sizes="100vw"
+            quality={85}
+          />
+        ))}
+        <div className="absolute inset-0 bg-black/40"></div>
+      </div>
+>>>>>>> Stashed changes
 
               {/* Navigation Arrows */}
               <button
@@ -293,6 +416,7 @@ export default function HeroSection() {
                 <FaChevronRight className="w-5 h-5" />
               </button>
 
+<<<<<<< Updated upstream
               {/* Slide Indicators */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 rtl:space-x-reverse">
                 {[...Array(totalSlides)].map((_, index) => (
@@ -382,6 +506,39 @@ export default function HeroSection() {
             </div>
           </div>
         </div>
+=======
+      {/* Navigation Arrows */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+        aria-label="Previous slide"
+      >
+        <FaChevronLeft className="w-6 h-6" />
+      </button>
+      
+      <button
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+        aria-label="Next slide"
+      >
+        <FaChevronRight className="w-6 h-6" />
+      </button>
+
+      {/* Slide Indicators */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        {Array.from({ length: totalSlides }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              currentSlide === index 
+                ? 'bg-white scale-125' 
+                : 'bg-white/50 hover:bg-white/75'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+>>>>>>> Stashed changes
       </div>
     </section>
   )

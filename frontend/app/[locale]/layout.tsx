@@ -1,10 +1,9 @@
-import '../globals.css';
 import { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Metadata } from 'next';
 import Navbar from '../../components/Navbar';
 import { AuthProvider } from '../../lib/contexts/AuthContext';
+<<<<<<< Updated upstream
 import { CartProvider } from '../../lib/contexts/CartContext';
 import type { Locale } from '@/i18n/config';
 
@@ -30,18 +29,23 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
 };
+=======
+import { CartProvider } from '../../lib/contexts/UnifiedCartContext';
+import { ThemeProvider } from '../../lib/contexts/ThemeContext';
+import { ToastProvider } from '../../lib/contexts/ToastContext';
+import { ErrorBoundary } from '../../components/ui/ErrorBoundary';
+>>>>>>> Stashed changes
 
 type Props = {
   children: ReactNode;
-  params: {
-    locale: Locale;
-  };
+  params: { locale: string };
 };
 
 export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
+<<<<<<< Updated upstream
     <html lang={params.locale} dir={params.locale === 'fa' ? 'rtl' : 'ltr'}>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white min-h-screen">
         <NextIntlClientProvider locale={params.locale} messages={messages}>
@@ -58,5 +62,21 @@ export default async function LocaleLayout({ children, params }: Props) {
         </NextIntlClientProvider>
       </body>
     </html>
+=======
+    <ErrorBoundary>
+      <NextIntlClientProvider locale={params.locale} messages={messages}>
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <Navbar />
+                <main className="flex-1">{children}</main>
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </NextIntlClientProvider>
+    </ErrorBoundary>
+>>>>>>> Stashed changes
   );
 } 

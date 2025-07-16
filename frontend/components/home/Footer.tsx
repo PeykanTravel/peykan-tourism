@@ -86,7 +86,7 @@ export default function Footer() {
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 bg-gray-800 hover:bg-green-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
                 >
                   <FaWhatsapp className="w-5 h-5" />
                 </a>

@@ -13,6 +13,7 @@ import type {
   UpdateCartItemPayload 
 } from '../types/api';
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../../lib/contexts/AuthContext';
 
 // Helper to get auth token
 const getAuthToken = () => {
@@ -159,6 +160,7 @@ const cartSummaryFetcher = async (url: string, token: string) => {
 
 // Hook for cart data - Updated for local cart support
 export const useCart = () => {
+  const { user, isAuthenticated } = useAuth();
   const [isClient, setIsClient] = useState(false);
   const [localItems, setLocalItems] = useState<CartItem[]>([]);
   const [localTotalItems, setLocalTotalItems] = useState(0);
@@ -174,11 +176,10 @@ export const useCart = () => {
   }, []);
 
   const token = getAuthToken();
-  const isAuthenticated = !!token;
   
   // For authenticated users, use SWR
   const { data, error, isLoading, mutate } = useSWR(
-    isAuthenticated ? ['/api/cart', token] : null,
+    isAuthenticated && token ? ['/api/cart', token] : null,
     ([url, authToken]) => cartFetcher(url, authToken),
     {
       revalidateOnFocus: false,

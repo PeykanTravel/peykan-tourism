@@ -4,17 +4,14 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import { TourCartItem as TourCartItemType } from '../../lib/hooks/useCart';
 import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Users, 
   User, 
   Baby, 
   Smile,
   Plus,
   Minus,
-  Trash2
+  MapPin
 } from 'lucide-react';
+import BaseCartItem from './BaseCartItem';
 
 interface TourCartItemProps {
   item: TourCartItemType;
@@ -37,27 +34,38 @@ export default function TourCartItem({
 }: TourCartItemProps) {
   const t = useTranslations('Cart');
 
+<<<<<<< Updated upstream
   const participants = item.participants;
   const totalParticipants = participants.adult + participants.child + participants.infant;
+=======
+  const participantTypes = [
+    { key: 'adult', label: t('adult'), icon: User },
+    { key: 'child', label: t('child'), icon: Smile },
+    { key: 'infant', label: t('infant'), icon: Baby }
+  ];
 
-  return (
-    <div className="p-6 border-b border-gray-200 last:border-b-0">
-      <div className="flex gap-4">
-        {/* Item Image */}
-        <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0">
-          {item.image ? (
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <MapPin className="w-8 h-8 text-gray-400" />
-            </div>
-          )}
+  const handleParticipantChange = (type: 'adult' | 'child' | 'infant', change: number) => {
+    const currentCount = item.booking_data.participants?.[type] || 0;
+    const newCount = Math.max(0, currentCount + change);
+    onParticipantChange(item.id, type, newCount);
+  };
+
+  const totalParticipants = item.booking_data.participants ? 
+    item.booking_data.participants.adult + item.booking_data.participants.child + item.booking_data.participants.infant : 
+    0;
+>>>>>>> Stashed changes
+
+  // Custom details section for tour-specific information
+  const customDetails = (
+    <div className="space-y-3">
+      {/* Tour Duration */}
+      {(item.booking_data as any).duration && (
+        <div className="text-sm text-gray-600">
+          <span className="font-medium">{t('duration')}:</span> {(item.booking_data as any).duration}
         </div>
+      )}
 
+<<<<<<< Updated upstream
         {/* Item Details */}
         <div className="flex-1">
           {/* Title and Variant */}
@@ -215,21 +223,78 @@ export default function TourCartItem({
                 {formatPrice(item.subtotal, item.currency)}
               </div>
             </div>
+=======
+      {/* Participants Breakdown */}
+      {item.booking_data.participants && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700">{t('participants')}:</h4>
+          <div className="grid grid-cols-1 gap-2">
+            {participantTypes.map(({ key, label, icon: Icon }) => {
+              const count = item.booking_data.participants?.[key as keyof typeof item.booking_data.participants] || 0;
+              return (
+                <div key={key} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">{label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleParticipantChange(key as 'adult' | 'child' | 'infant', -1)}
+                      disabled={isUpdating || count <= 0}
+                      className="p-1 rounded hover:bg-gray-200 disabled:opacity-50"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <span className="mx-2 text-sm font-medium">{count}</span>
+                    <button
+                      onClick={() => handleParticipantChange(key as 'adult' | 'child' | 'infant', 1)}
+                      disabled={isUpdating}
+                      className="p-1 rounded hover:bg-gray-200 disabled:opacity-50"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-sm text-gray-500 text-right">
+            {t('totalParticipants')}: {totalParticipants}
+>>>>>>> Stashed changes
           </div>
         </div>
+      )}
 
-        {/* Remove Button */}
-        <div className="flex flex-col items-end gap-2">
-          <button
-            onClick={() => onRemove(item.id)}
-            disabled={isUpdating}
-            className="text-red-600 hover:text-red-700 p-2 rounded hover:bg-red-50 disabled:opacity-50"
-            title={t('removeItem')}
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+      {/* Selected Options */}
+      {item.selected_options && item.selected_options.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700">{t('selectedOptions')}:</h4>
+          <div className="space-y-1">
+            {item.selected_options.map((option, index) => (
+              <div key={index} className="flex justify-between items-center p-2 bg-blue-50 rounded">
+                <span className="text-sm">{(option as any).name || `Option ${option.option_id}`}</span>
+                <span className="text-sm font-medium text-blue-600">
+                  {option.price && option.price > 0 ? `+${formatPrice(option.price, item.currency)}` : t('free')}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
+  );
+
+  return (
+    <BaseCartItem
+      item={item}
+      isUpdating={isUpdating}
+      onQuantityChange={onQuantityChange}
+      onRemove={onRemove}
+      formatPrice={formatPrice}
+      formatDate={formatDate}
+      customIcon={<MapPin className="h-5 w-5" />}
+      customDetails={customDetails}
+      showQuantityControls={false} // Tour uses participant-based controls
+    />
   );
 } 

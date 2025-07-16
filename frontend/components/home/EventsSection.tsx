@@ -12,7 +12,11 @@ export default function EventsSection() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="text-sm uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-4">
+<<<<<<< Updated upstream
             SPECIAL EVENTS
+=======
+            events
+>>>>>>> Stashed changes
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             SPECIAL EVENTS
@@ -76,10 +80,16 @@ export default function EventsSection() {
               </div>
 
               {/* Content below image - fills remaining space (40% of height) */}
+<<<<<<< Updated upstream
               <div className="flex-1 flex flex-col justify-center p-8">
                 <div className="max-w-2xl">
                   <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900 dark:text-white">
                     تجربه<br />
+=======
+              <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 mt-6 shadow-xl">
+                <div className="h-full flex flex-col justify-center">
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+>>>>>>> Stashed changes
                     ایونت‌های آینده
                   </h2>
                   <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -87,17 +97,48 @@ export default function EventsSection() {
                     از کنسرت‌ها گرفته تا نمایش‌های تئاتر و رویدادهای ورزشی.
                   </p>
                   
+<<<<<<< Updated upstream
                   <div className="flex flex-wrap items-center gap-6">
                     <Link 
                       href="/events"
                       className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+=======
+                  {/* Event Stats */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">50+</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">ایونت ماهانه</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">10K+</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">شرکت‌کننده</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-700 dark:text-blue-500 mb-2">95%</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">رضایت مشتری</div>
+                    </div>
+                  </div>
+                  
+                  {/* CTA Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Link 
+                      href="/events"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                      aria-label="Browse all events"
+>>>>>>> Stashed changes
                     >
                       رزرو کنید
                     </Link>
                     
                     <Link 
+<<<<<<< Updated upstream
                       href="/events"
                       className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-lg hover:underline transition-colors duration-300"
+=======
+                      href="/events?filter=upcoming"
+                      className="bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                      aria-label="View upcoming events"
+>>>>>>> Stashed changes
                     >
                       مشاهده ایونت‌های بیشتر
                     </Link>

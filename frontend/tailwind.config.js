@@ -76,6 +76,18 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'), 
-    require('@tailwindcss/typography')
+    require('@tailwindcss/typography'),
+    // RTL Support
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.rtl': {
+          direction: 'rtl',
+        },
+        '.ltr': {
+          direction: 'ltr',
+        },
+      }
+      addUtilities(newUtilities)
+    }
   ],
 } 

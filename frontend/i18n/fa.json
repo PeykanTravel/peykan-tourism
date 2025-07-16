@@ -15,7 +15,10 @@
     "orders": "سفارشات",
     "wishlist": "علاقه‌مندی‌ها",
     "logout": "خروج",
-    "loading": "در حال بارگذاری..."
+    "loading": "در حال بارگذاری...",
+    "pageNotFound": "صفحه یافت نشد",
+    "pageNotFoundDescription": "متأسفانه صفحه‌ای که به دنبال آن هستید وجود ندارد.",
+    "goHome": "بازگشت به خانه"
   },
   "navigation": {
     "home": "خانه",
@@ -149,6 +152,46 @@
     "newsletterSubtitle": "از آخرین تورها و تخفیف‌ها باخبر شوید",
     "emailPlaceholder": "ایمیل خود را وارد کنید",
     "subscribe": "عضویت",
+    "serviceTypes": {
+      "tours": "تورهای تفریحی",
+      "events": "رویدادها و کنسرت",
+      "transfers": "خدمات ترانسفر"
+    },
+    "slide2": {
+      "title": "تورهای استانبول",
+      "subtitle": "تجربه‌ای فراموش‌نشدنی در قلب ترکیه",
+      "tags": {
+        "daily": "تورهای روزانه",
+        "nightly": "تورهای شبانه",
+        "cruise": "تورهای دریایی",
+        "private": "تورهای خصوصی"
+      }
+    },
+    "slide3": {
+      "title": "رویدادها و کنسرت",
+      "subtitle": "بهترین رویدادهای فرهنگی و هنری استانبول",
+      "tags": {
+        "concerts": "کنسرت‌ها",
+        "shows": "نمایش‌ها",
+        "festivals": "فستیوال‌ها",
+        "special": "رویدادهای ویژه"
+      }
+    },
+    "searchForm": {
+      "destination": "مقصد مورد نظر...",
+      "participants": "{count} نفر",
+      "searchButton": "جستجو و رزرو"
+    },
+    "cta": {
+      "title": "آماده کاوش جهان هستید؟",
+      "subtitle": "اجازه دهید با تورها و مقاصد ویژه‌مان، خاطرات فراموش‌نشدنی برایتان بسازیم.",
+      "button": "همین حالا رزرو کنید",
+      "features": {
+        "support": "پشتیبانی 24 ساعته",
+        "pricing": "بهترین قیمت تضمینی",
+        "cancellation": "لغو رایگان"
+      }
+    },
     "footer": {
       "about": "درباره ما",
       "contact": "تماس با ما",
@@ -248,7 +291,7 @@
     "passwordWeak": "رمز عبور باید حداقل ۸ کاراکتر، شامل حروف بزرگ و کوچک، عدد و کاراکتر خاص باشد.",
     "passwordHelp": "رمز عبور باید حداقل ۸ کاراکتر، شامل حروف بزرگ و کوچک، عدد و کاراکتر خاص باشد."
   },
-  "tourDetail": {
+  "TourDetail": {
     "title": "جزئیات تور",
     "description": "توضیحات",
     "highlights": "نکات برجسته",
@@ -263,6 +306,7 @@
     "selectDate": "انتخاب تاریخ",
     "selectSchedule": "انتخاب برنامه",
     "selectVariant": "انتخاب نوع",
+    "selectPackage": "انتخاب بسته",
     "selectOptions": "انتخاب گزینه‌ها",
     "passengers": "مسافران",
     "adults": "بزرگسالان",
@@ -310,11 +354,24 @@
     "discount": "تخفیف",
     "finalPrice": "قیمت نهایی",
     "bookThisTour": "این تور را رزرو کنید",
+    "bookingNotAvailable": "امکان رزرو وجود ندارد",
+    "availableSpots": "ظرفیت موجود",
+    "spots": "جا",
+    "noAvailableDates": "تاریخ موجود نیست",
+    "additionalOptions": "گزینه‌های اضافی",
+    "priceSummary": "خلاصه قیمت",
+    "booking": "در حال رزرو...",
+    "notAvailable": "موجود نیست",
+    "guestUser": "کاربر مهمان",
+    "guestUserMessage": "آیتم‌ها در جلسه شما ذخیره می‌شوند.",
+    "loginToSync": "وارد شوید تا همگام سازی کنید",
     "addToCartSuccess": "تور به سبد خرید اضافه شد",
     "addToCartError": "خطا در افزودن به سبد خرید",
     "backToTours": "بازگشت به تورها",
-    "share": "اشتراک‌گذاری",
-    "favorite": "علاقه‌مندی",
+    "shareThis": "اشتراک‌گذاری",
+    "addToWishlist": "افزودن به علاقه‌مندی‌ها",
+    "pickup": "محل جمع‌آوری",
+    "rating": "امتیاز",
     "gallery": "گالری",
     "location": "مکان",
     "duration": "مدت زمان",
@@ -341,6 +398,9 @@
     "meals": "وعده‌های غذایی",
     "activities": "فعالیت‌ها",
     "equipment": "تجهیزات",
+    "transferService": "خدمات انتقال",
+    "professionalGuide": "راهنمای حرفه‌ای",
+    "mealIncluded": "وعده غذایی شامل",
     "guide": "راهنما",
     "photographer": "عکاس",
     "transfer": "ترنسفر",
@@ -1216,7 +1276,14 @@
     "emptyCartDescription": "برای شروع خرید، محصولی را انتخاب کنید",
     "browseTours": "مرور تورها",
     "browseEvents": "مرور رویدادها",
-    "bookTransfers": "رزرو ترنسفر"
+    "bookTransfers": "رزرو ترنسفر",
+    "adult": "بزرگسال",
+    "adults": "بزرگسالان",
+    "child": "کودک",
+    "children": "کودکان",
+    "infant": "نوزاد",
+    "infants": "نوزادان",
+    "totalParticipants": "مجموع شرکت‌کنندگان"
   },
   "checkout": {
     "orderSummary": "خلاصه سفارش",

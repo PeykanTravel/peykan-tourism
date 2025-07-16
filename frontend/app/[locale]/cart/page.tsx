@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { useCart, CartItem, TourCartItem, EventCartItem, TransferCartItem } from '../../../lib/hooks/useCart';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 import { tokenService } from '../../../lib/services/tokenService';
+import { apiClient } from '../../../lib/api/client';
+import { API_CONFIG } from '../../../lib/config/api';
+import { useErrorHandler } from '../../../lib/utils/errorHandler';
 import TourCartItemComponent from '../../../components/cart/TourCartItem';
 import EventCartItemComponent from '../../../components/cart/EventCartItem';
 import TransferCartItemComponent from '../../../components/cart/TransferCartItem';
@@ -23,6 +26,7 @@ export default function CartPage() {
   const t = useTranslations('Cart');
   const { items, totalItems, totalPrice, currency, updateItem, removeItem, clearCart, refreshCart } = useCart();
   const { isAuthenticated, user, isLoading } = useAuth();
+  const { handleError, handleSuccess } = useErrorHandler();
   
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -53,12 +57,10 @@ export default function CartPage() {
         // Refresh cart to update navbar count
         await refreshCart();
       } else {
-        console.error('Failed to update cart item:', result.error);
-        alert('خطا در به‌روزرسانی تعداد. لطفاً دوباره تلاش کنید.');
+        handleError(new Error(result.error || 'Update failed'), 'CART_UPDATE_QUANTITY');
       }
     } catch (error) {
-      console.error('Error updating quantity:', error);
-      alert('خطا در به‌روزرسانی تعداد. لطفاً دوباره تلاش کنید.');
+      handleError(error, 'CART_UPDATE_QUANTITY');
     } finally {
       setIsUpdating(null);
     }
@@ -88,12 +90,14 @@ export default function CartPage() {
           throw new Error('No authentication token found');
         }
         
-        const response = await fetch(`http://localhost:8000/api/v1/cart/items/${itemId}/update/`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+        const response = await apiClient.patch(API_CONFIG.ENDPOINTS.CART.UPDATE(itemId), {
+          booking_data: {
+            participants: updatedParticipants,
+            schedule_id: item.booking_data.schedule_id,
+            variant_id: item.variant_id,
+            special_requests: item.booking_data.special_requests || ''
           },
+<<<<<<< Updated upstream
           body: JSON.stringify({
             booking_data: {
               participants: updatedParticipants,
@@ -103,21 +107,18 @@ export default function CartPage() {
             },
             selected_options: tourItem.selected_options
           })
+=======
+          selected_options: item.selected_options
+>>>>>>> Stashed changes
         });
         
-        if (!response.ok) {
-          throw new Error(`Failed to update cart item: ${response.statusText}`);
-        }
-        
-        const updatedItem = await response.json();
-        console.log('Updated cart item:', updatedItem);
+        console.log('Updated cart item:', response.data);
         
         // Refresh cart data
         await refreshCart();
       }
-    } catch (error) {
-      console.error('Error updating participants:', error);
-      alert('خطا در به‌روزرسانی شرکت‌کنندگان. لطفاً دوباره تلاش کنید.');
+    } catch (error) {        
+        handleError(error, 'CART_UPDATE_PARTICIPANTS');
     } finally {
       setIsUpdating(null);
     }

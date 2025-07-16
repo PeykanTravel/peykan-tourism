@@ -3,9 +3,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+<<<<<<< Updated upstream
 import { useCart, TourCartItem } from '../../../../lib/hooks/useCart';
 import { useAuth } from '../../../../lib/contexts/AuthContext';
 import { tokenService } from '../../../../lib/services/tokenService';
+=======
+import { useCart } from '../../../../lib/contexts/UnifiedCartContext';
+import { useAuth } from '../../../../lib/contexts/AuthContext';
+import { API_CONFIG } from '../../../../lib/config/api';
+import { apiClient } from '../../../../lib/api/client';
+>>>>>>> Stashed changes
 import { 
   Calendar, 
   Clock, 
@@ -28,9 +35,18 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
-  Minus
+  Minus,
+  ArrowLeft,
+  Globe,
+  DollarSign,
+  Timer,
+  Award,
+  Shield,
+  Check,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface TourVariant {
   id: string;
@@ -134,6 +150,8 @@ interface Tour {
   start_time: string;
   end_time: string;
   min_participants: number;
+  city: string;
+  country: string;
   category: {
     id: string;
     name: string;
@@ -190,6 +208,8 @@ export default function TourDetailPage() {
   const [specialRequests, setSpecialRequests] = useState('');
   const [isBooking, setIsBooking] = useState(false);
   const [bookingMessage, setBookingMessage] = useState<string | null>(null);
+  const [showGallery, setShowGallery] = useState(false);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   
   // UI state
   const [activeTab, setActiveTab] = useState<'overview' | 'itinerary' | 'reviews' | 'pricing'>('overview');
@@ -200,17 +220,20 @@ export default function TourDetailPage() {
     const fetchTour = async () => {
       try {
         setIsLoading(true);
+<<<<<<< Updated upstream
         const response = await fetch(`http://localhost:8000/api/v1/tours/${slug}/`);
         if (response.ok) {
           const data = await response.json();
           setTour(data);
+=======
+        const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOURS.DETAIL(slug));
+        const data = response.data;
+        setTour(data);
+>>>>>>> Stashed changes
           
-          // Set default variant if available
-          if (data.variants && data.variants.length > 0) {
-            setSelectedVariant(data.variants[0]);
-          }
-        } else {
-          setError('Tour not found');
+        // Set default variant if available
+        if (data.variants && data.variants.length > 0) {
+          setSelectedVariant(data.variants[0]);
         }
       } catch (error) {
         console.error('Error fetching tour:', error);
@@ -299,25 +322,112 @@ export default function TourDetailPage() {
   const getBookingErrorMessage = () => {
     if (!tour) return 'تور یافت نشد.';
     
+    if (!tour.is_active) return 'این تور فعال نیست.';
+    
     if (!tour.schedules || tour.schedules.length === 0) {
-      return 'این تور در حال حاضر قابل رزرو نیست. دلیل: عدم وجود تاریخ‌های فعال';
+      return 'برای این تور برنامه‌ای تعریف نشده است.';
+    }
+    
+    const hasActiveSchedules = tour.schedules.some(s => s.is_available);
+    if (!hasActiveSchedules) {
+      return 'در حال حاضر تاریخ موجود برای این تور وجود ندارد.';
     }
     
     if (!tour.variants || tour.variants.length === 0) {
-      return 'این تور در حال حاضر قابل رزرو نیست. دلیل: عدم وجود پکیج‌های قابل انتخاب';
+      return 'برای این تور نوع یا بسته‌ای تعریف نشده است.';
+    }
+    
+    const hasActiveVariants = tour.variants.some(v => v.is_active);
+    if (!hasActiveVariants) {
+      return 'تمام انواع این تور غیرفعال هستند.';
     }
     
     if (!tour.pricing_summary || Object.keys(tour.pricing_summary).length === 0) {
-      return 'این تور در حال حاضر قابل رزرو نیست. دلیل: نقص اطلاعات قیمت‌گذاری';
+      return 'قیمت‌گذاری این تور کامل نیست.';
     }
     
     return null;
+  };
+
+  // Handle booking
+  const handleBooking = async () => {
+    if (!tour || !selectedSchedule || !selectedVariant) return;
+
+    const totalParticipants = participants.adult + participants.child + participants.infant;
+    if (totalParticipants === 0) {
+      setBookingMessage('لطفاً حداقل یک نفر انتخاب کنید.');
+      return;
+    }
+
+    const pricing = calculatePricing();
+    if (!pricing || pricing.hasPricingError) {
+      setBookingMessage('خطا در محاسبه قیمت.');
+      return;
+    }
+
+    try {
+      setIsBooking(true);
+      setBookingMessage(null);
+
+             // Create cart item
+       const cartItem = {
+         id: `${tour.id}-${selectedVariant.id}-${selectedSchedule.id}`,
+         product_type: 'tour' as const,
+         product_id: tour.id,
+         variant_id: selectedVariant.id,
+         schedule_id: selectedSchedule.id,
+         title: tour.title,
+         variant_name: selectedVariant.name,
+         schedule_date: selectedSchedule.start_date,
+         schedule_time: `${selectedSchedule.start_time} - ${selectedSchedule.end_time}`,
+         booking_date: selectedSchedule.start_date,
+         booking_time: selectedSchedule.start_time,
+         participants,
+         selected_options: Object.entries(selectedOptions).map(([optionId, quantity]) => {
+           const option = tour.options.find(o => o.id === optionId);
+           return {
+             option_id: optionId,
+             quantity,
+             price: option ? option.price : 0
+           };
+         }).filter(option => option.quantity > 0),
+         special_requests: specialRequests,
+         quantity: participants.adult + participants.child + participants.infant,
+         unit_price: selectedVariant.base_price,
+         total_price: pricing.total,
+         options_total: pricing.breakdown.options,
+         currency: tour.currency,
+         image: tour.image,
+         duration: `${tour.duration_hours} hours`,
+         location: `${tour.city}, ${tour.country}`,
+         booking_data: {
+           schedule_id: selectedSchedule.id,
+           participants,
+           special_requests: specialRequests
+         }
+       };
+
+      await addItem(cartItem);
+      setBookingMessage('تور با موفقیت به سبد خرید اضافه شد!');
+      
+      // Reset form
+      setParticipants({ adult: 1, child: 0, infant: 0 });
+      setSelectedOptions({});
+      setSpecialRequests('');
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      setBookingMessage('خطا در افزودن به سبد خرید.');
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   const pricing = calculatePricing();
   const isBookable = isTourBookable();
   const bookingError = getBookingErrorMessage();
 
+<<<<<<< Updated upstream
   // Handle booking
   const handleBooking = async () => {
     if (!tour || !selectedVariant || !selectedSchedule || !isBookable) return;
@@ -427,24 +537,36 @@ export default function TourDetailPage() {
     }
   };
 
+=======
+>>>>>>> Stashed changes
   // Toggle section expansion
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(section)) {
-        newSet.delete(section);
-      } else {
-        newSet.add(section);
-      }
-      return newSet;
-    });
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(section)) {
+      newExpanded.delete(section);
+    } else {
+      newExpanded.add(section);
+    }
+    setExpandedSections(newExpanded);
   };
 
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+              <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -452,374 +574,364 @@ export default function TourDetailPage() {
   // Error state
   if (error || !tour) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('tourNotFound')}</h1>
-            <p className="text-gray-600 mb-8">{error || t('tourNotFoundMessage')}</p>
-            <div className="space-x-4">
-              <Link
-                href={`/${locale}/tours`}
-                className="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                {t('backToTours')}
-              </Link>
-              <Link
-                href={`/${locale}`}
-                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {t('backToHome')}
-              </Link>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {t('error')}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {error || 'Tour not found'}
+          </p>
+          <Link 
+            href={`/${locale}/tours`}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('backToTours')}
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative h-full flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">{tour.title}</h1>
-                          <div className="flex items-center justify-center space-x-4 text-lg">
-              <div className="flex items-center">
-                <Star className="w-5 h-5 text-yellow-400 mr-2" />
-                <span>{tour.average_rating?.toFixed(1) || 'N/A'} ({tour.review_count || 0} {t('reviews')})</span>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Header Navigation */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link 
+                href={`/${locale}/tours`}
+                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                {t('backToTours')}
+              </Link>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {tour.category?.name} • {tour.city}, {tour.country}
               </div>
-              <div className="flex items-center">
-                <Clock className="w-5 h-5 mr-2" />
-                <span>{tour.duration_hours} {t('hours')}</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="w-5 h-5 mr-2" />
-                <span>{t('max')} {tour.max_participants} {t('people')}</span>
-              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <button className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+                <Heart className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Navigation Tabs */}
-            <div className="bg-white rounded-lg shadow-sm">
-              <div className="border-b border-gray-200">
-                <nav className="flex space-x-8 px-6">
+          {/* Left Column - Tour Information */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Hero Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
+              {/* Tour Image */}
+              <div className="relative h-64 md:h-80">
+                {tour.image ? (
+                  <Image 
+                    src={tour.image} 
+                    alt={tour.title}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center">
+                    <Camera className="w-16 h-16 text-blue-600 dark:text-blue-400" />
+                  </div>
+                )}
+                
+                {/* Gallery Button */}
+                {tour.gallery && tour.gallery.length > 0 && (
+                  <button
+                    onClick={() => setShowGallery(true)}
+                    className="absolute bottom-4 right-4 bg-black/50 text-white px-4 py-2 rounded-xl backdrop-blur-sm hover:bg-black/70 transition-colors"
+                  >
+                    <Camera className="w-4 h-4 mr-2 inline" />
+                    {tour.gallery.length} {t('photos')}
+                  </button>
+                )}
+              </div>
+
+              {/* Tour Info */}
+              <div className="p-6">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                  {tour.title}
+                </h1>
+                
+                {/* Quick Info */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <Clock className="w-4 h-4 mr-2 text-blue-600" />
+                    {tour.duration_hours} {t('hours')}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <Users className="w-4 h-4 mr-2 text-blue-600" />
+                    {tour.max_participants} {t('people')}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <MapPin className="w-4 h-4 mr-2 text-blue-600" />
+                    {tour.city}, {tour.country}
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <Star className="w-4 h-4 mr-2 text-yellow-500" />
+                    {tour.average_rating || 'N/A'} ({tour.review_count || 0})
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="prose dark:prose-invert max-w-none">
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {tour.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+              <div className="border-b border-gray-200 dark:border-gray-700">
+                <nav className="flex space-x-8 px-6" aria-label="Tabs">
                   {[
-                    { id: 'overview', label: t('overview'), icon: Info },
-                    { id: 'itinerary', label: t('itinerary'), icon: MapPin },
-                    { id: 'reviews', label: t('reviews'), icon: Star },
-                    { id: 'pricing', label: t('pricing'), icon: ShoppingCart }
-                  ].map(({ id, label, icon: Icon }) => (
+                    { id: 'overview', label: t('overview') },
+                    { id: 'itinerary', label: t('itinerary') },
+                    { id: 'reviews', label: t('reviews') },
+                    { id: 'pricing', label: t('pricing') }
+                  ].map((tab) => (
                     <button
-                      key={id}
-                      onClick={() => setActiveTab(id as any)}
-                      className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
-                        activeTab === id
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as any)}
+                      className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                        activeTab === tab.id
+                          ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                       }`}
                     >
-                      <Icon className="w-4 h-4 mr-2" />
-                      {label}
+                      {tab.label}
                     </button>
                   ))}
                 </nav>
               </div>
 
+              {/* Tab Content */}
               <div className="p-6">
-                {/* Overview Tab */}
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
-                    {/* Tour Info */}
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('information')}</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-center">
-                          <Calendar className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('type')}: {tour.tour_type === 'day' ? t('dayTour') : t('nightTour')}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Bus className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('transport')}: {tour.transport_type === 'boat' ? t('boat') : tour.transport_type === 'air' ? t('air') : t('land')}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('duration')}: {tour.duration_hours} {t('hours')}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Users className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('capacity')}: {tour.min_participants}-{tour.max_participants} {t('people')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('description')}</h3>
-                      <p className="text-gray-700 leading-relaxed">{tour.description}</p>
-                    </div>
-
                     {/* Highlights */}
                     {tour.highlights && (
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('highlights')}</h3>
-                        <div className="bg-blue-50 rounded-lg p-4">
-                          <p className="text-blue-800">{tour.highlights}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          {t('highlights')}
+                        </h3>
+                        <div className="prose dark:prose-invert max-w-none">
+                          <p className="text-gray-700 dark:text-gray-300">{tour.highlights}</p>
                         </div>
                       </div>
                     )}
 
                     {/* Included Services */}
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('includedServices')}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        {t('includedServices')}
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {tour.includes_transfer && (
-                          <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                          <div className="flex items-center text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-3" />
                             <span>{t('transferService')}</span>
                           </div>
                         )}
                         {tour.includes_guide && (
-                          <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                          <div className="flex items-center text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-3" />
                             <span>{t('professionalGuide')}</span>
                           </div>
                         )}
                         {tour.includes_meal && (
-                          <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
+                          <div className="flex items-center text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-3" />
                             <span>{t('mealIncluded')}</span>
                           </div>
                         )}
                         {tour.includes_photographer && (
-                          <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-                            <span>{t('photographer')}</span>
+                          <div className="flex items-center text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-5 h-5 mr-3" />
+                            <span>Professional Photography</span>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Rules and Required Items */}
+                    {/* Rules */}
                     {tour.rules && (
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('rulesAndRegulations')}</h3>
-                        <div className="bg-yellow-50 rounded-lg p-4">
-                          <p className="text-yellow-800">{tour.rules}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          {t('rules')}
+                        </h3>
+                        <div className="prose dark:prose-invert max-w-none">
+                          <p className="text-gray-700 dark:text-gray-300">{tour.rules}</p>
                         </div>
                       </div>
                     )}
 
+                    {/* Required Items */}
                     {tour.required_items && (
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('requiredItems')}</h3>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="text-gray-700">{tour.required_items}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          {t('requiredItems')}
+                        </h3>
+                        <div className="prose dark:prose-invert max-w-none">
+                          <p className="text-gray-700 dark:text-gray-300">{tour.required_items}</p>
                         </div>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Itinerary Tab */}
                 {activeTab === 'itinerary' && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('tourItinerary')}</h2>
                     {tour.itinerary && tour.itinerary.length > 0 ? (
                       tour.itinerary.map((item, index) => (
-                        <div key={item.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center mb-2">
-                                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                                  {index + 1}
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                              </div>
-                              <p className="text-gray-600 mb-2">{item.description}</p>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <MapPin className="w-4 h-4 mr-1" />
-                                <span>{item.location}</span>
-                                <span className="mx-2">•</span>
-                                <Clock className="w-4 h-4 mr-1" />
-                                <span>{item.duration_minutes} {t('minutes')}</span>
-                              </div>
+                        <div key={item.id} className="flex gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                          <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900 dark:text-white mb-1">
+                              {item.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                              {item.description}
+                            </p>
+                            <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                              <Clock className="w-3 h-3 mr-1" />
+                              {item.duration_minutes} {t('minutes')}
+                              <MapPin className="w-3 h-3 ml-4 mr-1" />
+                              {item.location}
                             </div>
-                            {item.image && (
-                              <img 
-                                src={item.image} 
-                                alt={item.title}
-                                className="w-20 h-20 object-cover rounded-lg ml-4"
-                              />
-                            )}
                           </div>
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">{t('noItineraryAvailable')}</p>
+                      <div className="text-center py-8">
+                        <Info className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-gray-400">{t('noItineraryAvailable')}</p>
+                      </div>
                     )}
                   </div>
                 )}
 
-                {/* Reviews Tab */}
                 {activeTab === 'reviews' && (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-bold text-gray-900">{t('reviewsAndRatings')}</h2>
-                      <div className="flex items-center">
-                        <Star className="w-5 h-5 text-yellow-400 mr-1" />
-                        <span className="font-semibold">{tour.average_rating?.toFixed(1) || 'N/A'}</span>
-                        <span className="text-gray-500 ml-1">({tour.review_count || 0} {t('reviews')})</span>
-                      </div>
-                    </div>
-                    
                     {tour.reviews && tour.reviews.length > 0 ? (
                       tour.reviews.map((review) => (
-                        <div key={review.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h3 className="font-semibold text-gray-900">{review.title}</h3>
-                              <p className="text-sm text-gray-500">{review.user_name}</p>
-                            </div>
+                        <div key={review.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                          <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center">
-                              {[...Array(5)].map((_, i) => (
-                                <Star 
-                                  key={i} 
-                                  className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
-                                />
-                              ))}
+                              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                                {review.user_name.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="ml-3">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {review.user_name}
+                                </p>
+                                <div className="flex items-center">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-4 h-4 ${
+                                        i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          <p className="text-gray-700">{review.comment}</p>
-                          <div className="flex items-center mt-2 text-sm text-gray-500">
-                            <span>{new Date(review.created_at).toLocaleDateString()}</span>
                             {review.is_verified && (
-                              <>
-                                <span className="mx-2">•</span>
-                                <CheckCircle className="w-4 h-4 text-green-500 mr-1" />
-                                <span>{t('verified')}</span>
-                              </>
+                              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                {t('verified')}
+                              </span>
                             )}
                           </div>
+                          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                            {review.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {review.comment}
+                          </p>
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">{t('noReviewsAvailable')}</p>
+                      <div className="text-center py-8">
+                        <Star className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-gray-400">{t('noReviewsAvailable')}</p>
+                      </div>
                     )}
                   </div>
                 )}
 
-                {/* Pricing Tab */}
                 {activeTab === 'pricing' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900">{t('pricing')} {t('information')}</h2>
-                    
-                    {/* Variants */}
-                    {tour.variants && tour.variants.length > 0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('tourVariants')}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {tour.variants.map((variant) => (
-                            <div 
-                              key={variant.id}
-                              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                                selectedVariant?.id === variant.id
-                                  ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}
-                              onClick={() => setSelectedVariant(variant)}
-                            >
-                              <h4 className="font-semibold text-gray-900 mb-2">{variant.name}</h4>
-                              <p className="text-sm text-gray-600 mb-3">{variant.description}</p>
-                              
-                              {/* Services included */}
-                              <div className="space-y-1 mb-3">
-                                {variant.includes_transfer && (
-                                  <div className="flex items-center text-xs text-gray-600">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    {t('transfer')}
-                                  </div>
-                                )}
-                                {variant.includes_guide && (
-                                  <div className="flex items-center text-xs text-gray-600">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    {t('guide')}
-                                  </div>
-                                )}
-                                {variant.includes_meal && (
-                                  <div className="flex items-center text-xs text-gray-600">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    {t('meal')}
-                                  </div>
-                                )}
-                                {variant.includes_photographer && (
-                                  <div className="flex items-center text-xs text-gray-600">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    {t('photographer')}
-                                  </div>
-                                )}
+                  <div className="space-y-4">
+                    {tour.variants && tour.variants.length > 0 ? (
+                      tour.variants.map((variant) => (
+                        <div key={variant.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              {variant.name}
+                            </h4>
+                            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                              ${variant.base_price}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {variant.description}
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {variant.pricing.map((price) => (
+                              <div key={price.id} className="flex items-center justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">
+                                  {price.age_group_display}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-white">
+                                  {price.is_free ? t('free') : `$${(variant.base_price * price.factor).toFixed(2)}`}
+                                </span>
                               </div>
-
-                              {/* Pricing */}
-                              <div className="space-y-1">
-                                {variant.pricing.map((price) => (
-                                  <div key={price.id} className="flex justify-between text-sm">
-                                    <span className="text-gray-600">{price.age_group_display}:</span>
-                                    <span className="font-semibold">
-                                      {price.is_free && !price.requires_services ? t('free') : `$${price.factor}`}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Cancellation Policy */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('cancellationPolicy')}</h3>
-                      <div className="bg-red-50 rounded-lg p-4">
-                        <div className="flex items-start">
-                          <AlertCircle className="w-5 h-5 text-red-500 mr-2 mt-0.5" />
-                          <div>
-                            <p className="text-red-800 font-medium mb-1">{t('cancellationPolicyText')}</p>
-                            <p className="text-red-700 text-sm">
-                              {tour.cancellation_hours} {t('hoursBeforeTour')}: {tour.refund_percentage}% {t('refund')}
-                            </p>
-                            <p className="text-red-700 text-sm">
-                              {t('lessThan')} {tour.cancellation_hours} {t('hours')}: {t('noRefund')}
-                            </p>
+                            ))}
                           </div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <DollarSign className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-gray-400">No pricing information available</p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Booking Sidebar */}
+          {/* Right Column - Booking Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('bookThisTour')}</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 sticky top-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                {t('bookThisTour')}
+              </h2>
 
               {/* Booking Error Message */}
               {bookingError && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
                   <div className="flex items-center">
-                    <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-                    <div className="text-sm text-red-800">
-                      <strong>⚠️ {t('bookingNotAvailable')}</strong>
+                    <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
+                    <div className="text-sm text-red-800 dark:text-red-200">
+                      <strong>{t('bookingNotAvailable')}</strong>
                       <p className="mt-1">{bookingError}</p>
                     </div>
                   </div>
@@ -828,7 +940,9 @@ export default function TourDetailPage() {
 
               {/* Schedule Selection */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('selectDate')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  {t('selectDate')}
+                </h3>
                 {tour.schedules && tour.schedules.length > 0 ? (
                   <div className="space-y-2">
                     {tour.schedules
@@ -837,51 +951,65 @@ export default function TourDetailPage() {
                         <button
                           key={schedule.id}
                           onClick={() => setSelectedSchedule(schedule)}
-                          className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                          className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
                             selectedSchedule?.id === schedule.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                         >
-                          <div className="font-medium text-gray-900">
-                            {new Date(schedule.start_date).toLocaleDateString('en-US', {
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {new Date(schedule.start_date).toLocaleDateString(locale, {
                               weekday: 'long',
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric'
                             })}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                             {schedule.start_time} - {schedule.end_time}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {t('availableSpots')}: {schedule.available_capacity} {t('spots')}
                           </div>
                         </button>
                       ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm">{t('noAvailableDates')}</p>
+                  <div className="text-center py-4">
+                    <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">{t('noAvailableDates')}</p>
+                  </div>
                 )}
               </div>
 
               {/* Variant Selection */}
               {selectedSchedule && tour.variants && tour.variants.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('selectPackage')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    {t('selectPackage')}
+                  </h3>
                   <div className="space-y-2">
                     {tour.variants.map((variant) => (
                       <button
                         key={variant.id}
                         onClick={() => setSelectedVariant(variant)}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
                           selectedVariant?.id === variant.id
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                         }`}
                       >
-                        <div className="font-medium text-gray-900">{variant.name}</div>
-                        <div className="text-sm text-gray-600">{variant.description}</div>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {variant.name}
+                          </div>
+                          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                            ${variant.base_price}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {variant.description}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -891,35 +1019,47 @@ export default function TourDetailPage() {
               {/* Participant Selection */}
               {selectedVariant && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('participants')}</h3>
-                  <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    {t('participants')}
+                  </h3>
+                  <div className="space-y-4">
                     {[
-                      { key: 'adult', label: t('adults'), icon: User },
-                      { key: 'child', label: t('children'), icon: Smile },
-                      { key: 'infant', label: t('infants'), icon: Baby }
-                    ].map(({ key, label, icon: Icon }) => (
-                      <div key={key} className="flex items-center justify-between">
+                      { key: 'adult', label: t('adults'), icon: User, desc: '(11+)' },
+                      { key: 'child', label: t('children'), icon: Smile, desc: '(2-10)' },
+                      { key: 'infant', label: t('infants'), icon: Baby, desc: '(0-2)' }
+                    ].map(({ key, label, icon: Icon, desc }) => (
+                      <div key={key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
                         <div className="flex items-center">
-                          <Icon className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-700">{label}</span>
+                          <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3" />
+                          <div>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {label}
+                            </span>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {desc}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                           <button
                             onClick={() => setParticipants(prev => ({
                               ...prev,
                               [key]: Math.max(0, prev[key as keyof typeof prev] - 1)
                             }))}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
+                            disabled={participants[key as keyof typeof participants] === 0}
                           >
                             <Minus className="w-4 h-4" />
                           </button>
-                          <span className="w-8 text-center font-medium">{participants[key as keyof typeof participants]}</span>
+                          <span className="w-8 text-center font-medium text-gray-900 dark:text-white">
+                            {participants[key as keyof typeof participants]}
+                          </span>
                           <button
                             onClick={() => setParticipants(prev => ({
                               ...prev,
                               [key]: prev[key as keyof typeof prev] + 1
                             }))}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -933,33 +1073,45 @@ export default function TourDetailPage() {
               {/* Options Selection */}
               {tour.options && tour.options.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('additionalOptions')}</h3>
-                  <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    {t('additionalOptions')}
+                  </h3>
+                  <div className="space-y-3">
                     {tour.options.map((option) => (
-                      <div key={option.id} className="flex items-center justify-between p-2 border border-gray-200 rounded">
+                      <div key={option.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
                         <div className="flex-1">
-                          <div className="font-medium text-sm">{option.name}</div>
-                          <div className="text-xs text-gray-600">${option.price}</div>
+                          <div className="font-medium text-sm text-gray-900 dark:text-white">
+                            {option.name}
+                          </div>
+                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                            {option.description}
+                          </div>
+                          <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            ${option.price}
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                           <button
                             onClick={() => setSelectedOptions(prev => ({
                               ...prev,
                               [option.id]: Math.max(0, (prev[option.id] || 0) - 1)
                             }))}
-                            className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
+                            disabled={!selectedOptions[option.id]}
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus className="w-4 h-4" />
                           </button>
-                          <span className="w-6 text-center text-sm">{selectedOptions[option.id] || 0}</span>
+                          <span className="w-8 text-center font-medium text-gray-900 dark:text-white">
+                            {selectedOptions[option.id] || 0}
+                          </span>
                           <button
                             onClick={() => setSelectedOptions(prev => ({
                               ...prev,
                               [option.id]: (prev[option.id] || 0) + 1
                             }))}
-                            className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-8 h-8 rounded-full bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -970,12 +1122,14 @@ export default function TourDetailPage() {
 
               {/* Special Requests */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('specialRequests')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  {t('specialRequests')}
+                </h3>
                 <textarea
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder={t('specialRequestsPlaceholder')}
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={3}
                 />
               </div>
@@ -983,59 +1137,75 @@ export default function TourDetailPage() {
               {/* Pricing Summary */}
               {pricing && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('priceSummary')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    {t('priceSummary')}
+                  </h3>
                   
                   {/* Pricing Error */}
                   {pricing.hasPricingError && (
-                    <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
                       <div className="flex items-center">
-                        <AlertCircle className="w-4 h-4 text-yellow-600 mr-2" />
-                        <span className="text-sm text-yellow-800">{pricing.pricingError}</span>
+                        <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mr-2" />
+                        <span className="text-sm text-yellow-800 dark:text-yellow-200">
+                          {pricing.pricingError}
+                        </span>
                       </div>
                     </div>
                   )}
                   
-                  <div className="space-y-2 text-sm">
-                    {participants.adult > 0 && (
-                      <div className="flex justify-between">
-                        <span>{t('adults')} ({participants.adult})</span>
-                        <span>
-                          {pricing.hasPricingError ? 'N/A' : `$${pricing.breakdown.adult.toFixed(2)}`}
-                        </span>
-                      </div>
-                    )}
-                    {participants.child > 0 && (
-                      <div className="flex justify-between">
-                        <span>{t('children')} ({participants.child})</span>
-                        <span>
-                          {pricing.hasPricingError ? 'N/A' : `$${pricing.breakdown.child.toFixed(2)}`}
-                        </span>
-                      </div>
-                    )}
-                    {participants.infant > 0 && (
-                      <div className="flex justify-between">
-                        <span className="flex items-center">
-                          {t('infants')} ({participants.infant})
-                          <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                    <div className="space-y-2 text-sm">
+                      {participants.adult > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {t('adults')} ({participants.adult})
+                          </span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {pricing.hasPricingError ? 'N/A' : `$${pricing.breakdown.adult.toFixed(2)}`}
+                          </span>
+                        </div>
+                      )}
+                      {participants.child > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {t('children')} ({participants.child})
+                          </span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {pricing.hasPricingError ? 'N/A' : `$${pricing.breakdown.child.toFixed(2)}`}
+                          </span>
+                        </div>
+                      )}
+                      {participants.infant > 0 && (
+                        <div className="flex justify-between">
+                          <span className="flex items-center text-gray-600 dark:text-gray-400">
+                            {t('infants')} ({participants.infant})
+                            <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
+                              {t('free')}
+                            </span>
+                          </span>
+                          <span className="text-green-600 dark:text-green-400 font-medium">
                             {t('free')}
                           </span>
-                        </span>
-                        <span className="text-green-600 font-medium">
-                          {t('free')}
-                        </span>
+                        </div>
+                      )}
+                      {pricing.breakdown.options > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">{t('options')}</span>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            ${pricing.breakdown.options.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                      <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {t('total')}
+                          </span>
+                          <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                            {pricing.hasPricingError ? 'N/A' : `$${pricing.total.toFixed(2)}`}
+                          </span>
+                        </div>
                       </div>
-                    )}
-                    {pricing.breakdown.options > 0 && (
-                      <div className="flex justify-between">
-                        <span>{t('options')}</span>
-                        <span>${pricing.breakdown.options.toFixed(2)}</span>
-                      </div>
-                    )}
-                    <div className="border-t pt-2 flex justify-between font-semibold">
-                      <span>{t('total')}</span>
-                      <span>
-                        {pricing.hasPricingError ? 'N/A' : `$${pricing.total.toFixed(2)}`}
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -1045,37 +1215,40 @@ export default function TourDetailPage() {
               <button
                 onClick={handleBooking}
                 disabled={!isBookable || !selectedSchedule || !selectedVariant || isBooking || (participants.adult + participants.child + participants.infant) === 0}
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-4 px-6 rounded-xl font-semibold transition-all duration-200 hover:scale-105 disabled:hover:scale-100 shadow-lg"
               >
                 {isBooking ? (
                   <span className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     {t('booking')}
                   </span>
                 ) : !isBookable ? (
                   t('notAvailable')
                 ) : (
-                  t('addToCart')
+                  <span className="flex items-center justify-center">
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    {t('addToCart')}
+                  </span>
                 )}
               </button>
 
               {/* Booking Message */}
               {bookingMessage && (
-                <div className={`mt-3 p-3 rounded-lg text-sm ${
-                  bookingMessage.includes('successfully')
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                <div className={`mt-4 p-3 rounded-xl text-sm ${
+                  bookingMessage.includes('موفقیت')
+                    ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800'
+                    : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800'
                 }`}>
-                  {bookingMessage}
-                </div>
+                {bookingMessage}
+              </div>
               )}
 
               {/* Guest Info */}
               {!isAuthenticated && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>{t('guestUser')}:</strong> {t('guestUserMessage')} 
-                    <Link href={`/${locale}/login`} className="text-blue-600 hover:underline ml-1">
+                    <Link href={`/${locale}/login`} className="text-blue-600 dark:text-blue-400 hover:underline ml-1">
                       {t('loginToSync')}
                     </Link>
                   </p>

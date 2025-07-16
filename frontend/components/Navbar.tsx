@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
 import { User, ShoppingCart, LogOut, Settings, Heart, Package, Menu, X, Plane, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../lib/contexts/AuthContext';
-import { useCart } from '../lib/hooks/useCart';
+import { useUnifiedCart } from '../lib/contexts/UnifiedCartContext';
 import { useTheme } from '../lib/contexts/ThemeContext';
 
 function NavbarContent() {
@@ -15,7 +15,7 @@ function NavbarContent() {
   const t = useTranslations('common');
   const locale = useLocale();
   const { user, isAuthenticated, logout } = useAuth();
-  const { totalItems } = useCart();
+  const { totalItems } = useUnifiedCart();
   const { isDark, toggleTheme } = useTheme();
   
   const [showUserMenu, setShowUserMenu] = useState(false);

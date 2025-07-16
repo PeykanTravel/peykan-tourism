@@ -12,11 +12,7 @@ export default function EventsSection() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="text-sm uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-4">
-<<<<<<< Updated upstream
             SPECIAL EVENTS
-=======
-            events
->>>>>>> Stashed changes
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             SPECIAL EVENTS
@@ -38,114 +34,121 @@ export default function EventsSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
               
-              {/* Light sweep animation */}
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
+              <div className="absolute bottom-8 left-8 right-8 text-white">
+                <div className="text-sm font-semibold mb-2 opacity-80">گذشته</div>
+                <h3 className="text-2xl font-bold mb-2">ایونت‌های گذشته</h3>
+                <p className="text-sm opacity-80">مجموعه‌ای از ایونت‌های برگزار شده قبلی</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Column - Featured/Upcoming Events */}
+          <div className="lg:w-2/4 order-1 lg:order-2">
+            <div className="h-[600px] rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-blue-600 to-purple-700 flex flex-col relative">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-purple-700/90"></div>
               
-              <div className="absolute inset-0 flex items-end justify-center p-8">
-                <div className="text-center text-white">
-                  <div className="text-3xl font-bold mb-2">01</div>
-                  <h3 className="text-2xl font-bold mb-4">ایونت‌های گذشته</h3>
-                  <p className="text-lg mb-6 opacity-90">
-                    لحظات فراموش‌نشدنی از ایونت‌های برگزار شده را دوباره زنده کنید
+              {/* Hero Image - takes up 60% of height */}
+              <div className="flex-1 relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80" 
+                  alt="Main Event"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                
+                <div className="absolute top-8 left-8 right-8">
+                  <div className="flex items-center justify-between">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+                      <span className="text-white text-sm font-medium">پیشروی</span>
+                    </div>
+                    <div className="bg-red-500 text-white rounded-full px-4 py-2">
+                      <span className="text-sm font-bold">LIVE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content below image - fills remaining space (40% of height) */}
+              <div className="flex-1 flex flex-col justify-center p-8">
+                <div className="max-w-2xl">
+                  <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight text-white">
+                    تجربه<br />
+                    ایونت‌های آینده
+                  </h2>
+                  <p className="text-xl mb-8 text-white/90 leading-relaxed">
+                    در ایونت‌های هیجان‌انگیز آینده شرکت کنید و خاطرات فراموش‌نشدنی بسازید.
+                    از کنسرت‌ها گرفته تا نمایش‌های تئاتر و رویدادهای ورزشی.
                   </p>
-                  <Link 
-                    href="/events?filter=past"
-                    className="inline-block bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-                  >
-                    مشاهده گالری
-                  </Link>
+                  
+                  <div className="flex flex-wrap gap-4">
+                    <Link href="/events" className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg font-semibold transition-colors duration-300">
+                      مشاهده همه
+                    </Link>
+                    <Link href="/events/featured" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 rounded-lg font-semibold transition-colors duration-300">
+                      ایونت‌های ویژه
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Horizontal Upcoming Events with content below */}
-          <div className="lg:w-3/4 order-1 lg:order-2">
-            <div className="h-[600px] flex flex-col">
-              {/* Image - takes up about 60% of height */}
-              <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl group cursor-pointer">
+          {/* Right Column - Upcoming Events */}
+          <div className="lg:w-1/4 order-3 lg:order-3">
+            <div className="h-[600px] flex flex-col gap-6">
+              {/* Top Event */}
+              <div className="flex-1 relative rounded-2xl overflow-hidden shadow-xl group cursor-pointer">
                 <img 
-                  src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" 
-                  alt="Upcoming Events"
+                  src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=400&q=80" 
+                  alt="Upcoming Event 1"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                 
-                {/* Light sweep animation */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
-                
-                {/* Number overlay */}
-                <div className="absolute top-6 right-6">
-                  <div className="text-6xl font-bold text-white/20">02</div>
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <div className="bg-green-500 text-white rounded-full px-3 py-1 text-xs font-semibold mb-3 inline-block">
+                    آینده
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">کنسرت موسیقی</h3>
+                  <p className="text-sm opacity-80">۱۵ آذر ۱۴۰۳</p>
                 </div>
               </div>
 
-              {/* Content below image - fills remaining space (40% of height) */}
-<<<<<<< Updated upstream
-              <div className="flex-1 flex flex-col justify-center p-8">
-                <div className="max-w-2xl">
-                  <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900 dark:text-white">
-                    تجربه<br />
-=======
-              <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 mt-6 shadow-xl">
-                <div className="h-full flex flex-col justify-center">
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
->>>>>>> Stashed changes
-                    ایونت‌های آینده
-                  </h2>
-                  <p className="text-xl mb-8 text-gray-600 dark:text-gray-300 leading-relaxed">
-                    در ایونت‌های هیجان‌انگیز آینده شرکت کنید و خاطرات فراموش‌نشدنی بسازید.
-                    از کنسرت‌ها گرفته تا نمایش‌های تئاتر و رویدادهای ورزشی.
-                  </p>
-                  
-<<<<<<< Updated upstream
-                  <div className="flex flex-wrap items-center gap-6">
-                    <Link 
-                      href="/events"
-                      className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
-=======
-                  {/* Event Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">50+</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">ایونت ماهانه</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">10K+</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">شرکت‌کننده</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-700 dark:text-blue-500 mb-2">95%</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">رضایت مشتری</div>
-                    </div>
+              {/* Bottom Event */}
+              <div className="flex-1 relative rounded-2xl overflow-hidden shadow-xl group cursor-pointer">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" 
+                  alt="Upcoming Event 2"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <div className="bg-orange-500 text-white rounded-full px-3 py-1 text-xs font-semibold mb-3 inline-block">
+                    محبوب
                   </div>
-                  
-                  {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Link 
-                      href="/events"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
-                      aria-label="Browse all events"
->>>>>>> Stashed changes
-                    >
-                      رزرو کنید
-                    </Link>
-                    
-                    <Link 
-<<<<<<< Updated upstream
-                      href="/events"
-                      className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold text-lg hover:underline transition-colors duration-300"
-=======
-                      href="/events?filter=upcoming"
-                      className="bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
-                      aria-label="View upcoming events"
->>>>>>> Stashed changes
-                    >
-                      مشاهده ایونت‌های بیشتر
-                    </Link>
-                  </div>
+                  <h3 className="text-xl font-bold mb-2">نمایش تئاتر</h3>
+                  <p className="text-sm opacity-80">۲۰ آذر ۱۴۰۳</p>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Section - Event Stats */}
+        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">500+</div>
+            <div className="text-gray-600 dark:text-gray-300">ایونت برگزار شده</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">50K+</div>
+            <div className="text-gray-600 dark:text-gray-300">شرکت‌کننده خوشحال</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">98%</div>
+            <div className="text-gray-600 dark:text-gray-300">رضایت مشتریان</div>
           </div>
         </div>
       </div>

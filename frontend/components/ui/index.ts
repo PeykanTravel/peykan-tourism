@@ -1,0 +1,16 @@
+// UI Components
+export { default as Modal } from './Modal';
+export { default as ProductCard } from './ProductCard';
+export { default as MediaManager } from './MediaManager';
+export { default as MediaGallery } from './MediaGallery';
+export { default as MediaUpload } from './MediaUpload';
+export { default as OptimizedImage } from './OptimizedImage';
+export { ErrorBoundary } from './ErrorBoundary';
+
+// Contexts
+export { ThemeProvider, useTheme } from '../../lib/contexts/ThemeContext';
+export { AuthProvider, useAuth } from '../../lib/contexts/AuthContext';
+export { CartProvider, useCart } from '../../lib/contexts/UnifiedCartContext';
+
+// Utils
+export { cn } from '../../lib/utils'; 

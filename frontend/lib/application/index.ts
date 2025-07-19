@@ -12,16 +12,19 @@ export { ProductService } from './services/ProductService';
 export { TransfersService } from './services/TransfersService';
 
 // Hooks
-export { useAuth } from './hooks/useAuth';
-export { useCart } from './hooks/useCart';
+export { useAuth, type UseAuthReturn } from './hooks/useAuth';
+export { useCart, type UseCartReturn } from './hooks/useCart';
 export { useProducts } from './hooks/useProducts';
 export { useOrders } from './hooks/useOrders';
+export { useProductService } from './hooks/useProductService';
+export { useEventsService } from './hooks/useEventsService';
+export { useTransfersService } from './hooks/useTransfersService';
 
-// Stores
-export { useAuthStore } from './stores/authStore';
-export { useCartStore } from './stores/cartStore';
-export { useProductsStore } from './stores/productsStore';
-export { useEventsStore } from './stores/eventsStore';
+// Stores - Deprecated, use AppContext instead
+// export { useAuthStore } from './stores/authStore';
+// export { useCartStore } from './stores/cartStore';
+// export { useProductsStore } from './stores/productsStore';
+// export { useEventsStore } from './stores/eventsStore';
 
 // Use Cases
 export { LoginUseCase } from './use-cases/auth/LoginUseCase';

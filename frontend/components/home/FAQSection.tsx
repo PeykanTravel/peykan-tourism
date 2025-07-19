@@ -1,8 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
-import { FaChevronDown } from 'react-icons/fa'
+import { Accordion, AccordionItem } from '@/components/ui'
 
 const faqs = [
   {
@@ -34,11 +33,6 @@ const faqs = [
 
 export default function FAQSection() {
   const t = useTranslations('home')
-  const [activeAccordion, setActiveAccordion] = useState<string>('packages')
-
-  const toggleAccordion = (id: string) => {
-    setActiveAccordion(activeAccordion === id ? '' : id)
-  }
 
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-800 relative overflow-hidden">
@@ -67,42 +61,14 @@ export default function FAQSection() {
 
           {/* Accordion Column */}
           <div className="lg:col-span-8">
-            <div className="space-y-4">
-              {faqs.map((faq) => (
-                <div
-                  key={faq.id}
-                  className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
-                >
-                  <button
-                    onClick={() => toggleAccordion(faq.id)}
-                    className="w-full px-6 py-4 text-right flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
-                  >
-                    <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {faq.question}
-                    </span>
-                    <div className="flex-shrink-0 mr-4">
-                      <FaChevronDown
-                        className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-300 ${
-                          activeAccordion === faq.id ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </div>
-                  </button>
-                  
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ${
-                      activeAccordion === faq.id ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                    }`}
-                  >
-                    <div className="px-6 pb-4">
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <Accordion 
+              items={faqs.map(faq => ({
+                id: faq.id,
+                title: faq.question,
+                content: faq.answer
+              }))}
+              defaultOpen="packages"
+            />
           </div>
         </div>
       </div>

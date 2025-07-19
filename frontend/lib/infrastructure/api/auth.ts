@@ -7,6 +7,7 @@ import {
   AuthTokens 
 } from '../../domain/entities/User';
 import { PaginatedResponse } from '../../domain/entities/Common';
+import { SafeStorage } from '../../utils/storage';
 
 export class AuthApi {
   private readonly basePath = '/auth';
@@ -146,8 +147,8 @@ export class AuthApi {
   // Get stored tokens
   getTokens(): { access: string | null; refresh: string | null } {
     return {
-      access: localStorage.getItem('access_token'),
-      refresh: localStorage.getItem('refresh_token')
+      access: SafeStorage.getItem('access_token'),
+      refresh: SafeStorage.getItem('refresh_token')
     };
   }
 }

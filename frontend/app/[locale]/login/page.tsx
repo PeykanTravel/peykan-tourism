@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { login } from '../../../lib/api/auth';
-import { useAuth } from '../../../lib/contexts/AuthContext';
+// Updated import for new auth store
+import { useAuthStore } from '../../../lib/application/stores/authStore';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react';
 
@@ -13,7 +13,9 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('auth');
-  const { login: authLogin } = useAuth();
+  
+  // New store usage
+  const { login, isLoading: authLoading, error: authError } = useAuthStore();
   
   // Get locale from current path
   const locale = typeof window !== 'undefined' ? 
@@ -55,76 +57,54 @@ export default function LoginPage() {
     setSuccess(null);
 
     try {
+      // Use the new auth store's login method
       const response = await login({
         username: formData.username,
         password: formData.password
       });
 
-      if (response.data.requires_email_verification) {
-        // Redirect to email verification page with email if available
-        if (response.data.email) {
-          router.push(`/verify-email?email=${encodeURIComponent(response.data.email)}`);
-        } else {
-          // If email is not available in response, use the username as it might be an email
-          router.push(`/verify-email?email=${encodeURIComponent(formData.username)}`);
-        }
+      if (response.requires_email_verification) {
+        // Redirect to email verification page
+        const emailToVerify = response.email || formData.username;
+        router.push(`/verify-email?email=${encodeURIComponent(emailToVerify)}`);
         return;
       }
 
-      if (response.data.success) {
-        // Check if both user and tokens are available
-        if (response.data.user && response.data.tokens) {
-          // Use AuthContext to handle login
-          authLogin(response.data.user, response.data.tokens);
+      // Login successful
+      setSuccess(t('loginSuccess'));
+      
+      // Check for pending transfer booking
+      const pendingBookingData = localStorage.getItem('pendingTransferBooking');
+      if (pendingBookingData) {
+        try {
+          const bookingData = JSON.parse(pendingBookingData);
+          const isBookingValid = Date.now() - bookingData.timestamp < 60 * 60 * 1000;
           
-          setSuccess(t('loginSuccess'));
-          
-          // Check for pending transfer booking
-          const pendingBookingData = localStorage.getItem('pendingTransferBooking');
-          if (pendingBookingData) {
-            try {
-              const bookingData = JSON.parse(pendingBookingData);
-              // Check if booking is not too old (within 1 hour)
-              const isBookingValid = Date.now() - bookingData.timestamp < 60 * 60 * 1000;
-              
-              if (isBookingValid) {
-                // Store booking data for completion
-                localStorage.setItem('completeTransferBooking', JSON.stringify(bookingData));
-                localStorage.removeItem('pendingTransferBooking');
-                
-                                 // Redirect to the original booking page
-                 setTimeout(() => {
-                   router.push(bookingData.returnUrl || `/${locale}/transfers/booking`);
-                 }, 1000);
-                return;
-              } else {
-                // Remove expired booking data
-                localStorage.removeItem('pendingTransferBooking');
-              }
-            } catch (error) {
-              console.error('Error parsing pending booking data:', error);
-              localStorage.removeItem('pendingTransferBooking');
-            }
+          if (isBookingValid) {
+            localStorage.setItem('completeTransferBooking', JSON.stringify(bookingData));
+            localStorage.removeItem('pendingTransferBooking');
+            
+            setTimeout(() => {
+              router.push(bookingData.returnUrl || `/${locale}/transfers/booking`);
+            }, 1000);
+            return;
+          } else {
+            localStorage.removeItem('pendingTransferBooking');
           }
-          
-          // Redirect after a short delay
-          setTimeout(() => {
-            router.push(redirect);
-          }, 1000);
-        } else {
-          setError(t('loginError'));
+        } catch (error) {
+          console.error('Error parsing pending booking data:', error);
+          localStorage.removeItem('pendingTransferBooking');
         }
-      } else {
-        setError(response.data.message || t('loginError'));
       }
+      
+      // Redirect after a short delay
+      setTimeout(() => {
+        router.push(redirect);
+      }, 1000);
       
     } catch (err: any) {
       console.error('Login error:', err);
-      setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        t('loginError')
-      );
+      setError(err.message || t('loginError'));
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +128,7 @@ export default function LoginPage() {
           </div>
 
           {/* Login Form */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 backdrop-blur-sm border border-gray-200">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Username/Email Field */}
               <div className="space-y-2">
@@ -241,7 +221,7 @@ export default function LoginPage() {
               </button>
 
               {/* Links */}
-              <div className="mt-6 space-y-4">
+              <div className="space-y-3">
                 <div className="text-center">
                   <Link
                     href="/forgot-password"

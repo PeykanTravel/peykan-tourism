@@ -135,11 +135,14 @@ class TourReviewCreateSerializer(serializers.ModelSerializer):
 class TourListSerializer(serializers.ModelSerializer):
     """Serializer for tour list view."""
     
+    category = TourCategorySerializer(read_only=True)
+    
     class Meta:
         model = Tour
         fields = [
-            'id', 'slug', 'price', 'currency', 'duration_hours', 
-            'is_active', 'created_at'
+            'id', 'slug', 'title', 'price', 'currency', 'duration_hours', 
+            'is_active', 'created_at', 'category', 'image', 'gallery',
+            'is_featured', 'is_popular', 'city', 'country'
         ]
 
 

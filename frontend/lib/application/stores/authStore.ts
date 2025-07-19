@@ -7,6 +7,7 @@ import {
   AuthResponse 
 } from '../../domain/entities/User';
 import { authApi } from '../../infrastructure/api/auth';
+import { SafeStorage } from '../../utils/storage';
 
 interface AuthState {
   // State
@@ -16,8 +17,8 @@ interface AuthState {
   error: string | null;
   
   // Actions
-  login: (credentials: AuthCredentials) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  login: (credentials: AuthCredentials) => Promise<AuthResponse>;
+  register: (data: RegisterData) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
@@ -51,6 +52,20 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
 }
 
+// Create a storage interface that uses SafeStorage
+const createSafeStorage = () => ({
+  getItem: (name: string) => {
+    const value = SafeStorage.getItem(name);
+    return value ? JSON.parse(value) : null;
+  },
+  setItem: (name: string, value: any) => {
+    SafeStorage.setItem(name, JSON.stringify(value));
+  },
+  removeItem: (name: string) => {
+    SafeStorage.removeItem(name);
+  },
+});
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -65,11 +80,19 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const response = await authApi.login(credentials);
-          set({ 
-            user: response.user, 
-            isAuthenticated: true, 
-            isLoading: false 
-          });
+          
+          // Only set authenticated state if user and tokens are present
+          if (response.user && response.tokens) {
+            set({ 
+              user: response.user, 
+              isAuthenticated: true, 
+              isLoading: false 
+            });
+          } else {
+            set({ isLoading: false });
+          }
+          
+          return response;
         } catch (error: any) {
           set({ 
             error: error.message || 'Login failed', 
@@ -83,11 +106,19 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const response = await authApi.register(data);
-          set({ 
-            user: response.user, 
-            isAuthenticated: true, 
-            isLoading: false 
-          });
+          
+          // Only set authenticated state if user and tokens are present
+          if (response.user && response.tokens) {
+            set({ 
+              user: response.user, 
+              isAuthenticated: true, 
+              isLoading: false 
+            });
+          } else {
+            set({ isLoading: false });
+          }
+          
+          return response;
         } catch (error: any) {
           set({ 
             error: error.message || 'Registration failed', 
@@ -328,6 +359,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-store',
+      storage: createSafeStorage(),
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
@@ -336,5 +368,7 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Initialize auth status on store creation
-useAuthStore.getState().checkAuthStatus(); 
+// Initialize auth status on store creation (only on client side)
+if (typeof window !== 'undefined') {
+  useAuthStore.getState().checkAuthStatus();
+} 

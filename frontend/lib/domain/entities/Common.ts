@@ -6,7 +6,8 @@ export interface ApiResponse<T> {
   data: T;
   message: string;
   errors?: string[];
-  status_code: number;
+  status: number;
+  status_code?: number; // For backward compatibility
 }
 
 // Paginated Response (matching Django DRF PageNumberPagination)
@@ -21,7 +22,8 @@ export interface PaginatedResponse<T> {
 export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
-  status_code: number;
+  status: number;
+  status_code?: number; // For backward compatibility
   error_code?: string;
   timestamp: string;
 }
@@ -238,9 +240,8 @@ export interface RequestConfig {
 export interface ResponseConfig<T> {
   data: T;
   status: number;
-  statusText: string;
   headers: Record<string, string>;
-  config: RequestConfig;
+  duration: number;
 }
 
 // Environment

@@ -3,6 +3,8 @@
  * Handles token storage, retrieval, validation, and cleanup
  */
 
+import { SafeStorage } from '../utils/storage';
+
 export interface TokenData {
   access: string;
   refresh: string;
@@ -29,12 +31,10 @@ class TokenService {
    * Store tokens and user data
    */
   public storeTokens(tokens: TokenData): void {
-    if (typeof window === 'undefined') return;
-
     try {
-      localStorage.setItem('access_token', tokens.access);
-      localStorage.setItem('refresh_token', tokens.refresh);
-      localStorage.setItem('user', JSON.stringify(tokens.user));
+      SafeStorage.setItem('access_token', tokens.access);
+      SafeStorage.setItem('refresh_token', tokens.refresh);
+      SafeStorage.setItem('user', JSON.stringify(tokens.user));
       
       console.log('Tokens stored successfully');
     } catch (error) {
@@ -46,26 +46,22 @@ class TokenService {
    * Get access token
    */
   public getAccessToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('access_token');
+    return SafeStorage.getItem('access_token');
   }
 
   /**
    * Get refresh token
    */
   public getRefreshToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('refresh_token');
+    return SafeStorage.getItem('refresh_token');
   }
 
   /**
    * Get user data
    */
   public getUser(): any | null {
-    if (typeof window === 'undefined') return null;
-    
     try {
-      const userData = localStorage.getItem('user');
+      const userData = SafeStorage.getItem('user');
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
       console.error('Error parsing user data:', error);
@@ -86,12 +82,10 @@ class TokenService {
    * Clear all tokens and user data
    */
   public clearTokens(): void {
-    if (typeof window === 'undefined') return;
-
     try {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
+      SafeStorage.removeItem('access_token');
+      SafeStorage.removeItem('refresh_token');
+      SafeStorage.removeItem('user');
       console.log('Tokens cleared successfully');
     } catch (error) {
       console.error('Error clearing tokens:', error);

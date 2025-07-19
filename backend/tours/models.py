@@ -111,6 +111,15 @@ class Tour(BaseProductModel):
     class Meta:
         verbose_name = _('Tour')
         verbose_name_plural = _('Tours')
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['category']),
+            models.Index(fields=['tour_type']),
+            models.Index(fields=['transport_type']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['is_active', 'category']),
+            models.Index(fields=['is_active', 'tour_type']),
+        ]
     
     def __str__(self):
         return self.title or self.slug
@@ -225,6 +234,14 @@ class TourSchedule(BaseScheduleModel):
         verbose_name = _('Tour Schedule')
         verbose_name_plural = _('Tour Schedules')
         unique_together = ['tour', 'start_date']
+        indexes = [
+            models.Index(fields=['tour']),
+            models.Index(fields=['start_date']),
+            models.Index(fields=['is_available']),
+            models.Index(fields=['tour', 'start_date']),
+            models.Index(fields=['tour', 'is_available']),
+            models.Index(fields=['start_date', 'is_available']),
+        ]
     
     def __str__(self):
         return f"{self.tour.title} - {self.start_date}"

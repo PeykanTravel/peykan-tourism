@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCart } from '../../lib/hooks';
+import { useCart } from '../../lib/hooks/useCart';
 import { createOrder } from '../../lib/api/orders';
 import { useRouter } from 'next/navigation';
 import { 
@@ -479,7 +479,7 @@ export default function CheckoutForm() {
                 </div>
                 
                 <div className="space-y-4 mb-6">
-                  {items.map((item) => (
+                  {items.map((item: any) => (
                     <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
                       <div className="flex-1">
                         <div className="font-semibold text-gray-900">{item.product_title}</div>

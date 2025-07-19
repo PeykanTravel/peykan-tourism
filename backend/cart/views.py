@@ -737,7 +737,7 @@ def merge_cart_view(request):
 def cart_count_view(request):
     """Get cart item count for navbar."""
     
-    user = request.user
+    user = request.user if request.user.is_authenticated else None
     
     # Get consistent session ID
     session_id = CartService.get_session_id(request)
@@ -750,4 +750,283 @@ def cart_count_view(request):
     
     return Response({
         'count': count
-    }) 
+    })
+
+
+class AddTourToCartView(APIView):
+    """Add tour to cart with specific tour logic."""
+    
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        """Add tour to cart with participant details."""
+        from tours.models import Tour, TourVariant, TourPricing
+        from tours.serializers import TourBookingRequestSerializer
+        
+        serializer = TourBookingRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        data = serializer.validated_data
+        user = request.user if request.user.is_authenticated else None
+        session_id = CartService.get_session_id(request)
+        
+        cart = CartService.get_or_create_cart(session_id=session_id, user=user)
+        
+        try:
+            tour = Tour.objects.get(id=data['tour_id'], is_active=True)
+            variant = TourVariant.objects.get(id=data['variant_id'], tour=tour, is_active=True)
+            
+            # Calculate total price based on participants
+            total_price = 0
+            participants = data.get('passengers', {})
+            
+            for age_group, count in participants.items():
+                if count > 0:
+                    try:
+                        pricing = TourPricing.objects.get(
+                            tour=tour,
+                            variant=variant,
+                            age_group=age_group
+                        )
+                        total_price += pricing.final_price * count
+                    except TourPricing.DoesNotExist:
+                        total_price += variant.base_price * count
+            
+            # Create cart item
+            cart_item = CartItem.objects.create(
+                cart=cart,
+                product_type='tour',
+                product_id=str(tour.id),
+                product_name=tour.title,
+                product_image=tour.image,
+                variant_id=str(variant.id),
+                variant_name=variant.name,
+                quantity=sum(participants.values()),
+                unit_price=variant.base_price,
+                total_price=total_price,
+                selected_options=data.get('selected_options', []),
+                special_requirements=data.get('special_requirements', ''),
+                booking_data={
+                    'schedule_id': data.get('schedule_id'),
+                    'participants': participants,
+                }
+            )
+            
+            return Response({
+                'message': 'Tour added to cart successfully',
+                'cart_item': CartItemSerializer(cart_item).data
+            }, status=status.HTTP_201_CREATED)
+            
+        except (Tour.DoesNotExist, TourVariant.DoesNotExist):
+            return Response(
+                {'error': 'Tour or variant not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class AddEventToCartView(APIView):
+    """Add event to cart with specific event logic."""
+    
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        """Add event to cart with seat selection."""
+        from events.models import Event, TicketType, EventPerformance
+        from events.serializers import EventBookingRequestSerializer
+        
+        serializer = EventBookingRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        data = serializer.validated_data
+        user = request.user if request.user.is_authenticated else None
+        session_id = CartService.get_session_id(request)
+        
+        cart = CartService.get_or_create_cart(session_id=session_id, user=user)
+        
+        try:
+            event = Event.objects.get(id=data['event_id'], is_active=True)
+            ticket_type = TicketType.objects.get(id=data['ticket_type_id'], event=event, is_active=True)
+            performance = EventPerformance.objects.get(id=data['performance_id'], event=event)
+            
+            # Calculate total price
+            total_price = ticket_type.price * data['quantity']
+            
+            # Create cart item
+            cart_item = CartItem.objects.create(
+                cart=cart,
+                product_type='event',
+                product_id=str(event.id),
+                product_name=event.title,
+                product_image=event.image,
+                variant_id=str(ticket_type.id),
+                variant_name=ticket_type.name,
+                quantity=data['quantity'],
+                unit_price=ticket_type.price,
+                total_price=total_price,
+                selected_options=data.get('selected_options', []),
+                selected_seats=data.get('selected_seats', []),
+                special_requirements=data.get('special_requirements', ''),
+                booking_data={
+                    'performance_id': str(performance.id),
+                    'performance_date': performance.date.isoformat(),
+                    'performance_time': performance.start_time.isoformat(),
+                }
+            )
+            
+            return Response({
+                'message': 'Event added to cart successfully',
+                'cart_item': CartItemSerializer(cart_item).data
+            }, status=status.HTTP_201_CREATED)
+            
+        except (Event.DoesNotExist, TicketType.DoesNotExist, EventPerformance.DoesNotExist):
+            return Response(
+                {'error': 'Event, ticket type, or performance not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class AddTransferToCartView(APIView):
+    """Add transfer to cart with specific transfer logic."""
+    
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        """Add transfer to cart with booking details."""
+        from transfers.models import TransferRoute, TransferRoutePricing
+        from transfers.services import TransferPricingService
+        
+        # Validate required fields
+        required_fields = ['route_id', 'vehicle_type', 'trip_type', 'outbound_date', 'outbound_time']
+        for field in required_fields:
+            if field not in request.data:
+                return Response(
+                    {'error': f'Missing required field: {field}'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        user = request.user if request.user.is_authenticated else None
+        session_id = CartService.get_session_id(request)
+        
+        cart = CartService.get_or_create_cart(session_id=session_id, user=user)
+        
+        try:
+            route = TransferRoute.objects.get(id=request.data['route_id'], is_active=True)
+            pricing = TransferRoutePricing.objects.get(
+                route=route,
+                vehicle_type=request.data['vehicle_type'],
+                is_active=True
+            )
+            
+            # Calculate price using TransferPricingService
+            price_data = TransferPricingService.calculate_transfer_price(
+                route=route,
+                vehicle_type=request.data['vehicle_type'],
+                trip_type=request.data['trip_type'],
+                outbound_date=request.data['outbound_date'],
+                outbound_time=request.data['outbound_time'],
+                return_date=request.data.get('return_date'),
+                return_time=request.data.get('return_time'),
+                selected_options=request.data.get('selected_options', [])
+            )
+            
+            # Create cart item
+            cart_item = CartItem.objects.create(
+                cart=cart,
+                product_type='transfer',
+                product_id=str(route.id),
+                product_name=f"{route.origin} → {route.destination}",
+                product_image='',  # Transfer routes don't have images
+                variant_id=request.data['vehicle_type'],
+                variant_name=request.data['vehicle_type'].title(),
+                quantity=1,
+                unit_price=price_data['final_price'],
+                total_price=price_data['final_price'],
+                selected_options=request.data.get('selected_options', []),
+                special_requirements=request.data.get('special_requirements', ''),
+                booking_data={
+                    'trip_type': request.data['trip_type'],
+                    'outbound_date': request.data['outbound_date'],
+                    'outbound_time': request.data['outbound_time'],
+                    'return_date': request.data.get('return_date'),
+                    'return_time': request.data.get('return_time'),
+                    'passenger_count': request.data.get('passenger_count', 1),
+                    'luggage_count': request.data.get('luggage_count', 0),
+                    'pickup_address': request.data.get('pickup_address', ''),
+                    'dropoff_address': request.data.get('dropoff_address', ''),
+                    'contact_name': request.data.get('contact_name', ''),
+                    'contact_phone': request.data.get('contact_phone', ''),
+                }
+            )
+            
+            return Response({
+                'message': 'Transfer added to cart successfully',
+                'cart_item': CartItemSerializer(cart_item).data
+            }, status=status.HTTP_201_CREATED)
+            
+        except (TransferRoute.DoesNotExist, TransferRoutePricing.DoesNotExist):
+            return Response(
+                {'error': 'Transfer route or pricing not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class ValidateCartView(APIView):
+    """Validate cart items for checkout."""
+    
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        """Validate cart items and return any issues."""
+        user = request.user if request.user.is_authenticated else None
+        session_id = CartService.get_session_id(request)
+        
+        cart = CartService.get_or_create_cart(session_id=session_id, user=user)
+        
+        validation_errors = []
+        warnings = []
+        
+        for item in cart.items.all():
+            # Check if product still exists and is active
+            if item.product_type == 'tour':
+                from tours.models import Tour
+                try:
+                    tour = Tour.objects.get(id=item.product_id, is_active=True)
+                except Tour.DoesNotExist:
+                    validation_errors.append(f"Tour {item.product_name} is no longer available")
+                    
+            elif item.product_type == 'event':
+                from events.models import Event
+                try:
+                    event = Event.objects.get(id=item.product_id, is_active=True)
+                except Event.DoesNotExist:
+                    validation_errors.append(f"Event {item.product_name} is no longer available")
+                    
+            elif item.product_type == 'transfer':
+                from transfers.models import TransferRoute
+                try:
+                    route = TransferRoute.objects.get(id=item.product_id, is_active=True)
+                except TransferRoute.DoesNotExist:
+                    validation_errors.append(f"Transfer {item.product_name} is no longer available")
+            
+            # Check if variant still exists
+            if item.variant_id:
+                if item.product_type == 'tour':
+                    from tours.models import TourVariant
+                    try:
+                        TourVariant.objects.get(id=item.variant_id, tour_id=item.product_id, is_active=True)
+                    except TourVariant.DoesNotExist:
+                        validation_errors.append(f"Tour variant for {item.product_name} is no longer available")
+                        
+                elif item.product_type == 'event':
+                    from events.models import TicketType
+                    try:
+                        TicketType.objects.get(id=item.variant_id, event_id=item.product_id, is_active=True)
+                    except TicketType.DoesNotExist:
+                        validation_errors.append(f"Ticket type for {item.product_name} is no longer available")
+        
+        return Response({
+            'is_valid': len(validation_errors) == 0,
+            'errors': validation_errors,
+            'warnings': warnings,
+            'cart_count': cart.items.count()
+        }) 

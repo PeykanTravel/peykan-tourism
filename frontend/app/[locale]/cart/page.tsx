@@ -4,19 +4,17 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useCart, CartItem, TourCartItem, EventCartItem, TransferCartItem } from '../../../lib/hooks/useCart';
-import { useAuth } from '../../../lib/contexts/AuthContext';
-import { tokenService } from '../../../lib/services/tokenService';
-import { apiClient } from '../../../lib/api/client';
-import { API_CONFIG } from '../../../lib/config/api';
-import { useErrorHandler } from '../../../lib/utils/errorHandler';
+// New application layer imports
+import { useCart } from '../../../lib/application/hooks/useCart';
+import { useAuth } from '../../../lib/application/hooks/useAuth';
 import TourCartItemComponent from '../../../components/cart/TourCartItem';
 import EventCartItemComponent from '../../../components/cart/EventCartItem';
 import TransferCartItemComponent from '../../../components/cart/TransferCartItem';
 import { 
   ShoppingCart, 
   Trash2, 
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 
 export default function CartPage() {
@@ -24,24 +22,35 @@ export default function CartPage() {
   const params = useParams();
   const locale = params.locale as string;
   const t = useTranslations('Cart');
-  const { items, totalItems, totalPrice, currency, updateItem, removeItem, clearCart, refreshCart } = useCart();
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const { handleError, handleSuccess } = useErrorHandler();
+  
+  // New application layer hooks
+  const { 
+    cart, 
+    isLoading: cartLoading,
+    error: cartError,
+    updateCartItem, 
+    removeFromCart, 
+    clearCart, 
+    getCartItemCount, 
+    getCartTotal
+  } = useCart();
+  
+  const { user, isLoading: authLoading } = useAuth();
   
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!authLoading && !user) {
       router.push('/login?redirect=/cart');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [user, authLoading, router]);
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     
-    if (!isAuthenticated || !user) {
+    if (!user) {
       alert('لطفاً ابتدا وارد حساب کاربری خود شوید.');
       router.push('/login?redirect=/cart');
       return;
@@ -49,18 +58,12 @@ export default function CartPage() {
     
     setIsUpdating(itemId);
     try {
-      const result = await updateItem(itemId, { 
+      await updateCartItem(itemId, { 
         quantity: newQuantity
       });
-      
-      if (result.success) {
-        // Refresh cart to update navbar count
-        await refreshCart();
-      } else {
-        handleError(new Error(result.error || 'Update failed'), 'CART_UPDATE_QUANTITY');
-      }
     } catch (error) {
-      handleError(error, 'CART_UPDATE_QUANTITY');
+      console.error('Error updating cart item:', error);
+      alert('خطا در بروزرسانی سبد خرید. لطفاً دوباره تلاش کنید.');
     } finally {
       setIsUpdating(null);
     }
@@ -69,7 +72,7 @@ export default function CartPage() {
   const handleParticipantChange = async (itemId: string, participantType: 'adult' | 'child' | 'infant', newCount: number) => {
     if (newCount < 0) return;
     
-    if (!isAuthenticated || !user) {
+    if (!user) {
       alert('لطفاً ابتدا وارد حساب کاربری خود شوید.');
       router.push('/login?redirect=/cart');
       return;
@@ -77,69 +80,26 @@ export default function CartPage() {
     
     setIsUpdating(itemId);
     try {
-      const item = items.find(i => i.id === itemId);
-      if (item && item.type === 'tour') {
-        const tourItem = item as TourCartItem;
-        const updatedParticipants = {
-          ...tourItem.participants,
-          [participantType]: newCount
-        };
-        
-        const token = tokenService.getAccessToken();
-        if (!token) {
-          throw new Error('No authentication token found');
-        }
-        
-        const response = await apiClient.patch(API_CONFIG.ENDPOINTS.CART.UPDATE(itemId), {
-          booking_data: {
-            participants: updatedParticipants,
-            schedule_id: item.booking_data.schedule_id,
-            variant_id: item.variant_id,
-            special_requests: item.booking_data.special_requests || ''
-          },
-<<<<<<< Updated upstream
-          body: JSON.stringify({
-            booking_data: {
-              participants: updatedParticipants,
-              schedule_id: tourItem.schedule_id,
-              variant_id: tourItem.variant_id,
-              special_requests: tourItem.special_requests || ''
-            },
-            selected_options: tourItem.selected_options
-          })
-=======
-          selected_options: item.selected_options
->>>>>>> Stashed changes
-        });
-        
-        console.log('Updated cart item:', response.data);
-        
-        // Refresh cart data
-        await refreshCart();
-      }
+      await updateCartItem(itemId, {
+        participants: newCount
+      });
     } catch (error) {        
-        handleError(error, 'CART_UPDATE_PARTICIPANTS');
+      console.error('Error updating participants:', error);
+      alert('خطا در بروزرسانی تعداد شرکت‌کنندگان. لطفاً دوباره تلاش کنید.');
     } finally {
       setIsUpdating(null);
     }
   };
 
   const handleRemoveItem = async (itemId: string) => {
-    if (!isAuthenticated || !user) {
+    if (!user) {
       alert('لطفاً ابتدا وارد حساب کاربری خود شوید.');
       router.push('/login?redirect=/cart');
       return;
     }
     
     try {
-      const result = await removeItem(itemId);
-      if (result.success) {
-        // Refresh cart to update navbar count
-        await refreshCart();
-      } else {
-        console.error('Failed to remove item from cart:', result.error);
-        alert('خطا در حذف آیتم. لطفاً دوباره تلاش کنید.');
-      }
+      await removeFromCart(itemId);
     } catch (error) {
       console.error('Error removing cart item:', error);
       alert('خطا در حذف آیتم. لطفاً دوباره تلاش کنید.');
@@ -148,15 +108,8 @@ export default function CartPage() {
 
   const handleClearCart = async () => {
     try {
-      const result = await clearCart();
-      if (result.success) {
-        // Refresh cart to update navbar count
-        await refreshCart();
-        setShowClearConfirm(false);
-      } else {
-        console.error('Failed to clear cart:', result.error);
-        alert('خطا در پاک کردن سبد خرید. لطفاً دوباره تلاش کنید.');
-      }
+      await clearCart();
+      setShowClearConfirm(false);
     } catch (error) {
       console.error('Error clearing cart:', error);
       alert('خطا در پاک کردن سبد خرید. لطفاً دوباره تلاش کنید.');
@@ -164,7 +117,7 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
+    if (!user) {
       router.push('/login?redirect=/checkout');
       return;
     }
@@ -201,45 +154,47 @@ export default function CartPage() {
     }
   };
 
-  // Render cart item based on product type
-  const renderCartItem = (item: CartItem) => {
-    const commonProps = {
-      isUpdating: isUpdating === item.id,
-      onQuantityChange: handleQuantityChange,
-      onRemove: handleRemoveItem,
-      formatPrice,
-      formatDate
-    };
+  // Show loading state
+  if (authLoading || cartLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">در حال بارگذاری...</p>
+        </div>
+      </div>
+    );
+  }
 
-    switch (item.type) {
-      case 'tour':
-        return (
-          <TourCartItemComponent
-            {...commonProps}
-            item={item as TourCartItem}
-            onParticipantChange={handleParticipantChange}
-          />
-        );
-      case 'event':
-        return (
-          <EventCartItemComponent
-            {...commonProps}
-            item={item as EventCartItem}
-          />
-        );
-      case 'transfer':
-        return (
-          <TransferCartItemComponent
-            {...commonProps}
-            item={item as TransferCartItem}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  // Show error state
+  if (cartError) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-6">
+              <AlertCircle className="w-10 h-10 text-red-500" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              خطا در بارگذاری سبد خرید
+            </h1>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              {cartError}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            >
+              تلاش مجدد
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  if (items.length === 0) {
+  // Show empty cart
+  if (!cart || cart.getItems().length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
@@ -279,113 +234,120 @@ export default function CartPage() {
     );
   }
 
+  // Render cart items
+  const renderCartItem = (item: any) => {
+    const commonProps = {
+      isUpdating: isUpdating === item.id,
+      onQuantityChange: handleQuantityChange,
+      onRemove: handleRemoveItem,
+      formatPrice,
+      formatDate
+    };
+
+    switch (item.productType) {
+      case 'tour':
+        return (
+          <TourCartItemComponent
+            {...commonProps}
+            item={item}
+            onParticipantChange={handleParticipantChange}
+          />
+        );
+      case 'event':
+        return (
+          <EventCartItemComponent
+            {...commonProps}
+            item={item}
+          />
+        );
+      case 'transfer':
+        return (
+          <TransferCartItemComponent
+            {...commonProps}
+            item={item}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-blue-600" />
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {t('cart')} ({getCartItemCount()})
+          </h1>
+          <p className="text-gray-600">
+            {t('cartDescription')}
+          </p>
+        </div>
+
+        {/* Cart Items */}
+        <div className="space-y-6 mb-8">
+          {cart.getItems().map((item) => (
+            <div key={item.id}>
+              {renderCartItem(item)}
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-              <p className="text-gray-600">
-                {totalItems} {t('items')} {t('inCart')}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
+          ))}
+        </div>
+
+        {/* Cart Summary */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {t('summary')}
+            </h2>
             <button
               onClick={() => setShowClearConfirm(true)}
-              className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-2"
+              className="flex items-center gap-2 text-red-600 hover:text-red-700 font-medium"
             >
               <Trash2 className="w-4 h-4" />
               {t('clearCart')}
             </button>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {t('items')} ({totalItems})
-                </h2>
-              </div>
-              
-              <div className="divide-y divide-gray-200">
-                {items.map((item) => (
-                  <div key={item.id}>
-                    {renderCartItem(item)}
-                  </div>
-                ))}
-              </div>
+          
+          <div className="border-t border-gray-200 pt-4">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-lg font-medium text-gray-700">
+                {t('total')}:
+              </span>
+              <span className="text-2xl font-bold text-gray-900">
+                {formatPrice(getCartTotal(), 'USD')}
+              </span>
             </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                {t('orderSummary')}
-              </h2>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('subtotal')}</span>
-                  <span className="font-medium">{formatPrice(totalPrice, currency)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('tax')}</span>
-                  <span className="font-medium">{formatPrice(0, currency)}</span>
-                </div>
-                <div className="border-t border-gray-200 pt-3">
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>{t('total')}</span>
-                    <span>{formatPrice(totalPrice, currency)}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <button
-                onClick={handleCheckout}
-                className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {t('proceedToCheckout')}
-              </button>
-              
-              {!isAuthenticated && (
-                <p className="text-xs text-gray-500 mt-3 text-center">
-                  {t('guestCheckoutNote')}
-                </p>
-              )}
-            </div>
+            
+            <button
+              onClick={handleCheckout}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors shadow-md"
+            >
+              {t('proceedToCheckout')}
+            </button>
           </div>
         </div>
 
         {/* Clear Cart Confirmation Modal */}
         {showClearConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md mx-4">
-              <div className="flex items-center mb-4">
-                <AlertCircle className="w-6 h-6 text-red-500 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">{t('clearCartConfirm')}</h3>
-              </div>
-              <p className="text-gray-600 mb-6">{t('clearCartWarning')}</p>
+            <div className="bg-white rounded-xl p-6 max-w-md mx-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {t('clearCartConfirm')}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {t('clearCartWarning')}
+              </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
                   {t('cancel')}
                 </button>
                 <button
                   onClick={handleClearCart}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                 >
                   {t('clearCart')}
                 </button>

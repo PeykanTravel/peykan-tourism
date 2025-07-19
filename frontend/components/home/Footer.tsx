@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { FaInstagram, FaTelegram, FaWhatsapp, FaPlane } from 'react-icons/fa'
+import { Button, Input } from '@/components/ui'
 
 export default function Footer() {
   return (
@@ -21,14 +22,17 @@ export default function Footer() {
               {/* Subscribe Box */}
               <div className="space-y-4">
                 <div className="flex">
-                  <input
+                  <Input
                     type="email"
                     placeholder="آدرس ایمیل"
-                    className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400"
+                    className="flex-1 rounded-r-none border-gray-700 bg-gray-800 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                   />
-                  <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg font-semibold transition-all duration-300 hover:scale-105">
+                  <Button
+                    variant="primary"
+                    className="rounded-l-none hover:scale-105"
+                  >
                     عضویت
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

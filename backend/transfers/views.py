@@ -118,6 +118,19 @@ class TransferRouteViewSet(viewsets.ReadOnlyModelViewSet):
         
         return Response(search_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @action(detail=False, methods=['get'], url_path='by-slug/(?P<slug>[^/.]+)')
+    def by_slug(self, request, slug=None):
+        """Get transfer route by slug."""
+        try:
+            route = TransferRoute.objects.get(slug=slug, is_active=True)
+            serializer = self.get_serializer(route)
+            return Response(serializer.data)
+        except TransferRoute.DoesNotExist:
+            return Response(
+                {'error': 'Transfer route not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
     @action(detail=True, methods=['post'])
     def calculate_price(self, request, pk=None):
         """Calculate transfer price."""
@@ -133,11 +146,46 @@ class TransferRouteViewSet(viewsets.ReadOnlyModelViewSet):
             
             # Use the service to calculate price
             try:
-                price_data = TransferPricingService.calculate_price(
+                price_data = TransferPricingService.calculate_transfer_price(
                     route=validated_data['route'],
-                    pricing=validated_data['pricing'],
-                    booking_time=validated_data['booking_time'],
-                    return_time=validated_data.get('return_time'),
+                    vehicle_type=validated_data['pricing'].vehicle_type,
+                    trip_type='one_way',  # Default, can be enhanced
+                    outbound_time=validated_data['booking_time'].strftime('%H:%M'),
+                    return_time=validated_data.get('return_time').strftime('%H:%M') if validated_data.get('return_time') else None,
+                    selected_options=validated_data.get('selected_options', [])
+                )
+                
+                response_serializer = TransferPriceResponseSerializer(data=price_data)
+                if response_serializer.is_valid():
+                    return Response(response_serializer.data)
+                else:
+                    return Response(
+                        {'error': 'Price calculation failed'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+            except Exception as e:
+                return Response(
+                    {'error': str(e)}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        
+        return Response(calculation_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def calculate_price_public(self, request):
+        """Public endpoint for transfer price calculation."""
+        calculation_serializer = TransferPriceCalculationSerializer(data=request.data)
+        if calculation_serializer.is_valid():
+            validated_data = calculation_serializer.validated_data
+            
+            # Use the service to calculate price
+            try:
+                price_data = TransferPricingService.calculate_transfer_price(
+                    route=validated_data['route'],
+                    vehicle_type=validated_data['pricing'].vehicle_type,
+                    trip_type='one_way',  # Default, can be enhanced
+                    outbound_time=validated_data['booking_time'].strftime('%H:%M'),
+                    return_time=validated_data.get('return_time').strftime('%H:%M') if validated_data.get('return_time') else None,
                     selected_options=validated_data.get('selected_options', [])
                 )
                 

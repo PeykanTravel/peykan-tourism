@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Mail, ArrowRight, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
-import { requestPasswordReset } from '../../../lib/api/auth';
+import { useAuthService } from '../../../lib/application/hooks/useAuthService';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const t = useTranslations('auth');
+  const authService = useAuthService();
   
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function ForgotPasswordPage() {
     setMessage('');
 
     try {
-      const response = await requestPasswordReset(email);
+      await authService.forgotPassword(email);
       setMessage(t('passwordResetEmailSent'));
       setMessageType('success');
       

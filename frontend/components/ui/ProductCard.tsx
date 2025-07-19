@@ -90,7 +90,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
               alt={title}
               fill
               className="object-cover rounded-l-lg"
-              preset="medium"
             />
           </div>
           
@@ -178,7 +177,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           alt={title}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-300"
-          preset="medium"
         />
         
         {/* Category badge */}

@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Eye, EyeOff, Lock, ArrowRight, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
-import { resetPassword } from '../../../lib/api/auth';
+import { useAuthService } from '../../../lib/application/hooks/useAuthService';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations('auth');
+  const authService = useAuthService();
   
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,12 +56,7 @@ export default function ResetPasswordPage() {
     setMessage('');
 
     try {
-      await resetPassword({
-        email,
-        new_password: newPassword,
-        new_password_confirm: confirmPassword,
-        otp_code: otpCode
-      });
+      await authService.resetPassword(otpCode, newPassword);
       
       setMessage(t('passwordResetSuccessfully'));
       setMessageType('success');

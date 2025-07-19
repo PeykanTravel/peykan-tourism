@@ -39,15 +39,35 @@ class TourCategoryListView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 
+class FeaturedToursView(generics.ListAPIView):
+    """Get featured tours for home page."""
+    serializer_class = TourListSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
+    
+    def get_queryset(self):
+        """Get featured tours ordered by creation date."""
+        return Tour.objects.filter(
+            is_active=True, 
+            is_featured=True
+        ).select_related('category').order_by('-created_at')[:6]
+
+
 class TourListView(generics.ListAPIView):
     """List all tours (no search/filter)."""
     serializer_class = TourListSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Tour.objects.all()  # Remove is_active filter temporarily
+    queryset = Tour.objects.filter(is_active=True).select_related('category')
     pagination_class = None
     filter_backends = []
     search_fields = []
     ordering_fields = []
+    
+    def get_queryset(self):
+        """Get tours ordered by featured, popular, then creation date."""
+        return Tour.objects.filter(is_active=True).select_related('category').order_by(
+            '-is_featured', '-is_popular', '-created_at'
+        )
 
 
 class TourDetailView(generics.RetrieveAPIView):

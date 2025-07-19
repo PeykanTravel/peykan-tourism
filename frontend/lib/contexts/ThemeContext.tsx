@@ -7,8 +7,11 @@ type Theme = 'light' | 'dark' | 'system';
 interface ThemeContextType {
   theme: Theme;
   isDark: boolean;
+  locale: string;
+  isRTL: boolean;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  setLocale: (locale: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -16,19 +19,27 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark');
   const [isDark, setIsDark] = useState(true);
+  const [locale, setLocaleState] = useState('fa');
+  const [isRTL, setIsRTL] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme and locale from localStorage
   useEffect(() => {
-    setMounted(true);
     const savedTheme = localStorage.getItem('theme') as Theme;
+    const savedLocale = localStorage.getItem('locale') || 'fa';
+    
     if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
       setThemeState(savedTheme);
     } else {
-      // Set default to dark if no saved theme
       setThemeState('dark');
       localStorage.setItem('theme', 'dark');
     }
+    
+    setLocaleState(savedLocale);
+    setIsRTL(savedLocale === 'fa');
+    localStorage.setItem('locale', savedLocale);
+    
+    setMounted(true);
   }, []);
 
   // Apply theme to document
@@ -46,6 +57,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.toggle('dark', theme === 'dark');
     }
   }, [theme, mounted]);
+
+  // Apply locale and direction to document
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const root = document.documentElement;
+    
+    // Set lang and dir attributes
+    root.lang = locale;
+    root.dir = isRTL ? 'rtl' : 'ltr';
+    
+    // Add/remove RTL classes
+    if (isRTL) {
+      root.classList.add('rtl');
+      root.classList.remove('ltr');
+    } else {
+      root.classList.add('ltr');
+      root.classList.remove('rtl');
+    }
+  }, [locale, isRTL, mounted]);
 
   // Listen for system theme changes
   useEffect(() => {
@@ -72,21 +103,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setTheme(newTheme);
   };
 
+  const setLocale = (newLocale: string) => {
+    setLocaleState(newLocale);
+    setIsRTL(newLocale === 'fa');
+    localStorage.setItem('locale', newLocale);
+  };
+
   const value = {
     theme,
     isDark,
+    locale,
+    isRTL,
     setTheme,
     toggleTheme,
+    setLocale,
   };
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <div className="dark" suppressHydrationWarning>
-        {children}
-      </div>
-    );
-  }
 
   return (
     <ThemeContext.Provider value={value}>
@@ -102,8 +133,11 @@ export function useTheme() {
     return {
       theme: 'dark' as Theme,
       isDark: true,
+      locale: 'fa',
+      isRTL: true,
       setTheme: () => {},
       toggleTheme: () => {},
+      setLocale: () => {},
     };
   }
   return context;

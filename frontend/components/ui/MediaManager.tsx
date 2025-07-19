@@ -248,7 +248,6 @@ const MediaManager: React.FC<MediaManagerProps> = ({
                     alt={item.alt}
                     fill
                     className="object-cover"
-                    preset="gallery"
                   />
                 ) : (
                   <div className="relative w-full h-full">
@@ -344,7 +343,6 @@ const MediaManager: React.FC<MediaManagerProps> = ({
                   width={800}
                   height={600}
                   className="max-w-full max-h-full object-contain"
-                  preset="large"
                 />
               ) : (
                 <video

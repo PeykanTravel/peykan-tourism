@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, Users, DollarSign } from 'lucide-react';
+import { useCurrency } from '../../lib/currency-context';
 
 interface TourCardProps {
   tour: {
@@ -21,13 +22,12 @@ interface TourCardProps {
 }
 
 export default function TourCard({ tour, viewMode }: TourCardProps) {
-  // Helper for price formatting
-  const formatPrice = (price: string, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD',
-      maximumFractionDigits: 0
-    }).format(parseFloat(price));
+  const { formatPrice, convertCurrency, currency: userCurrency } = useCurrency();
+  
+  // Helper for price formatting with currency conversion
+  const formatPriceWithConversion = (price: string, originalCurrency: string) => {
+    const convertedPrice = convertCurrency(parseFloat(price), originalCurrency as any, userCurrency);
+    return formatPrice(convertedPrice, userCurrency);
   };
 
   // Helper for stars
@@ -78,7 +78,7 @@ export default function TourCard({ tour, viewMode }: TourCardProps) {
               </div>
               <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
                 <DollarSign className="w-4 h-4" />
-                <span>{formatPrice(tour.price, tour.currency)}</span>
+                <span>{formatPriceWithConversion(tour.price, tour.currency)}</span>
               </div>
               {renderStars(tour.rating)}
             </div>
@@ -126,7 +126,7 @@ export default function TourCard({ tour, viewMode }: TourCardProps) {
             </div>
             <div className="flex items-center gap-1">
               <DollarSign className="w-4 h-4 text-white/80" />
-              <span>{formatPrice(tour.price, tour.currency)}</span>
+              <span>{formatPriceWithConversion(tour.price, tour.currency)}</span>
             </div>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4 text-white/80" />

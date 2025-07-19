@@ -22,17 +22,21 @@ import {
   Minus,
   Settings,
   Eye,
-  EyeOff
+  EyeOff,
+  Music,
+  Video,
+  Camera,
+  Wifi,
+  Car,
+  Coffee
 } from 'lucide-react';
-import { getEventBySlug, calculateEventPricing } from '@/lib/api/events';
-import { addEventSeatsToCart } from '../../../../lib/api/cart';
-import { tokenService } from '@/lib/services/tokenService';
-import { useAuth } from '@/lib/contexts/AuthContext';
-import { Event, EventPricingBreakdown, EventBookingRequest, EventPerformance, EventSection, TicketType } from '@/lib/types/api';
+import { useEventsService } from '@/lib/application/hooks/useEventsService';
+import { useCart } from '@/lib/hooks/useCart';
+import { Event, EventPricingBreakdown, EventPerformance, EventSection, TicketType } from '@/lib/types/api';
+import { useCurrency, SUPPORTED_CURRENCIES, CurrencyCode } from '@/lib/currency-context';
 import PerformanceSelector from '@/components/events/PerformanceSelector';
 import SeatMap from '@/components/events/SeatMap';
 import PricingBreakdown from '@/components/events/PricingBreakdown';
-import { useCart } from '@/lib/hooks/useCart';
 
 interface Seat {
   id: string;
@@ -44,7 +48,6 @@ interface Seat {
   is_wheelchair_accessible: boolean;
   is_premium: boolean;
   status: 'available' | 'selected' | 'reserved' | 'sold' | 'blocked';
-  // Add ticket_type as optional, can be string (id), object, or undefined
   ticket_type?: string | { id: string; name: string };
 }
 
@@ -57,11 +60,22 @@ interface BookingStep {
 }
 
 export default function EventDetailPage() {
-  const { slug } = useParams();
-  const { user } = useAuth();
+  const params = useParams();
+  const slug = params.slug as string;
+  const locale = params.locale as string;
   const { refreshCart } = useCart();
   const t = useTranslations('eventDetail');
   const router = useRouter();
+  const { formatPrice, convertCurrency, currency: userCurrency } = useCurrency();
+  
+  // Use the new events service
+  const { 
+    getEventBySlug, 
+    calculateEventPricing, 
+    addEventToCart,
+    isLoading: eventsLoading,
+    error: eventsError 
+  } = useEventsService();
   
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -113,13 +127,13 @@ export default function EventDetailPage() {
     }
   ]);
   
-  // Fetch event data
+  // Fetch event data using the new service
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         setIsLoading(true);
-        const response = await getEventBySlug(slug as string);
-        setEvent(response);
+        const eventData = await getEventBySlug(slug);
+        setEvent(eventData);
         setError(null);
       } catch (err) {
         setError(t('failedToLoadEvent'));
@@ -132,7 +146,7 @@ export default function EventDetailPage() {
     if (slug) {
       fetchEvent();
     }
-  }, [slug, t]);
+  }, [slug, t, getEventBySlug]);
 
   // Update booking steps based on selections
   useEffect(() => {
@@ -166,175 +180,162 @@ export default function EventDetailPage() {
     });
   };
 
-  const formatPrice = (price: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD'
-    }).format(price);
-  };
-
   // Handle performance selection
   const handlePerformanceSelect = (performance: EventPerformance) => {
     setSelectedPerformance(performance);
     setSelectedSection(null);
     setSelectedSeats([]);
+    setSelectedTicketType(null);
     setCurrentStep(2);
   };
 
   // Handle section selection
   const handleSectionSelect = (section: EventSection) => {
     setSelectedSection(section);
-    if (section.ticket_types && section.ticket_types.length > 0) {
-      setSelectedTicketType(section.ticket_types[0].ticket_type);
-    }
-    setCurrentStep(2);
+    setSelectedSeats([]);
+    setSelectedTicketType(null);
   };
 
   // Handle seat selection
   const handleSeatSelect = (seat: Seat) => {
-    setSelectedSeats(prev => [...prev, seat]);
+    if (seat.status === 'available') {
+      setSelectedSeats(prev => [...prev, seat]);
+    }
   };
 
   const handleSeatDeselect = (seat: Seat) => {
     setSelectedSeats(prev => prev.filter(s => s.id !== seat.id));
   };
 
+  // Handle ticket type selection
+  const handleTicketTypeSelect = (ticketType: TicketType) => {
+    setSelectedTicketType(ticketType);
+  };
+
   // Handle option selection
-  const handleOptionChange = (option: any, quantity: number) => {
+  const handleOptionSelect = (option: any, quantity: number) => {
     setSelectedOptions(prev => {
-      const existing = prev.find(opt => opt.id === option.id);
+      const existing = prev.find(o => o.id === option.id);
       if (existing) {
-        if (quantity === 0) {
-          return prev.filter(opt => opt.id !== option.id);
-        }
-        return prev.map(opt => 
-          opt.id === option.id ? { ...opt, quantity } : opt
-        );
+        return prev.map(o => o.id === option.id ? { ...o, quantity } : o);
+      } else {
+        return [...prev, { ...option, quantity }];
       }
-      return quantity > 0 ? [...prev, { ...option, quantity }] : prev;
     });
   };
 
-  // Get pricing when selections change
+  // Calculate pricing when selections change
   useEffect(() => {
     const fetchPricing = async () => {
-      if (!selectedPerformance || !selectedSection || !selectedTicketType || selectedSeats.length === 0) {
+      if (!event || !selectedPerformance || !selectedSection || !selectedTicketType || selectedSeats.length === 0) {
         setPricingBreakdown(null);
         return;
       }
 
       try {
-        const response = await calculateEventPricing(event!.id, {
+        const pricing = await calculateEventPricing({
+          event_id: event.id,
           performance_id: selectedPerformance.id,
           section_name: selectedSection.name,
           ticket_type_id: selectedTicketType.id,
           quantity: selectedSeats.length,
-          selected_options: selectedOptions.map(opt => ({
-            option_id: opt.id,
-            quantity: opt.quantity
-          })),
-          discount_code: discountCode
+          selected_options: selectedOptions,
+          discount_code: discountCode,
+          user_currency: userCurrency
         });
-        setPricingBreakdown(response.pricing_breakdown);
-      } catch (err) {
-        console.error('Failed to fetch pricing:', err);
+        
+        setPricingBreakdown(pricing);
+      } catch (error) {
+        console.error('Failed to calculate pricing:', error);
       }
     };
 
     fetchPricing();
-  }, [selectedPerformance, selectedSection, selectedTicketType, selectedSeats, selectedOptions, discountCode]);
+  }, [selectedPerformance, selectedSection, selectedSeats, selectedOptions, discountCode, event?.id, selectedTicketType?.id, calculateEventPricing]);
 
   // Handle booking
   const handleBooking = async () => {
-    if (!user) {
-      router.push('/login');
+    if (!event || !selectedPerformance || !selectedSection || selectedSeats.length === 0) {
       return;
     }
 
-    if (!selectedPerformance || !selectedSection || !selectedTicketType || selectedSeats.length === 0) {
-      alert(t('selectRequiredFields'));
-      return;
-    }
-
-    setIsBooking(true);
-    
     try {
-      const bookingRequest: EventBookingRequest = {
-        event_id: event!.id,
+      setIsBooking(true);
+      
+      // Add event to cart using the new service
+      await addEventToCart({
+        event_id: event.id,
         performance_id: selectedPerformance.id,
         section_name: selectedSection.name,
-        ticket_type_id: selectedTicketType.id,
+        ticket_type_id: selectedTicketType?.id || '',
         quantity: selectedSeats.length,
         selected_seats: selectedSeats.map(seat => seat.id),
         selected_options: selectedOptions.map(opt => ({
           option_id: opt.id,
           quantity: opt.quantity
-        })),
-        discount_code: discountCode || undefined
-      };
+        }))
+      });
 
-      const token = tokenService.getAccessToken();
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-
-      await addEventSeatsToCart({
-        event_id: event!.id,
-        performance_id: selectedPerformance.id,
-        ticket_type_id: selectedTicketType.id,
-        seats: selectedSeats.map(seat => ({
-          seat_id: seat.id,
-          seat_number: seat.seat_number,
-          row_number: seat.row_number,
-          section: seat.section,
-          price: seat.price
-        })),
-        selected_options: selectedOptions.map(opt => ({
-          option_id: opt.id,
-          quantity: opt.quantity
-        })),
-        special_requests: selectedOptions.length > 0 ? 
-          `Options: ${selectedOptions.map(opt => `${opt.name} x${opt.quantity}`).join(', ')}` : 
-          undefined
-      }, token);
-
+      // Refresh cart
       await refreshCart();
-      router.push('/cart');
-    } catch (err) {
-      console.error('Booking failed:', err);
-      alert(t('bookingFailed'));
+      
+      // Navigate to cart
+      router.push(`/${locale}/cart`);
+      
+    } catch (error) {
+      console.error('Failed to add event to cart:', error);
+      setError(t('failedToAddToCart'));
     } finally {
       setIsBooking(false);
     }
   };
 
+  // Handle discount code
   const handleDiscountApply = () => {
-    // This will trigger the useEffect for pricing
-    console.log('Applying discount:', discountCode);
+    // Pricing will be recalculated automatically via useEffect
+    setShowPricingDetails(true);
   };
 
-  if (isLoading) {
+  // Loading state
+  if (isLoading || eventsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loadingEvent')}</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
   }
 
-  if (error || !event) {
+  // Error state
+  if (error || eventsError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('eventNotFound')}</h1>
-          <p className="text-gray-600 mb-6">{error || t('eventNotFoundDescription')}</p>
-          <button
-            onClick={() => router.push('/events')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+          <div className="text-red-600 text-xl mb-4">{t('error')}</div>
+          <p className="text-gray-600">{error || eventsError}</p>
+          <button 
+            onClick={() => router.back()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            {t('backToEvents')}
+            {t('goBack')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-gray-600 text-xl mb-4">{t('eventNotFound')}</div>
+          <button 
+            onClick={() => router.back()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            {t('goBack')}
           </button>
         </div>
       </div>
@@ -344,10 +345,10 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <button
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <button 
               onClick={() => router.back()}
               className="flex items-center text-gray-600 hover:text-gray-900"
             >
@@ -356,18 +357,14 @@ export default function EventDetailPage() {
             </button>
             
             <div className="flex items-center space-x-4">
-              <button
+              <button 
                 onClick={() => setIsFavorite(!isFavorite)}
-                className={`p-2 rounded-lg ${
-                  isFavorite 
-                    ? 'bg-red-50 text-red-600' 
-                    : 'bg-gray-100 text-gray-600 hover:text-gray-900'
-                }`}
+                className={`p-2 rounded-full ${isFavorite ? 'text-red-500' : 'text-gray-400'} hover:text-red-500`}
               >
                 <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
               
-              <button className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:text-gray-900">
+              <button className="p-2 text-gray-400 hover:text-gray-600 rounded-full">
                 <Share2 className="h-5 w-5" />
               </button>
             </div>
@@ -376,316 +373,306 @@ export default function EventDetailPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Event Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="relative">
-            <img
-              src={event.image}
-              alt={event.title}
-              className="w-full h-64 object-cover rounded-t-lg"
-            />
-            <div className="absolute top-4 left-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {event.category.name}
-              </span>
-            </div>
-          </div>
-          
-          <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="flex items-center text-gray-600">
-                <Calendar className="h-5 w-5 mr-2" />
-                <span>{event.performances?.[0] ? formatDate(event.performances[0].date) : t('noPerformances')}</span>
-              </div>
-              
-              <div className="flex items-center text-gray-600">
-                <Clock className="h-5 w-5 mr-2" />
-                <span>{event.start_time}</span>
-              </div>
-              
-              <div className="flex items-center text-gray-600">
-                <MapPin className="h-5 w-5 mr-2" />
-                <span>{event.venue.name}</span>
-              </div>
-              
-              <div className="flex items-center text-gray-600">
-                <Users className="h-5 w-5 mr-2" />
-                <span>{event.venue.total_capacity} {t('capacity')}</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-6 mb-6">
-              <div className="flex items-center">
-                <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                <span className="ml-1 text-sm text-gray-600">
-                  {event.average_rating} ({event.review_count} {t('reviews')})
-                </span>
-              </div>
-              
-              <div className="text-sm text-gray-600">
-                {event.style}
-              </div>
-            </div>
-            
-            <p className="text-gray-700 leading-relaxed">
-              {event.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Booking Steps */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('bookingSteps')}</h2>
-            <div className="flex items-center justify-between">
-              {bookingSteps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                    step.isComplete 
-                      ? 'bg-green-500 border-green-500 text-white' 
-                      : step.isActive 
-                        ? 'bg-blue-500 border-blue-500 text-white' 
-                        : 'bg-gray-100 border-gray-300 text-gray-400'
-                  }`}>
-                    {step.isComplete ? (
-                      <CheckCircle className="h-5 w-5" />
-                    ) : (
-                      <span className="text-sm font-medium">{step.id}</span>
-                    )}
-                  </div>
-                  <div className="ml-3">
-                    <div className={`text-sm font-medium ${
-                      step.isActive ? 'text-gray-900' : 'text-gray-500'
-                    }`}>
-                      {step.title}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {step.description}
-                    </div>
-                  </div>
-                  {index < bookingSteps.length - 1 && (
-                    <ChevronRight className="h-5 w-5 text-gray-400 mx-4" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Booking Flow */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Performance Selection */}
-            <PerformanceSelector
-              performances={event.performances || []}
-              selectedPerformance={selectedPerformance}
-              onPerformanceSelect={handlePerformanceSelect}
-              formatDate={formatDate}
-              formatTime={formatTime}
-              formatPrice={formatPrice}
-            />
+          <div className="lg:col-span-2">
+            {/* Event Header */}
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{event.title}</h1>
+                  <p className="text-gray-600 mb-4">{event.description}</p>
+                  
+                  <div className="flex items-center space-x-6 text-sm text-gray-500">
+                    <div className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span>{formatDate(event.performances?.[0]?.date || '')}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span>{formatTime(event.start_time)}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span>{event.venue?.name}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {formatPrice(event.price, event.currency)}
+                  </div>
+                  <div className="text-sm text-gray-500">{t('startingFrom')}</div>
+                </div>
+              </div>
 
-            {/* Seat Map */}
-            {selectedPerformance && (
-              <SeatMap
-                sections={selectedPerformance.sections || []}
-                ticketTypes={event.ticket_types || []}
-                selectedSeats={selectedSeats}
-                onSeatSelect={handleSeatSelect}
-                onSeatDeselect={handleSeatDeselect}
-                onSectionSelect={handleSectionSelect}
-                selectedSection={selectedSection}
-                selectedTicketType={selectedTicketType}
-                formatPrice={formatPrice}
-              />
+              {/* Event Details */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{t('eventDetails')}</h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div><strong>{t('category')}:</strong> {event.category?.name}</div>
+                    <div><strong>{t('style')}:</strong> {event.style}</div>
+                    <div><strong>{t('duration')}:</strong> {event.duration_hours} {t('hours')}</div>
+                    {event.age_restriction && (
+                      <div><strong>{t('ageRestriction')}:</strong> {event.age_restriction}+</div>
+                    )}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{t('venueInfo')}</h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div><strong>{t('venue')}:</strong> {event.venue?.name}</div>
+                    <div><strong>{t('address')}:</strong> {event.venue?.address}</div>
+                    <div><strong>{t('capacity')}:</strong> {event.venue?.total_capacity} {t('seats')}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Booking Steps */}
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">{t('bookingSteps')}</h2>
+              <div className="space-y-4">
+                {bookingSteps.map((step) => (
+                  <div key={step.id} className={`flex items-center space-x-4 p-4 rounded-lg border ${
+                    step.isActive ? 'border-blue-200 bg-blue-50' : 
+                    step.isComplete ? 'border-green-200 bg-green-50' : 
+                    'border-gray-200 bg-gray-50'
+                  }`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      step.isComplete ? 'bg-green-500 text-white' :
+                      step.isActive ? 'bg-blue-500 text-white' :
+                      'bg-gray-300 text-gray-600'
+                    }`}>
+                      {step.isComplete ? (
+                        <CheckCircle className="h-5 w-5" />
+                      ) : (
+                        <span className="text-sm font-medium">{step.id}</span>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-medium">{step.title}</h3>
+                      <p className="text-sm text-gray-600">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Performance Selection */}
+            {currentStep >= 1 && (
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4">{t('selectPerformance')}</h2>
+                <PerformanceSelector
+                  performances={event.performances || []}
+                  selectedPerformance={selectedPerformance}
+                  onSelect={handlePerformanceSelect}
+                />
+              </div>
+            )}
+
+            {/* Seat Selection */}
+            {currentStep >= 2 && selectedPerformance && (
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4">{t('selectSeats')}</h2>
+                <SeatMap
+                  performance={selectedPerformance}
+                  selectedSeats={selectedSeats}
+                  onSeatSelect={handleSeatSelect}
+                  onSeatDeselect={handleSeatDeselect}
+                  onSectionSelect={handleSectionSelect}
+                  selectedSection={selectedSection}
+                />
+              </div>
             )}
 
             {/* Options Selection */}
-            {selectedSection && event.options && event.options.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    {t('additionalOptions')}
-                  </h3>
-                  <div className="space-y-4">
-                    {event.options.map((option) => (
-                      <div key={option.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{option.name}</h4>
-                          <p className="text-sm text-gray-600">{option.description}</p>
-                          <p className="text-sm font-medium text-gray-900 mt-1">
-                            {formatPrice(option.price, option.currency)}
-                          </p>
-                        </div>
+            {currentStep >= 3 && selectedSeats.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4">{t('addOptions')}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {event.options?.map((option) => (
+                    <div key={option.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">{option.name}</h3>
+                        <span className="text-blue-600 font-semibold">
+                          {formatPrice(option.price, option.currency)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3">{option.description}</p>
+                      
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => {
-                              const currentQuantity = selectedOptions.find(opt => opt.id === option.id)?.quantity || 0;
-                              handleOptionChange(option, Math.max(0, currentQuantity - 1));
+                              const currentQty = selectedOptions.find(o => o.id === option.id)?.quantity || 0;
+                              if (currentQty > 0) {
+                                handleOptionSelect(option, currentQty - 1);
+                              }
                             }}
-                            className="p-1 rounded-md bg-gray-100 hover:bg-gray-200"
+                            className="p-1 rounded-full hover:bg-gray-100"
                           >
                             <Minus className="h-4 w-4" />
                           </button>
                           <span className="w-8 text-center">
-                            {selectedOptions.find(opt => opt.id === option.id)?.quantity || 0}
+                            {selectedOptions.find(o => o.id === option.id)?.quantity || 0}
                           </span>
                           <button
                             onClick={() => {
-                              const currentQuantity = selectedOptions.find(opt => opt.id === option.id)?.quantity || 0;
-                              handleOptionChange(option, Math.min(option.max_quantity, currentQuantity + 1));
+                              const currentQty = selectedOptions.find(o => o.id === option.id)?.quantity || 0;
+                              handleOptionSelect(option, currentQty + 1);
                             }}
-                            className="p-1 rounded-md bg-gray-100 hover:bg-gray-200"
+                            className="p-1 rounded-full hover:bg-gray-100"
                           >
                             <Plus className="h-4 w-4" />
                           </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Review and Booking */}
+            {currentStep >= 4 && pricingBreakdown && (
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4">{t('reviewAndBook')}</h2>
+                
+                <PricingBreakdown pricing={pricingBreakdown} />
+                
+                <div className="mt-6">
+                  <button
+                    onClick={handleBooking}
+                    disabled={isBooking}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isBooking ? t('processing') : t('addToCart')}
+                  </button>
                 </div>
               </div>
             )}
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Pricing Breakdown */}
-            <PricingBreakdown
-              breakdown={pricingBreakdown}
-              discountCode={discountCode}
-              onDiscountCodeChange={setDiscountCode}
-              onApplyDiscount={handleDiscountApply}
-              formatPrice={formatPrice}
-              showDetails={showPricingDetails}
-              onToggleDetails={() => setShowPricingDetails(!showPricingDetails)}
-            />
-
-            {/* Booking Summary */}
-            {selectedSeats.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">{t('bookingSummary')}</h3>
-                </div>
-                <div className="p-4 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>{t('performance')}</span>
-                    <span>{selectedPerformance ? formatDate(selectedPerformance.date) : '-'}</span>
+          <div className="lg:col-span-1">
+            {/* Pricing Summary */}
+            {pricingBreakdown && (
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6 sticky top-4">
+                <h3 className="text-lg font-semibold mb-4">{t('pricingSummary')}</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>{t('tickets')}</span>
+                    <span>{selectedSeats.length} × {formatPrice(pricingBreakdown.base_price, pricingBreakdown.currency)}</span>
                   </div>
-                  {/* Group seats by section and ticket type */}
-                  {Object.entries(selectedSeats.reduce((acc: Record<string, Seat[]>, seat) => {
-                    // Safely resolve ticket type name for grouping
-                    let ticketTypeName = '-';
-                    if (seat.ticket_type) {
-                      if (typeof seat.ticket_type === 'string' && event.ticket_types) {
-                        // Try to resolve name from event.ticket_types by id
-                        const found = event.ticket_types.find((tt: any) => tt.id === seat.ticket_type);
-                        ticketTypeName = found?.name || seat.ticket_type;
-                      } else if (typeof seat.ticket_type === 'object' && seat.ticket_type.name) {
-                        ticketTypeName = seat.ticket_type.name;
-                      } else {
-                        ticketTypeName = seat.ticket_type as string;
-                      }
-                    } else if (selectedTicketType?.name) {
-                      ticketTypeName = selectedTicketType.name;
-                    }
-                    const key = `${seat.section}__${ticketTypeName}`;
-                    if (!acc[key]) acc[key] = [];
-                    acc[key].push(seat);
-                    return acc;
-                  }, {} as Record<string, Seat[]>)).map(([key, seats]: [string, Seat[]]) => {
-                    // Extract ticket type name for display
-                    let ticketTypeName = '-';
-                    const firstSeat = seats[0];
-                    if (firstSeat.ticket_type) {
-                      if (typeof firstSeat.ticket_type === 'string' && event.ticket_types) {
-                        const found = event.ticket_types.find((tt: any) => tt.id === firstSeat.ticket_type);
-                        ticketTypeName = found?.name || firstSeat.ticket_type;
-                      } else if (typeof firstSeat.ticket_type === 'object' && firstSeat.ticket_type.name) {
-                        ticketTypeName = firstSeat.ticket_type.name;
-                      } else {
-                        ticketTypeName = firstSeat.ticket_type as string;
-                      }
-                    } else if (selectedTicketType?.name) {
-                      ticketTypeName = selectedTicketType.name;
-                    }
-                    return (
-                      <div key={key} className="mt-2">
-                        <div className="flex justify-between text-sm font-medium">
-                          <span>{t('section')}</span>
-                          <span>{seats[0].section}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>{t('ticketType') || 'Ticket Type'}</span>
-                          <span>{ticketTypeName || '-'}</span>
-                        </div>
-                        <div className="text-sm mt-1">
-                          <span>{t('seats')}:</span>
-                          <ul className="ml-2 mt-1">
-                            {seats.map(seat => (
-                              <li key={seat.id} className="flex justify-between">
-                                <span>
-                                  Row {seat.row_number}, Seat {seat.seat_number}
-                                  {seat.is_premium ? ' (Premium)' : ''}
-                                  {seat.is_wheelchair_accessible ? ' (Wheelchair)' : ''}
-                                </span>
-                                <span>{formatPrice(Number(seat.price), seat.currency)}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {/* Options */}
-                  {selectedOptions.length > 0 && (
-                    <div className="mt-2">
-                      <div className="font-medium text-sm mb-1">{t('options')}</div>
-                      <ul className="ml-2">
-                        {selectedOptions.map(opt => (
-                          <li key={opt.id} className="flex justify-between">
-                            <span>{opt.name} ({opt.quantity}x)</span>
-                            <span>{formatPrice(Number(opt.price) * Number(opt.quantity), opt.currency || 'USD')}</span>
-                          </li>
-                        ))}
-                      </ul>
+                  
+                  {pricingBreakdown.options_total > 0 && (
+                    <div className="flex justify-between">
+                      <span>{t('options')}</span>
+                      <span>{formatPrice(pricingBreakdown.options_total, pricingBreakdown.currency)}</span>
                     </div>
                   )}
-                  {/* Total */}
-                  <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200">
-                    <span>{t('total') || 'Total'}</span>
-                    <span>{formatPrice(
-                      selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0) +
-                      selectedOptions.reduce((sum, opt) => sum + Number(opt.price) * Number(opt.quantity), 0),
-                      'USD')}
-                    </span>
+                  
+                  {pricingBreakdown.fees_total > 0 && (
+                    <div className="flex justify-between">
+                      <span>{t('fees')}</span>
+                      <span>{formatPrice(pricingBreakdown.fees_total, pricingBreakdown.currency)}</span>
+                    </div>
+                  )}
+                  
+                  {pricingBreakdown.discount_amount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>{t('discount')}</span>
+                      <span>-{formatPrice(pricingBreakdown.discount_amount, pricingBreakdown.currency)}</span>
+                    </div>
+                  )}
+                  
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between font-semibold text-lg">
+                      <span>{t('total')}</span>
+                      <span>{formatPrice(pricingBreakdown.total, pricingBreakdown.currency)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Booking Button */}
-            <button
-              onClick={handleBooking}
-              disabled={isBooking || !selectedPerformance || !selectedSection || selectedSeats.length === 0}
-              className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isBooking ? t('booking') : t('addToCart')}
-            </button>
-
-            {/* Security Notice */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-start">
-                <Shield className="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                <div className="text-sm text-gray-600">
-                  <p className="font-medium mb-1">{t('secureBooking')}</p>
-                  <p>{t('secureBookingDescription')}</p>
+            {/* Event Info */}
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4">{t('eventInfo')}</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">{t('artists')}</h4>
+                  <div className="space-y-2">
+                    {event.artists?.map((artist) => (
+                      <div key={artist.id} className="flex items-center space-x-3">
+                        {artist.image && (
+                          <img 
+                            src={artist.image} 
+                            alt={artist.name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        )}
+                        <div>
+                          <div className="font-medium">{artist.name}</div>
+                          {artist.bio && (
+                            <div className="text-sm text-gray-600">{artist.bio}</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">{t('venueFacilities')}</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {event.venue?.facilities?.map((facility, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span>{facility}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Reviews */}
+            {event.reviews && event.reviews.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-4">{t('reviews')}</h3>
+                
+                <div className="space-y-4">
+                  {event.reviews.slice(0, 3).map((review) => (
+                    <div key={review.id} className="border-b pb-4 last:border-b-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-gray-600">{review.rating}/5</span>
+                        </div>
+                        <span className="text-sm text-gray-500">{review.user_name}</span>
+                      </div>
+                      
+                      <h4 className="font-medium mb-1">{review.title}</h4>
+                      <p className="text-sm text-gray-600">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

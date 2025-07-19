@@ -3,16 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-<<<<<<< Updated upstream
 import { useCart, TourCartItem } from '../../../../lib/hooks/useCart';
 import { useAuth } from '../../../../lib/contexts/AuthContext';
+import { apiClient } from '../../../../lib/infrastructure/api/client';
 import { tokenService } from '../../../../lib/services/tokenService';
-=======
-import { useCart } from '../../../../lib/contexts/UnifiedCartContext';
-import { useAuth } from '../../../../lib/contexts/AuthContext';
-import { API_CONFIG } from '../../../../lib/config/api';
-import { apiClient } from '../../../../lib/api/client';
->>>>>>> Stashed changes
 import { 
   Calendar, 
   Clock, 
@@ -220,16 +214,8 @@ export default function TourDetailPage() {
     const fetchTour = async () => {
       try {
         setIsLoading(true);
-<<<<<<< Updated upstream
-        const response = await fetch(`http://localhost:8000/api/v1/tours/${slug}/`);
-        if (response.ok) {
-          const data = await response.json();
-          setTour(data);
-=======
-        const response = await apiClient.get(API_CONFIG.ENDPOINTS.TOURS.DETAIL(slug));
-        const data = response.data;
+        const data = await apiClient.get(`/tours/${slug}/`) as Tour;
         setTour(data);
->>>>>>> Stashed changes
           
         // Set default variant if available
         if (data.variants && data.variants.length > 0) {
@@ -349,85 +335,10 @@ export default function TourDetailPage() {
     return null;
   };
 
-  // Handle booking
-  const handleBooking = async () => {
-    if (!tour || !selectedSchedule || !selectedVariant) return;
-
-    const totalParticipants = participants.adult + participants.child + participants.infant;
-    if (totalParticipants === 0) {
-      setBookingMessage('لطفاً حداقل یک نفر انتخاب کنید.');
-      return;
-    }
-
-    const pricing = calculatePricing();
-    if (!pricing || pricing.hasPricingError) {
-      setBookingMessage('خطا در محاسبه قیمت.');
-      return;
-    }
-
-    try {
-      setIsBooking(true);
-      setBookingMessage(null);
-
-             // Create cart item
-       const cartItem = {
-         id: `${tour.id}-${selectedVariant.id}-${selectedSchedule.id}`,
-         product_type: 'tour' as const,
-         product_id: tour.id,
-         variant_id: selectedVariant.id,
-         schedule_id: selectedSchedule.id,
-         title: tour.title,
-         variant_name: selectedVariant.name,
-         schedule_date: selectedSchedule.start_date,
-         schedule_time: `${selectedSchedule.start_time} - ${selectedSchedule.end_time}`,
-         booking_date: selectedSchedule.start_date,
-         booking_time: selectedSchedule.start_time,
-         participants,
-         selected_options: Object.entries(selectedOptions).map(([optionId, quantity]) => {
-           const option = tour.options.find(o => o.id === optionId);
-           return {
-             option_id: optionId,
-             quantity,
-             price: option ? option.price : 0
-           };
-         }).filter(option => option.quantity > 0),
-         special_requests: specialRequests,
-         quantity: participants.adult + participants.child + participants.infant,
-         unit_price: selectedVariant.base_price,
-         total_price: pricing.total,
-         options_total: pricing.breakdown.options,
-         currency: tour.currency,
-         image: tour.image,
-         duration: `${tour.duration_hours} hours`,
-         location: `${tour.city}, ${tour.country}`,
-         booking_data: {
-           schedule_id: selectedSchedule.id,
-           participants,
-           special_requests: specialRequests
-         }
-       };
-
-      await addItem(cartItem);
-      setBookingMessage('تور با موفقیت به سبد خرید اضافه شد!');
-      
-      // Reset form
-      setParticipants({ adult: 1, child: 0, infant: 0 });
-      setSelectedOptions({});
-      setSpecialRequests('');
-      
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      setBookingMessage('خطا در افزودن به سبد خرید.');
-    } finally {
-      setIsBooking(false);
-    }
-  };
-
   const pricing = calculatePricing();
   const isBookable = isTourBookable();
   const bookingError = getBookingErrorMessage();
 
-<<<<<<< Updated upstream
   // Handle booking
   const handleBooking = async () => {
     if (!tour || !selectedVariant || !selectedSchedule || !isBookable) return;
@@ -537,8 +448,6 @@ export default function TourDetailPage() {
     }
   };
 
-=======
->>>>>>> Stashed changes
   // Toggle section expansion
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);

@@ -7,6 +7,7 @@ import {
   RequestConfig, 
   ResponseConfig 
 } from '../../domain/entities/Common';
+import { SafeStorage } from '../../utils/storage';
 
 // Extended Axios config with metadata
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
@@ -80,36 +81,36 @@ class TokenManager {
   private readonly TOKEN_EXPIRES_KEY = 'token_expires';
 
   getAccessToken(): string | null {
-    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    return SafeStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+    return SafeStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
   setTokens(accessToken: string, refreshToken: string, expiresIn: number): void {
     const expirationTime = Date.now() + (expiresIn * 1000);
     
-    localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
-    localStorage.setItem(this.TOKEN_EXPIRES_KEY, expirationTime.toString());
+    SafeStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+    SafeStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+    SafeStorage.setItem(this.TOKEN_EXPIRES_KEY, expirationTime.toString());
   }
 
   clearTokens(): void {
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-    localStorage.removeItem(this.TOKEN_EXPIRES_KEY);
+    SafeStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    SafeStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    SafeStorage.removeItem(this.TOKEN_EXPIRES_KEY);
   }
 
   isTokenExpired(): boolean {
-    const expirationTime = localStorage.getItem(this.TOKEN_EXPIRES_KEY);
+    const expirationTime = SafeStorage.getItem(this.TOKEN_EXPIRES_KEY);
     if (!expirationTime) return true;
     
     return Date.now() > parseInt(expirationTime);
   }
 
   isTokenExpiringSoon(thresholdMinutes: number = 5): boolean {
-    const expirationTime = localStorage.getItem(this.TOKEN_EXPIRES_KEY);
+    const expirationTime = SafeStorage.getItem(this.TOKEN_EXPIRES_KEY);
     if (!expirationTime) return true;
     
     const threshold = thresholdMinutes * 60 * 1000;
@@ -144,6 +145,7 @@ export class ApiClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+      withCredentials: true, // Enable cookies for CORS
     });
 
     this.setupInterceptors();
@@ -198,42 +200,89 @@ export class ApiClient {
           method: response.config.method?.toUpperCase() || 'GET',
           duration
         });
-
+        
         return response;
       },
       async (error: any) => {
-        const duration = Date.now() - (error.config?.metadata?.startTime || 0);
+        const originalRequest = error.config;
         
-        // Handle 401 Unauthorized - Try to refresh token
-        if (error.response?.status === 401 && !error.config._retry) {
-          error.config._retry = true;
+        // Log error for debugging
+        console.error('API Error:', {
+          url: originalRequest?.url,
+          method: originalRequest?.method,
+          status: error.response?.status,
+          message: error.response?.data?.message || error.message
+        });
+
+        // Handle 401 errors with token refresh
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
           
           try {
-            await this.refreshTokenIfNeeded();
-            return this.axiosInstance(error.config);
+            const refreshSuccess = await this.refreshTokens(this.tokenManager.getRefreshToken() || '');
+            if (refreshSuccess) {
+              // Retry original request with new token
+              return this.axiosInstance(originalRequest);
+            } else {
+              // Clear auth and redirect to login
+              this.tokenManager.clearTokens();
+              this.eventEmitter.emit('auth:expired', { message: 'Session expired' });
+              if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+              }
+              return Promise.reject(error);
+            }
           } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
             this.tokenManager.clearTokens();
-            this.eventEmitter.emit('auth:expired', {
-              message: 'Session expired. Please login again.'
-            });
-            return Promise.reject(refreshError);
+            this.eventEmitter.emit('auth:expired', { message: 'Session expired' });
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
+            return Promise.reject(error);
           }
         }
 
-        const apiError = this.transformError(error);
-        
+        // Handle network errors
+        if (!error.response) {
+          console.error('Network error:', error.message);
+          return Promise.reject({
+            message: 'Network error. Please check your connection.',
+            isNetworkError: true
+          });
+        }
+
+        // Handle server errors
+        if (error.response?.status >= 500) {
+          console.error('Server error:', error.response.status);
+          return Promise.reject({
+            message: 'Server error. Please try again later.',
+            isServerError: true
+          });
+        }
+
+        // Handle validation errors
+        if (error.response?.status === 400) {
+          const validationErrors = error.response.data;
+          console.error('Validation error:', validationErrors);
+          return Promise.reject({
+            message: 'Please check your input and try again.',
+            validationErrors,
+            isValidationError: true
+          });
+        }
+
         this.eventEmitter.emit('request:error', {
           url: error.config?.url || '',
           method: error.config?.method?.toUpperCase() || 'GET',
-          error: apiError
+          error: this.transformError(error)
         });
-
-        return Promise.reject(apiError);
+        
+        return Promise.reject(error);
       }
     );
   }
 
-  // Refresh token if needed
   private async refreshTokenIfNeeded(): Promise<void> {
     if (this.refreshingPromise) {
       return this.refreshingPromise;
@@ -241,160 +290,155 @@ export class ApiClient {
 
     const refreshToken = this.tokenManager.getRefreshToken();
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      return;
     }
 
-    this.refreshingPromise = this.refreshTokens(refreshToken)
-      .finally(() => {
-        this.refreshingPromise = null;
-      });
-
-    return this.refreshingPromise;
+    this.refreshingPromise = this.refreshTokens(refreshToken).then(() => {});
+    try {
+      await this.refreshingPromise;
+    } finally {
+      this.refreshingPromise = null;
+    }
   }
 
-  // Refresh tokens
-  private async refreshTokens(refreshToken: string): Promise<void> {
+  private async refreshTokens(refreshToken: string): Promise<boolean> {
     try {
-      const response = await this.axiosInstance.post('/auth/refresh-token/', {
-        refresh_token: refreshToken
+      const response = await axios.post(`${this.config.baseURL}/auth/refresh/`, {
+        refresh: refreshToken
       });
 
-      const { access_token, refresh_token: newRefreshToken, expires_in } = response.data;
+      const { access, refresh } = response.data;
+      this.tokenManager.setTokens(access, refresh, 3600); // 1 hour default
       
-      this.tokenManager.setTokens(access_token, newRefreshToken, expires_in);
-      
-      this.eventEmitter.emit('auth:refresh', {
-        tokens: response.data
-      });
+      this.eventEmitter.emit('auth:refresh', { tokens: { access, refresh } });
+      return true; // Indicate success
     } catch (error) {
       this.tokenManager.clearTokens();
-      throw error;
+      return false; // Indicate failure
     }
   }
 
-  // Transform axios error to ApiError
   private transformError(error: any): ApiError {
     if (error.response) {
       return {
-        message: error.response.data?.message || error.message || 'An error occurred',
+        status: error.response.status,
+        message: error.response.data?.message || error.response.statusText,
         errors: error.response.data?.errors || {},
-        status_code: error.response.status,
-        error_code: error.response.data?.error_code,
         timestamp: new Date().toISOString()
       };
     }
-
+    
     if (error.request) {
       return {
-        message: 'Network error. Please check your connection.',
-        status_code: 0,
+        status: 0,
+        message: 'Network error - no response received',
+        errors: {},
         timestamp: new Date().toISOString()
       };
     }
-
+    
     return {
-      message: error.message || 'An unexpected error occurred',
-      status_code: 500,
+      status: 0,
+      message: error.message || 'Unknown error',
+      errors: {},
       timestamp: new Date().toISOString()
     };
   }
 
-  // Generic request method with retry logic
   private async request<T>(config: RequestConfig): Promise<ResponseConfig<T>> {
-    let lastError: any;
+    const startTime = Date.now();
     
-    for (let attempt = 0; attempt <= this.config.retryAttempts; attempt++) {
-      try {
-        const axiosConfig: AxiosRequestConfig = {
-          url: config.url,
-          method: config.method,
-          headers: config.headers,
-          params: config.params,
-          data: config.data,
-          timeout: config.timeout || this.config.timeout,
-        };
-
-        const response = await this.axiosInstance(axiosConfig);
-        
-        return {
-          data: response.data,
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers as Record<string, string>,
-          config
-        };
-      } catch (error) {
-        lastError = error;
-        
-        if (attempt < this.config.retryAttempts) {
-          await this.delay(this.config.retryDelay * (attempt + 1));
-        }
-      }
+    try {
+      const response = await this.axiosInstance(config);
+      const duration = Date.now() - startTime;
+      
+      return {
+        data: response.data,
+        status: response.status,
+        headers: response.headers as Record<string, string>,
+        duration
+      };
+    } catch (error: any) {
+      const duration = Date.now() - startTime;
+      throw this.transformError(error);
     }
-
-    throw lastError;
   }
 
-  // Utility method for delays
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  // Public API methods
   async get<T>(url: string, config?: Partial<RequestConfig>): Promise<T> {
-    const response = await this.request<T>({
-      url,
-      method: 'GET',
-      ...config
-    });
+    const response = await this.request<T>({ ...config, method: 'GET', url });
     return response.data;
+  }
+
+  async getWithResponse<T>(url: string, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+    const response = await this.request<T>({ ...config, method: 'GET', url });
+    return {
+      success: true,
+      data: response.data,
+      message: 'Success',
+      status: response.status
+    };
   }
 
   async post<T>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<T> {
-    const response = await this.request<T>({
-      url,
-      method: 'POST',
-      data,
-      ...config
-    });
+    const response = await this.request<T>({ ...config, method: 'POST', url, data });
     return response.data;
   }
 
+  async postWithResponse<T>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+    const response = await this.request<T>({ ...config, method: 'POST', url, data });
+    return {
+      success: true,
+      data: response.data,
+      message: 'Success',
+      status: response.status
+    };
+  }
+
   async put<T>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<T> {
-    const response = await this.request<T>({
-      url,
-      method: 'PUT',
-      data,
-      ...config
-    });
+    const response = await this.request<T>({ ...config, method: 'PUT', url, data });
     return response.data;
   }
 
   async patch<T>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<T> {
-    const response = await this.request<T>({
-      url,
-      method: 'PATCH',
-      data,
-      ...config
-    });
+    const response = await this.request<T>({ ...config, method: 'PATCH', url, data });
     return response.data;
+  }
+
+  async patchWithResponse<T>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+    const response = await this.request<T>({ ...config, method: 'PATCH', url, data });
+    return {
+      success: true,
+      data: response.data,
+      message: 'Success',
+      status: response.status
+    };
   }
 
   async delete<T>(url: string, config?: Partial<RequestConfig>): Promise<T> {
-    const response = await this.request<T>({
-      url,
-      method: 'DELETE',
-      ...config
-    });
+    const response = await this.request<T>({ ...config, method: 'DELETE', url });
     return response.data;
   }
 
-  // Paginated requests
-  async getPaginated<T>(url: string, config?: Partial<RequestConfig>): Promise<PaginatedResponse<T>> {
-    return this.get<PaginatedResponse<T>>(url, config);
+  async deleteWithResponse<T>(url: string, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+    const response = await this.request<T>({ ...config, method: 'DELETE', url });
+    return {
+      success: true,
+      data: response.data,
+      message: 'Success',
+      status: response.status
+    };
   }
 
-  // Event system
+  async getPaginated<T>(url: string, config?: Partial<RequestConfig>): Promise<PaginatedResponse<T>> {
+    const response = await this.request<PaginatedResponse<T>>({ ...config, method: 'GET', url });
+    return response.data;
+  }
+
+  // Event handling
   on<K extends keyof ApiEvents>(event: K, handler: (data: ApiEvents[K]) => void): void {
     this.eventEmitter.on(event, handler);
   }
@@ -413,10 +457,9 @@ export class ApiClient {
   }
 
   isAuthenticated(): boolean {
-    return !!this.tokenManager.getAccessToken() && !this.tokenManager.isTokenExpired();
+    return !this.tokenManager.isTokenExpired();
   }
 }
 
 // Export singleton instance
-export const apiClient = new ApiClient();
-export default apiClient; 
+export const apiClient = new ApiClient(); 

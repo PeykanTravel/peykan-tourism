@@ -14,14 +14,11 @@ import type {
 } from '../types/api';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../lib/contexts/AuthContext';
+import { SafeStorage } from '../../../lib/utils/storage';
 
 // Helper to get auth token
 const getAuthToken = () => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  
-  const token = localStorage.getItem('access_token');
+  const token = SafeStorage.getItem('access_token');
   return token;
 };
 
@@ -29,12 +26,8 @@ const getAuthToken = () => {
 const LOCAL_CART_KEY = 'peykan_local_cart';
 
 const getLocalCart = (): CartItem[] => {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-  
   try {
-    const stored = localStorage.getItem(LOCAL_CART_KEY);
+    const stored = SafeStorage.getItem(LOCAL_CART_KEY);
     
     if (stored) {
       const parsed = JSON.parse(stored);
@@ -49,13 +42,9 @@ const getLocalCart = (): CartItem[] => {
 };
 
 const setLocalCart = (items: CartItem[]) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
   try {
     const jsonString = JSON.stringify(items);
-    localStorage.setItem(LOCAL_CART_KEY, jsonString);
+    SafeStorage.setItem(LOCAL_CART_KEY, jsonString);
   } catch (error) {
     console.error('Failed to save local cart:', error);
   }
@@ -140,7 +129,7 @@ const removeFromLocalCart = (itemId: string): boolean => {
 
 const clearLocalCart = (): boolean => {
   try {
-    localStorage.removeItem(LOCAL_CART_KEY);
+    SafeStorage.removeItem(LOCAL_CART_KEY);
     return true;
   } catch {
     return false;

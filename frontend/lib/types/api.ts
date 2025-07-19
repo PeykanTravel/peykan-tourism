@@ -433,6 +433,8 @@ export interface EventPricingBreakdown {
   }>;
   taxes_total: number;
   final_price: number;
+  currency: string;
+  grand_total?: number;
 }
 
 export interface EventSeatReservation {
@@ -820,14 +822,120 @@ export interface TransferBookingRequest {
 export interface TransferRoute extends BaseModel {
   name: string;
   description: string;
-  pickup_location: TransferLocation;
-  dropoff_location: TransferLocation;
-  transfer_type: string;
-  base_price: number;
-  currency: string;
-  estimated_duration: number;
-  distance_km: number;
+  origin: string;
+  destination: string;
+  origin_coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  destination_coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  peak_hour_surcharge: number;
+  midnight_surcharge: number;
+  round_trip_discount_enabled: boolean;
+  round_trip_discount_percentage: number;
+  is_popular: boolean;
   is_active: boolean;
+  pricing: TransferRoutePricing[];
+}
+
+export interface TransferRoutePricing extends BaseModel {
+  route: TransferRoute;
+  vehicle_type: string;
+  base_price: number;
+  max_passengers: number;
+  max_luggage: number;
+  is_active: boolean;
+}
+
+export interface TransferOption extends BaseModel {
+  name: string;
+  description: string;
+  option_type: string;
+  price_type: string;
+  price: number;
+  price_percentage: number;
+  max_quantity: number;
+  is_active: boolean;
+}
+
+export interface TransferBooking extends BaseModel {
+  booking_reference: string;
+  user: User;
+  route: TransferRoute;
+  pricing: TransferRoutePricing;
+  trip_type: 'one_way' | 'round_trip';
+  outbound_date: string;
+  outbound_time: string;
+  return_date?: string;
+  return_time?: string;
+  passenger_count: number;
+  luggage_count: number;
+  pickup_address: string;
+  pickup_instructions?: string;
+  dropoff_address: string;
+  dropoff_instructions?: string;
+  contact_name: string;
+  contact_phone: string;
+  outbound_price: number;
+  return_price?: number;
+  round_trip_discount?: number;
+  options_total: number;
+  final_price: number;
+  selected_options: Array<{
+    option_id: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  special_requirements?: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+}
+
+export interface TransferPricingRequest {
+  route_id: string;
+  vehicle_type: string;
+  trip_type: 'one_way' | 'round_trip';
+  outbound_date: string;
+  outbound_time: string;
+  return_date?: string;
+  return_time?: string;
+  passenger_count: number;
+  luggage_count: number;
+  selected_options?: Array<{
+    option_id: string;
+    quantity: number;
+  }>;
+}
+
+export interface TransferPricingResult {
+  price_breakdown: {
+    base_price: number;
+    peak_hour_surcharge?: number;
+    midnight_surcharge?: number;
+    round_trip_discount?: number;
+    options_total: number;
+    final_price: number;
+    currency: string;
+  };
+  trip_info: {
+    trip_type: string;
+    duration: number;
+    distance: number;
+  };
+  route_info: {
+    origin: string;
+    destination: string;
+    vehicle_type: string;
+  };
+  time_info: {
+    outbound_time: string;
+    return_time?: string;
+    is_peak_hour: boolean;
+    is_midnight: boolean;
+  };
 }
 
 // Cart API Types

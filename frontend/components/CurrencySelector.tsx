@@ -1,25 +1,18 @@
 'use client';
-import { useState } from 'react';
-
-const currencies = [
-  { code: 'USD', symbol: '$', name: 'US Dollar' },
-  { code: 'EUR', symbol: '€', name: 'Euro' },
-  { code: 'TRY', symbol: '₺', name: 'Turkish Lira' },
-  { code: 'IRR', symbol: 'ریال', name: 'Iranian Rial' },
-];
+import { useCurrency, SUPPORTED_CURRENCIES, CurrencyCode } from '@/lib/currency-context';
 
 export default function CurrencySelector() {
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const { currency, setCurrency } = useCurrency();
 
   return (
     <select
-      className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-900"
-      value={selectedCurrency}
-      onChange={(e) => setSelectedCurrency(e.target.value)}
+      className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      value={currency}
+      onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
     >
-      {currencies.map(currency => (
-        <option key={currency.code} value={currency.code}>
-          {currency.symbol} {currency.code}
+      {Object.entries(SUPPORTED_CURRENCIES).map(([code, info]) => (
+        <option key={code} value={code}>
+          {info.symbol} {code} - {info.name}
         </option>
       ))}
     </select>

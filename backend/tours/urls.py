@@ -17,6 +17,7 @@ urlpatterns = [
     # Tours
     path('', views.TourListView.as_view(), name='tour_list'),
     path('tours/', views.TourListView.as_view(), name='tour_list_alt'),  # Alternative endpoint
+    path('featured/', views.FeaturedToursView.as_view(), name='featured_tours'),  # Featured tours for home page
     path('search/', views.TourSearchView.as_view(), name='tour_search'),
     path('<slug:slug>/', views.TourDetailView.as_view(), name='tour_detail'),
     path('<slug:slug>/availability/', views.tour_availability_view, name='tour_availability'),

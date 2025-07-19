@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui'
 
 export default function CTASection() {
   const t = useTranslations('home')
@@ -28,10 +29,13 @@ export default function CTASection() {
 
           {/* CTA Button */}
           <div className="pt-8">
-            <button className="group relative inline-flex items-center justify-center px-12 py-4 text-lg font-bold text-blue-600 bg-white rounded-full hover:bg-blue-50 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
-              <span className="relative z-10">{t('cta.button')}</span>
-              <div className="absolute inset-0 bg-blue-600/10 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-            </button>
+            <Button
+              variant="secondary"
+              size="xl"
+              className="bg-white text-blue-600 hover:bg-blue-50 shadow-2xl hover:shadow-3xl transform hover:scale-105"
+            >
+              {t('cta.button')}
+            </Button>
           </div>
 
           {/* Additional Info */}

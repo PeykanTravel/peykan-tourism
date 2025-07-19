@@ -1,5 +1,7 @@
 'use client';
 
+import { useCurrency } from '../currency-context';
+
 // Re-export from CartContext for backward compatibility
 export { useCart } from '../contexts/CartContext';
 
@@ -13,6 +15,10 @@ export interface TourCartItem {
   image?: string;
   duration?: string;
   location?: string;
+  date?: string;
+  time?: string;
+  variant_name?: string;
+  quantity?: number;
   
   // Tour-specific fields
   tour_id: string;
@@ -26,8 +32,22 @@ export interface TourCartItem {
   selected_options: Array<{
     option_id: string;
     quantity: number;
+    name?: string;
+    price?: number;
   }>;
   special_requests?: string;
+  
+  // Booking data structure
+  booking_data?: {
+    participants: {
+      adult: number;
+      child: number;
+      infant: number;
+    };
+    duration?: string;
+    schedule_id: string;
+    special_requests?: string;
+  };
   
   // Calculated fields
   total_participants: number;
@@ -99,6 +119,17 @@ export interface TransferCartItem {
   currency: string;
   slug: string;
   
+  // UI display fields  
+  image?: string;
+  duration?: string;
+  location?: string;
+  date?: string;
+  time?: string;
+  pickup_location?: string;
+  destination?: string;
+  capacity?: number;
+  amenities?: string[];
+  
   // Backend-aligned fields
   route_id: string;
   route_data: {
@@ -110,7 +141,7 @@ export interface TransferCartItem {
     distance_km: number;
     estimated_duration_minutes: number;
   };
-  vehicle_type: string;
+  vehicle_type?: string;
   trip_type: 'one_way' | 'round_trip';
   outbound_datetime: string;
   return_datetime?: string;
@@ -138,11 +169,6 @@ export interface TransferCartItem {
     final_price: number;
     currency: string;
   } | null;
-  
-  // UI display fields
-  image?: string;
-  duration?: string;
-  location?: string;
 }
 
 export type CartItem = TourCartItem | EventCartItem | TransferCartItem; 

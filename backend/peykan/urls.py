@@ -9,7 +9,9 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-def health_check(request):
+from .health_checks import health_check_view
+
+def simple_health_check(request):
     """Simple health check endpoint for Docker."""
     return JsonResponse({
         'status': 'healthy',
@@ -20,9 +22,9 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     
-    # Health check endpoint
-    path('api/v1/health/', health_check, name='health_check'),
-    path('health/', health_check, name='health_check_alt'),
+    # Health check endpoints
+    path('api/v1/health/', health_check_view, name='health_check'),
+    path('health/', simple_health_check, name='health_check_alt'),
     
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -39,6 +41,7 @@ urlpatterns = [
         path('orders/', include('orders.urls')),
         path('payments/', include('payments.urls')),
         path('agents/', include('agents.urls')),
+        path('reservations/', include('reservations.urls')),
     ])),
 ]
 

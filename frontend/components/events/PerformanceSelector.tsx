@@ -1,71 +1,25 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Calendar, Clock, Users, Star, MapPin, AlertCircle, CheckCircle2, TrendingUp } from 'lucide-react';
+import { Calendar, Clock, Users, Star } from 'lucide-react';
 import { EventPerformance } from '@/lib/types/api';
 
 interface PerformanceSelectorProps {
   performances: EventPerformance[];
   selectedPerformance: EventPerformance | null;
-  onPerformanceSelect: (performance: EventPerformance) => void;
-  formatDate: (date: string) => string;
-  formatTime: (time: string) => string;
-  formatPrice: (price: number, currency: string) => string;
+  onSelect: (performance: EventPerformance) => void;
 }
 
 export default function PerformanceSelector({
   performances,
   selectedPerformance,
-  onPerformanceSelect,
-  formatDate,
-  formatTime,
-  formatPrice
+  onSelect
 }: PerformanceSelectorProps) {
   const t = useTranslations('eventDetail');
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const getAvailabilityStatus = useCallback((performance: EventPerformance) => {
-    const occupancyRate = ((performance.max_capacity - performance.available_capacity) / performance.max_capacity) * 100;
-    
-    if (occupancyRate >= 95) return 'sold_out';
-    if (occupancyRate >= 80) return 'few_left';
-    if (occupancyRate >= 50) return 'filling_up';
-    return 'available';
-  }, []);
-
-  const getStatusColor = useCallback((status: string) => {
-    switch (status) {
-      case 'sold_out': return 'bg-red-100 text-red-800 border-red-200';
-      case 'few_left': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'filling_up': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-green-100 text-green-800 border-green-200';
-    }
-  }, []);
-
-  const getStatusIcon = useCallback((status: string) => {
-    switch (status) {
-      case 'sold_out': return <AlertCircle className="h-4 w-4" />;
-      case 'few_left': return <TrendingUp className="h-4 w-4" />;
-      case 'filling_up': return <Users className="h-4 w-4" />;
-      default: return <CheckCircle2 className="h-4 w-4" />;
-    }
-  }, []);
-
-  const getStatusText = useCallback((status: string) => {
-    switch (status) {
-      case 'sold_out': return t('soldOut');
-      case 'few_left': return t('fewTicketsLeft');
-      case 'filling_up': return t('fillingUp');
-      default: return t('available');
-    }
-  }, [t]);
-
-  const isPerformanceSelectable = useCallback((performance: EventPerformance) => {
-    return performance.is_available && performance.available_capacity > 0;
-  }, []);
-
-  // Group performances by date for calendar view
+  // Group performances by date
   const performancesByDate = performances.reduce((acc, performance) => {
     const date = performance.date;
     if (!acc[date]) {
@@ -75,210 +29,132 @@ export default function PerformanceSelector({
     return acc;
   }, {} as Record<string, EventPerformance[]>);
 
-  if (performances.length === 0) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-        <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noPerformancesAvailable')}</h3>
-        <p className="text-gray-600">{t('checkBackLater')}</p>
-      </div>
-    );
-  }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (timeString: string) => {
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getAvailabilityColor = (performance: EventPerformance) => {
+    const occupancyRate = performance.current_capacity / performance.max_capacity;
+    if (occupancyRate >= 0.9) return 'text-red-600';
+    if (occupancyRate >= 0.7) return 'text-yellow-600';
+    return 'text-green-600';
+  };
+
+  const getAvailabilityText = (performance: EventPerformance) => {
+    const available = performance.max_capacity - performance.current_capacity;
+    if (available <= 5) return t('fewSeatsLeft');
+    if (available <= 20) return t('limitedAvailability');
+    return t('available');
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              {t('selectPerformance')}
-            </h2>
-            <p className="text-gray-600">
-              {performances.length} {t('performancesAvailable')}
-            </p>
-          </div>
-          
-          {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+    <div className="space-y-6">
+      {/* Date Selector */}
+      <div>
+        <h3 className="text-lg font-medium mb-4">{t('selectDate')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Object.keys(performancesByDate).map((date) => (
             <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
+              key={date}
+              onClick={() => setSelectedDate(selectedDate === date ? null : date)}
+              className={`p-4 rounded-lg border-2 text-left transition-colors ${
+                selectedDate === date
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              {t('listView')}
+              <div className="flex items-center space-x-2 mb-2">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <span className="font-medium">{formatDate(date)}</span>
+              </div>
+              <div className="text-sm text-gray-600">
+                {performancesByDate[date].length} {t('performance', { count: performancesByDate[date].length })}
+              </div>
             </button>
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'calendar'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              {t('calendarView')}
-            </button>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Performance List */}
-      <div className="p-6">
-        {viewMode === 'list' ? (
-          <div className="space-y-4">
-            {performances.map((performance) => {
-              const status = getAvailabilityStatus(performance);
-              const isSelectable = isPerformanceSelectable(performance);
-              const isSelected = selectedPerformance?.id === performance.id;
-              // Use backend-provided min_price
-              const minPrice = performance.min_price ?? 0;
-
-              return (
-                <div
-                  key={performance.id}
-                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                    isSelected 
-                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
-                      : isSelectable 
-                        ? 'border-gray-200 hover:border-gray-300 hover:shadow-md' 
-                        : 'border-gray-200 opacity-60 cursor-not-allowed'
-                  }`}
-                  onClick={() => isSelectable && onPerformanceSelect(performance)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="flex items-center text-gray-900">
-                          <Calendar className="h-5 w-5 mr-2" />
-                          <span className="font-medium">
-                            {formatDate(performance.date)}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center text-gray-600">
-                          <Clock className="h-4 w-4 mr-1" />
-                          <span>{formatTime(performance.start_time)}</span>
-                        </div>
-
-                        {performance.is_special && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            <Star className="h-3 w-3 mr-1" />
-                            {t('specialPerformance')}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center space-x-6 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" />
-                          <span>
-                            {performance.available_capacity.toLocaleString()} / {performance.max_capacity.toLocaleString()} {t('available')}
-                          </span>
-                        </div>
-                        
-                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(status)}`}>
-                          {getStatusIcon(status)}
-                          <span className="ml-1">{getStatusText(status)}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right ml-4">
-                      <div className="text-lg font-bold text-gray-900">
-                        {formatPrice(minPrice, 'USD')}
-                      </div>
-                      <div className="text-sm text-gray-500">{t('fromPrice')}</div>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                      <span>{t('capacity')}</span>
-                      <span>
-                        {((performance.max_capacity - performance.available_capacity) / performance.max_capacity * 100).toFixed(0)}% {t('sold')}
+      {selectedDate && (
+        <div>
+          <h3 className="text-lg font-medium mb-4">{t('selectTime')}</h3>
+          <div className="space-y-3">
+            {performancesByDate[selectedDate].map((performance) => (
+              <div
+                key={performance.id}
+                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  selectedPerformance?.id === performance.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => onSelect(performance)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">
+                        {formatTime(performance.start_time)}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all ${
-                          status === 'sold_out' ? 'bg-red-500' :
-                          status === 'few_left' ? 'bg-orange-500' :
-                          status === 'filling_up' ? 'bg-yellow-500' : 'bg-green-500'
-                        }`}
-                        style={{
-                          width: `${((performance.max_capacity - performance.available_capacity) / performance.max_capacity) * 100}%`
-                        }}
-                      />
+                    
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-4 w-4 text-gray-500" />
+                      <span className={`text-sm ${getAvailabilityColor(performance)}`}>
+                        {getAvailabilityText(performance)}
+                      </span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          /* Calendar View */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(performancesByDate).map(([date, dayPerformances]) => (
-              <div key={date} className="border rounded-lg overflow-hidden">
-                <div className="bg-gray-50 px-4 py-3 border-b">
-                  <h3 className="font-medium text-gray-900">
-                    {formatDate(date)}
-                  </h3>
+                  
+                  <div className="text-right">
+                    <div className="text-sm text-gray-600">
+                      {performance.current_capacity} / {performance.max_capacity} {t('seats')}
+                    </div>
+                    {performance.is_special && (
+                      <div className="flex items-center space-x-1 text-yellow-600">
+                        <Star className="h-3 w-3 fill-current" />
+                        <span className="text-xs">{t('specialPerformance')}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
-                <div className="p-4 space-y-3">
-                  {dayPerformances.map((performance) => {
-                    const status = getAvailabilityStatus(performance);
-                    const isSelectable = isPerformanceSelectable(performance);
-                    const isSelected = selectedPerformance?.id === performance.id;
-                    // Use backend-provided min_price
-                    const minPrice = performance.min_price ?? 0;
-
-                    return (
-                      <div
-                        key={performance.id}
-                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                          isSelected 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : isSelectable 
-                              ? 'border-gray-200 hover:border-gray-300' 
-                              : 'border-gray-200 opacity-60 cursor-not-allowed'
-                        }`}
-                        onClick={() => isSelectable && onPerformanceSelect(performance)}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center text-sm font-medium text-gray-900">
-                            <Clock className="h-4 w-4 mr-1" />
-                            {formatTime(performance.start_time)}
-                          </div>
-                          
-                          {performance.is_special && (
-                            <Star className="h-4 w-4 text-purple-500" />
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
-                          <span>{performance.available_capacity} {t('available')}</span>
-                          <span className="font-medium">{formatPrice(minPrice, 'USD')}</span>
-                        </div>
-                        
-                        <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getStatusColor(status)}`}>
-                          {getStatusIcon(status)}
-                          <span className="ml-1">{getStatusText(status)}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                {/* Pricing Info */}
+                {performance.min_price && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="text-sm text-gray-600">
+                      {t('startingFrom')} <span className="font-semibold text-blue-600">
+                        ${performance.min_price}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* No Performances Message */}
+      {performances.length === 0 && (
+        <div className="text-center py-8">
+          <div className="text-gray-500 text-lg mb-2">{t('noPerformances')}</div>
+          <p className="text-gray-400">{t('noPerformancesDescription')}</p>
+        </div>
+      )}
     </div>
   );
 } 

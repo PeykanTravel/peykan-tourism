@@ -1,11 +1,11 @@
 import useSWR, { mutate } from 'swr';
 import { getOrders, getOrderDetail, createOrder } from '../api/orders';
 import type { Order, CreateOrderPayload } from '../api/orders';
+import { SafeStorage } from '../../../lib/utils/storage';
 
 // Helper to get auth token
 const getAuthToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('access_token');
+  return SafeStorage.getItem('access_token');
 };
 
 // Fetcher functions

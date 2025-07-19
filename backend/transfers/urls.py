@@ -20,7 +20,7 @@ urlpatterns = [
     
     # Additional transfer-specific routes
     path('routes/by-slug/<slug:slug>/', 
-         TransferRouteViewSet.as_view({'get': 'by_slug'}), 
+         TransferRouteViewSet.as_view({'get': 'retrieve'}), 
          name='transfer-route-detail-by-slug'),
     
     # Public price calculation endpoint

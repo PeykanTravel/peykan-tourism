@@ -15,6 +15,9 @@ urlpatterns = [
     
     # Cart items
     path('add/', views.AddToCartView.as_view(), name='add_to_cart'),
+    path('add-tour/', views.AddTourToCartView.as_view(), name='add_tour_to_cart'),
+    path('add-event/', views.AddEventToCartView.as_view(), name='add_event_to_cart'),
+    path('add-transfer/', views.AddTransferToCartView.as_view(), name='add_transfer_to_cart'),
     path('items/<uuid:item_id>/update/', views.UpdateCartItemView.as_view(), name='update_cart_item'),
     path('items/<uuid:item_id>/', views.UpdateCartItemView.as_view(), name='update_cart_item_direct'),
     path('items/<uuid:item_id>/remove/', views.RemoveFromCartView.as_view(), name='remove_from_cart'),
@@ -25,4 +28,5 @@ urlpatterns = [
     
     # Cart operations
     path('merge/', views.merge_cart_view, name='merge_cart'),
+    path('validate/', views.ValidateCartView.as_view(), name='validate_cart'),
 ] 

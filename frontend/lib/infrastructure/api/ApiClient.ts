@@ -17,6 +17,11 @@ export interface ApiResponse<T = any> {
     next: string | null;
     previous: string | null;
   };
+  // Add pagination fields that repositories expect
+  results?: T[];
+  count?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface ApiError {
@@ -30,6 +35,13 @@ export interface RequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean;
   retryCount?: number;
   timeout?: number;
+}
+
+// Extend the internal config type as well
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    skipAuth?: boolean;
+  }
 }
 
 export interface ApiClientConfig {
@@ -145,7 +157,7 @@ export class ApiClient {
   /**
    * Transform axios response to standard format
    */
-  private transformResponse(response: AxiosResponse): ApiResponse {
+  private transformResponse(response: AxiosResponse): any {
     const { data, status } = response;
 
     // Handle different response formats
@@ -155,7 +167,12 @@ export class ApiClient {
         data: data.data || data,
         message: data.message,
         errors: data.errors,
-        pagination: data.pagination
+        pagination: data.pagination,
+        // Add pagination fields that repositories expect
+        results: data.results || data.data,
+        count: data.count,
+        page: data.page,
+        limit: data.limit
       };
     }
 
@@ -231,63 +248,43 @@ export class ApiClient {
   }
 
   /**
-   * Make GET request
+   * GET request
    */
-  async get<T = any>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.axiosInstance.get<T>(url, config);
-      return response as ApiResponse<T>;
-    } catch (error) {
-      throw error;
-    }
+  async get<T = any>(url: string, config?: RequestConfig): Promise<any> {
+    const response = await this.axiosInstance.get<T>(url, config);
+    return response;
   }
 
   /**
-   * Make POST request
+   * POST request
    */
-  async post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.axiosInstance.post<T>(url, data, config);
-      return response as ApiResponse<T>;
-    } catch (error) {
-      throw error;
-    }
+  async post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<any> {
+    const response = await this.axiosInstance.post<T>(url, data, config);
+    return response;
   }
 
   /**
-   * Make PUT request
+   * PUT request
    */
-  async put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.axiosInstance.put<T>(url, data, config);
-      return response as ApiResponse<T>;
-    } catch (error) {
-      throw error;
-    }
+  async put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<any> {
+    const response = await this.axiosInstance.put<T>(url, data, config);
+    return response;
   }
 
   /**
-   * Make PATCH request
+   * PATCH request
    */
-  async patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.axiosInstance.patch<T>(url, data, config);
-      return response as ApiResponse<T>;
-    } catch (error) {
-      throw error;
-    }
+  async patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<any> {
+    const response = await this.axiosInstance.patch<T>(url, data, config);
+    return response;
   }
 
   /**
-   * Make DELETE request
+   * DELETE request
    */
-  async delete<T = any>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
-    try {
-      const response = await this.axiosInstance.delete<T>(url, config);
-      return response as ApiResponse<T>;
-    } catch (error) {
-      throw error;
-    }
+  async delete<T = any>(url: string, config?: RequestConfig): Promise<any> {
+    const response = await this.axiosInstance.delete<T>(url, config);
+    return response;
   }
 
   /**

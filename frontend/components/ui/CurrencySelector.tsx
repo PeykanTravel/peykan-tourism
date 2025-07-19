@@ -1,20 +1,25 @@
 'use client';
-import { useCurrency, SUPPORTED_CURRENCIES, CurrencyCode } from '@/lib/currency-context';
+import { useCurrency } from '@/lib/contexts/AppContext';
+import { Currency } from '@/lib/domain/value-objects/Currency';
 
 export default function CurrencySelector() {
-  const { currency, setCurrency } = useCurrency();
+  const { currentCurrency, setCurrency } = useCurrency();
+
+  const handleCurrencyChange = (currencyCode: string) => {
+    const newCurrency = Currency.create(currencyCode);
+    setCurrency(newCurrency);
+  };
 
   return (
     <select
       className="border rounded px-2 py-1 text-sm bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      value={currency}
-      onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
+      value={currentCurrency.getCode()}
+      onChange={(e) => handleCurrencyChange(e.target.value)}
     >
-      {Object.entries(SUPPORTED_CURRENCIES).map(([code, info]) => (
-        <option key={code} value={code}>
-          {info.symbol} {code} - {info.name}
-        </option>
-      ))}
+      <option value="USD">$ USD - US Dollar</option>
+      <option value="EUR">€ EUR - Euro</option>
+      <option value="GBP">£ GBP - British Pound</option>
+      <option value="IRR">ریال IRR - Iranian Rial</option>
     </select>
   );
 } 

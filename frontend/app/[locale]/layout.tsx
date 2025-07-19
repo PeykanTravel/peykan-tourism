@@ -15,8 +15,7 @@ import Footer from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/Toaster';
 
 // Providers
-import { AuthProvider } from '@/lib/contexts/AuthContext';
-import { CartProvider } from '@/lib/contexts/CartContext';
+import { AppProvider } from '@/lib/contexts/AppContext';
 import { ToastProvider } from '@/lib/contexts/ToastContext';
 
 // Styles
@@ -41,20 +40,18 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
         <NextIntlClientProvider messages={messages}>
-          <AuthProvider>
-            <CartProvider>
-              <ToastProvider>
-                <div className="min-h-screen flex flex-col">
-                  <Navbar />
-                  <main className="flex-1">
-                    {children}
-                  </main>
-                  <Footer />
-                  <Toaster />
-                </div>
-              </ToastProvider>
-            </CartProvider>
-          </AuthProvider>
+          <AppProvider>
+            <ToastProvider>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+                <Toaster />
+              </div>
+            </ToastProvider>
+          </AppProvider>
         </NextIntlClientProvider>
       </body>
     </html>

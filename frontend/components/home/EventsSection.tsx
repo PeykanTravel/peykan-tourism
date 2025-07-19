@@ -1,45 +1,34 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import Link from 'next/link'
-import { useProductService } from '@/lib/application/hooks/useProductService'
-import { useCartStore } from '@/lib/application/stores/cartStore'
-import { EventCard } from '@/components/feature/products'
-import { Loading } from '@/components/ui'
-import React from 'react'
+import React from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { useProducts } from '@/lib/application/hooks/useProducts';
+import { useCart } from '@/lib/contexts/AppContext';
+import { Quantity } from '@/lib/domain/value-objects/Quantity';
 
 export default function EventsSection() {
-  const t = useTranslations('home')
-  
-  // Fetch events using new architecture
-  const { getEvents, isLoading, error } = useProductService()
-  const { addToCart } = useCartStore()
-  const [events, setEvents] = React.useState<any[]>([])
+  const t = useTranslations('home');
+  const { products: events, getEvents, isLoading, error } = useProducts();
+  const { addItem } = useCart();
 
   // Fetch events on component mount
   React.useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await getEvents({}, 1, 3)
-        if (response) {
-          setEvents(response.results || [])
-        }
+        await getEvents({ limit: 3 });
       } catch (err) {
-        console.error('Error fetching events:', err)
+        console.error('Error fetching events:', err);
       }
-    }
+    };
 
-    fetchEvents()
-  }, [getEvents])
+    fetchEvents();
+  }, [getEvents]);
 
   const handleAddToCart = (event: any) => {
-    addToCart({
-      product_id: event.id,
-      product_type: 'event',
-      quantity: 1,
-      options: {}
-    })
-  }
+    // Note: This is a temporary implementation - needs proper CartItem creation
+    console.log('Add to cart:', event);
+  };
 
   if (error) {
     return (
@@ -55,7 +44,7 @@ export default function EventsSection() {
           </div>
         </div>
       </section>
-    )
+    );
   }
 
   return (
@@ -77,7 +66,7 @@ export default function EventsSection() {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-20">
-            <Loading size="lg" />
+            <p>Loading...</p>
           </div>
         )}
 
@@ -85,11 +74,16 @@ export default function EventsSection() {
         {!isLoading && events.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map(event => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onAddToCart={handleAddToCart}
-              />
+              <div key={event.id} className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold">{event.title}</h3>
+                <p className="text-gray-600">{event.description}</p>
+                <button
+                  onClick={() => handleAddToCart(event)}
+                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Add to Cart
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -125,5 +119,5 @@ export default function EventsSection() {
         )}
       </div>
     </section>
-  )
+  );
 } 

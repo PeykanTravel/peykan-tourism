@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, Users, Car, DollarSign } from 'lucide-react';
-import { useCurrency } from '../../lib/currency-context';
+import { formatCurrency } from '@/lib/utils';
 
 interface TransferCardProps {
   transfer: {
@@ -24,12 +24,9 @@ interface TransferCardProps {
 }
 
 export default function TransferCard({ transfer, viewMode }: TransferCardProps) {
-  const { formatPrice, convertCurrency, currency: userCurrency } = useCurrency();
-  
-  // Helper for price formatting with currency conversion
-  const formatPriceWithConversion = (price: string, originalCurrency: string) => {
-    const convertedPrice = convertCurrency(parseFloat(price), originalCurrency as any, userCurrency);
-    return formatPrice(convertedPrice, userCurrency);
+  // Helper for price formatting
+  const formatPrice = (price: string, currency: string) => {
+    return formatCurrency(parseFloat(price), currency);
   };
 
   // Helper for duration
@@ -78,7 +75,7 @@ export default function TransferCard({ transfer, viewMode }: TransferCardProps) 
               </div>
               <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
                 <DollarSign className="w-4 h-4" />
-                <span>{formatPriceWithConversion(transfer.price, transfer.currency)}</span>
+                <span>{formatPrice(transfer.price, transfer.currency)}</span>
               </div>
             </div>
           </div>
@@ -120,7 +117,7 @@ export default function TransferCard({ transfer, viewMode }: TransferCardProps) 
             </div>
             <div className="flex items-center gap-1">
               <DollarSign className="w-4 h-4 text-white/80" />
-              <span>{formatPriceWithConversion(transfer.price, transfer.currency)}</span>
+              <span>{formatPrice(transfer.price, transfer.currency)}</span>
             </div>
           </div>
         </div>

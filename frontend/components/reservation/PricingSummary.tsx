@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import { useCurrency } from '@/lib/currency-context';
+import { formatCurrency } from '@/lib/utils';
 import { Info, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface PricingItem {
@@ -43,8 +43,11 @@ export default function PricingSummary({
   onApplyDiscount
 }: PricingSummaryProps) {
   const t = useTranslations('pricing');
-  const { formatPrice } = useCurrency();
   const [discountInput, setDiscountInput] = React.useState('');
+
+  const formatPrice = (amount: number, currencyCode: string) => {
+    return formatCurrency(amount, currencyCode);
+  };
 
   const handleApplyDiscount = () => {
     if (discountInput.trim() && onApplyDiscount) {

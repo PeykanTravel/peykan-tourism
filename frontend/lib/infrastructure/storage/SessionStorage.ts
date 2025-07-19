@@ -14,7 +14,7 @@ export interface SessionStorageOptions {
   defaultTTL?: number; // Time to live in milliseconds
 }
 
-export class SessionStorage {
+export class SessionStorageManager {
   private prefix: string;
   private defaultTTL: number;
 
@@ -37,7 +37,7 @@ export class SessionStorage {
         expiresAt
       };
 
-      sessionStorage.setItem(storageKey, JSON.stringify(item));
+      window.sessionStorage.setItem(storageKey, JSON.stringify(item));
     } catch (error) {
       console.error('Error setting sessionStorage item:', error);
     }
@@ -49,7 +49,7 @@ export class SessionStorage {
   get<T>(key: string): T | null {
     try {
       const storageKey = this.getStorageKey(key);
-      const itemString = sessionStorage.getItem(storageKey);
+      const itemString = window.sessionStorage.getItem(storageKey);
       
       if (!itemString) {
         return null;
@@ -76,7 +76,7 @@ export class SessionStorage {
   remove(key: string): void {
     try {
       const storageKey = this.getStorageKey(key);
-      sessionStorage.removeItem(storageKey);
+      window.sessionStorage.removeItem(storageKey);
     } catch (error) {
       console.error('Error removing sessionStorage item:', error);
     }
@@ -88,7 +88,7 @@ export class SessionStorage {
   has(key: string): boolean {
     try {
       const storageKey = this.getStorageKey(key);
-      const itemString = sessionStorage.getItem(storageKey);
+      const itemString = window.sessionStorage.getItem(storageKey);
       
       if (!itemString) {
         return false;
@@ -114,10 +114,10 @@ export class SessionStorage {
    */
   clear(): void {
     try {
-      const keys = Object.keys(sessionStorage);
+      const keys = Object.keys(window.sessionStorage);
       keys.forEach(key => {
         if (key.startsWith(this.prefix)) {
-          sessionStorage.removeItem(key);
+          window.sessionStorage.removeItem(key);
         }
       });
     } catch (error) {
@@ -130,7 +130,7 @@ export class SessionStorage {
    */
   keys(): string[] {
     try {
-      const keys = Object.keys(sessionStorage);
+      const keys = Object.keys(window.sessionStorage);
       return keys
         .filter(key => key.startsWith(this.prefix))
         .map(key => key.substring(this.prefix.length));
@@ -146,11 +146,11 @@ export class SessionStorage {
   size(): number {
     try {
       let size = 0;
-      const keys = Object.keys(sessionStorage);
+      const keys = Object.keys(window.sessionStorage);
       
       keys.forEach(key => {
         if (key.startsWith(this.prefix)) {
-          size += sessionStorage.getItem(key)?.length || 0;
+          size += window.sessionStorage.getItem(key)?.length || 0;
         }
       });
       
@@ -198,7 +198,7 @@ export class SessionStorage {
   getWithMetadata<T>(key: string): { value: T | null; metadata: { timestamp: number; expiresAt?: number } } | null {
     try {
       const storageKey = this.getStorageKey(key);
-      const itemString = sessionStorage.getItem(storageKey);
+      const itemString = window.sessionStorage.getItem(storageKey);
       
       if (!itemString) {
         return null;
@@ -226,7 +226,7 @@ export class SessionStorage {
   }
 
   /**
-   * Set multiple items at once
+   * Set multiple items
    */
   setMultiple(items: Array<{ key: string; value: any; ttl?: number }>): void {
     items.forEach(item => {
@@ -235,7 +235,7 @@ export class SessionStorage {
   }
 
   /**
-   * Get multiple items at once
+   * Get multiple items
    */
   getMultiple<T>(keys: string[]): Record<string, T | null> {
     const result: Record<string, T | null> = {};
@@ -246,7 +246,7 @@ export class SessionStorage {
   }
 
   /**
-   * Remove multiple items at once
+   * Remove multiple items
    */
   removeMultiple(keys: string[]): void {
     keys.forEach(key => {
@@ -262,8 +262,8 @@ export class SessionStorage {
   }
 }
 
-// Create default instance
-export const sessionStorage = new SessionStorage({
-  prefix: 'peykan_session_',
-  defaultTTL: 60 * 60 * 1000 // 1 hour
-}); 
+// Export a default instance
+export const sessionStorage = new SessionStorageManager();
+
+// Also export the class for custom instances
+export { SessionStorageManager as SessionStorage }; 

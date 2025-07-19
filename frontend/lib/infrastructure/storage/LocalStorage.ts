@@ -14,7 +14,7 @@ export interface StorageOptions {
   defaultTTL?: number; // Time to live in milliseconds
 }
 
-export class LocalStorage {
+export class LocalStorageManager {
   private prefix: string;
   private defaultTTL: number;
 
@@ -37,7 +37,7 @@ export class LocalStorage {
         expiresAt
       };
 
-      localStorage.setItem(storageKey, JSON.stringify(item));
+      window.localStorage.setItem(storageKey, JSON.stringify(item));
     } catch (error) {
       console.error('Error setting localStorage item:', error);
     }
@@ -49,7 +49,7 @@ export class LocalStorage {
   get<T>(key: string): T | null {
     try {
       const storageKey = this.getStorageKey(key);
-      const itemString = localStorage.getItem(storageKey);
+      const itemString = window.localStorage.getItem(storageKey);
       
       if (!itemString) {
         return null;
@@ -76,7 +76,7 @@ export class LocalStorage {
   remove(key: string): void {
     try {
       const storageKey = this.getStorageKey(key);
-      localStorage.removeItem(storageKey);
+      window.localStorage.removeItem(storageKey);
     } catch (error) {
       console.error('Error removing localStorage item:', error);
     }
@@ -88,7 +88,7 @@ export class LocalStorage {
   has(key: string): boolean {
     try {
       const storageKey = this.getStorageKey(key);
-      const itemString = localStorage.getItem(storageKey);
+      const itemString = window.localStorage.getItem(storageKey);
       
       if (!itemString) {
         return false;
@@ -114,10 +114,10 @@ export class LocalStorage {
    */
   clear(): void {
     try {
-      const keys = Object.keys(localStorage);
+      const keys = Object.keys(window.localStorage);
       keys.forEach(key => {
         if (key.startsWith(this.prefix)) {
-          localStorage.removeItem(key);
+          window.localStorage.removeItem(key);
         }
       });
     } catch (error) {
@@ -130,7 +130,7 @@ export class LocalStorage {
    */
   keys(): string[] {
     try {
-      const keys = Object.keys(localStorage);
+      const keys = Object.keys(window.localStorage);
       return keys
         .filter(key => key.startsWith(this.prefix))
         .map(key => key.substring(this.prefix.length));
@@ -146,11 +146,11 @@ export class LocalStorage {
   size(): number {
     try {
       let size = 0;
-      const keys = Object.keys(localStorage);
+      const keys = Object.keys(window.localStorage);
       
       keys.forEach(key => {
         if (key.startsWith(this.prefix)) {
-          size += localStorage.getItem(key)?.length || 0;
+          size += window.localStorage.getItem(key)?.length || 0;
         }
       });
       
@@ -198,7 +198,7 @@ export class LocalStorage {
   getWithMetadata<T>(key: string): { value: T | null; metadata: { timestamp: number; expiresAt?: number } } | null {
     try {
       const storageKey = this.getStorageKey(key);
-      const itemString = localStorage.getItem(storageKey);
+      const itemString = window.localStorage.getItem(storageKey);
       
       if (!itemString) {
         return null;
@@ -226,7 +226,7 @@ export class LocalStorage {
   }
 
   /**
-   * Set multiple items at once
+   * Set multiple items
    */
   setMultiple(items: Array<{ key: string; value: any; ttl?: number }>): void {
     items.forEach(item => {
@@ -235,7 +235,7 @@ export class LocalStorage {
   }
 
   /**
-   * Get multiple items at once
+   * Get multiple items
    */
   getMultiple<T>(keys: string[]): Record<string, T | null> {
     const result: Record<string, T | null> = {};
@@ -246,7 +246,7 @@ export class LocalStorage {
   }
 
   /**
-   * Remove multiple items at once
+   * Remove multiple items
    */
   removeMultiple(keys: string[]): void {
     keys.forEach(key => {
@@ -262,8 +262,8 @@ export class LocalStorage {
   }
 }
 
-// Create default instance
-export const localStorage = new LocalStorage({
-  prefix: 'peykan_',
-  defaultTTL: 24 * 60 * 60 * 1000 // 24 hours
-}); 
+// Export a default instance
+export const localStorage = new LocalStorageManager();
+
+// Also export the class for custom instances
+export { LocalStorageManager as LocalStorage }; 

@@ -372,16 +372,4 @@ class ReservationService {
 }
 
 // Export singleton instance
-export const reservationService = new ReservationService();
-
-// Export types
-export type {
-  PricingRequest,
-  PricingResponse,
-  AvailabilityRequest,
-  AvailabilityResponse,
-  ReservationItem,
-  ReservationRequest,
-  Reservation,
-  ReservationListResponse,
-}; 
+export const reservationService = new ReservationService(); 

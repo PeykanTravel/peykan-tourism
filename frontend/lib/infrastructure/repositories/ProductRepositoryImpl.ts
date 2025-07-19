@@ -4,11 +4,8 @@
  */
 
 import { ProductRepository, ProductCreateData, ProductUpdateData, ProductSearchCriteria } from '../../domain/repositories/ProductRepository';
-import { ProductAggregate } from '../../domain/aggregates/ProductAggregate';
 import { Product, ProductType, ProductStatus } from '../../domain/entities/Product';
-import { Price } from '../../domain/value-objects/Price';
-import { Location } from '../../domain/value-objects/Location';
-import { apiClient, ApiResponse } from '../api/ApiClient';
+import { apiClient } from '../api/ApiClient';
 
 export class ProductRepositoryImpl implements ProductRepository {
   private readonly baseUrl = '/products';
@@ -16,12 +13,12 @@ export class ProductRepositoryImpl implements ProductRepository {
   /**
    * Find product by ID
    */
-  async findById(id: string): Promise<ProductAggregate | null> {
+  async findById(id: string): Promise<Product | null> {
     try {
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}/${id}`);
+      const response = await apiClient.get(`${this.baseUrl}/${id}`);
       
       if (response.success && response.data) {
-        return this.mapToProductAggregate(response.data);
+        return this.mapToProduct(response.data);
       }
       
       return null;
@@ -34,12 +31,12 @@ export class ProductRepositoryImpl implements ProductRepository {
   /**
    * Find product by slug
    */
-  async findBySlug(slug: string): Promise<ProductAggregate | null> {
+  async findBySlug(slug: string): Promise<Product | null> {
     try {
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}/by-slug/${slug}`);
+      const response = await apiClient.get(`${this.baseUrl}/by-slug/${slug}`);
       
       if (response.success && response.data) {
-        return this.mapToProductAggregate(response.data);
+        return this.mapToProduct(response.data);
       }
       
       return null;
@@ -50,10 +47,10 @@ export class ProductRepositoryImpl implements ProductRepository {
   }
 
   /**
-   * Find products with search criteria
+   * Find products by search criteria
    */
-  async find(criteria: ProductSearchCriteria): Promise<{
-    products: ProductAggregate[];
+  async findByCriteria(criteria: ProductSearchCriteria): Promise<{
+    products: Product[];
     total: number;
     page: number;
     limit: number;
@@ -67,19 +64,17 @@ export class ProductRepositoryImpl implements ProductRepository {
       if (criteria.type) params.append('type', criteria.type);
       if (criteria.status) params.append('status', criteria.status);
       if (criteria.category) params.append('category', criteria.category);
-      if (criteria.minPrice !== undefined) params.append('min_price', criteria.minPrice.toString());
-      if (criteria.maxPrice !== undefined) params.append('max_price', criteria.maxPrice.toString());
+      if (criteria.min_price !== undefined) params.append('min_price', criteria.min_price.toString());
+      if (criteria.max_price !== undefined) params.append('max_price', criteria.max_price.toString());
       if (criteria.currency) params.append('currency', criteria.currency);
       if (criteria.location) params.append('location', criteria.location);
-      if (criteria.availableFrom) params.append('available_from', criteria.availableFrom.toISOString());
-      if (criteria.availableTo) params.append('available_to', criteria.availableTo.toISOString());
-      if (criteria.sortBy) params.append('sort_by', criteria.sortBy);
-      if (criteria.sortOrder) params.append('sort_order', criteria.sortOrder);
+      if (criteria.available_from) params.append('available_from', criteria.available_from.toISOString());
+      if (criteria.available_to) params.append('available_to', criteria.available_to.toISOString());
 
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}?${params.toString()}`);
+      const response = await apiClient.get(`${this.baseUrl}?${params.toString()}`);
       
       if (response.success && response.data) {
-        const products = response.data.results.map((productData: any) => this.mapToProductAggregate(productData));
+        const products = response.data.results?.map((productData: any) => this.mapToProduct(productData)) || [];
         
         return {
           products,
@@ -97,14 +92,32 @@ export class ProductRepositoryImpl implements ProductRepository {
   }
 
   /**
-   * Find products by type
+   * Find all products
    */
-  async findByType(type: ProductType): Promise<ProductAggregate[]> {
+  async findAll(): Promise<Product[]> {
     try {
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}/by-type/${type}`);
+      const response = await apiClient.get(`${this.baseUrl}`);
       
       if (response.success && response.data) {
-        return response.data.map((productData: any) => this.mapToProductAggregate(productData));
+        return response.data.results?.map((productData: any) => this.mapToProduct(productData)) || [];
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error finding all products:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Find products by type
+   */
+  async findByType(type: ProductType): Promise<Product[]> {
+    try {
+      const response = await apiClient.get(`${this.baseUrl}/by-type/${type}`);
+      
+      if (response.success && response.data) {
+        return response.data.results?.map((productData: any) => this.mapToProduct(productData)) || [];
       }
       
       return [];
@@ -115,52 +128,34 @@ export class ProductRepositoryImpl implements ProductRepository {
   }
 
   /**
-   * Find featured products
+   * Find products by status
    */
-  async findFeatured(limit: number = 10): Promise<ProductAggregate[]> {
+  async findByStatus(status: ProductStatus): Promise<Product[]> {
     try {
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}/featured?limit=${limit}`);
+      const response = await apiClient.get(`${this.baseUrl}/by-status/${status}`);
       
       if (response.success && response.data) {
-        return response.data.map((productData: any) => this.mapToProductAggregate(productData));
+        return response.data.results?.map((productData: any) => this.mapToProduct(productData)) || [];
       }
       
       return [];
     } catch (error) {
-      console.error('Error finding featured products:', error);
+      console.error('Error finding products by status:', error);
       return [];
     }
   }
 
   /**
-   * Find popular products
+   * Create a new product
    */
-  async findPopular(limit: number = 10): Promise<ProductAggregate[]> {
-    try {
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}/popular?limit=${limit}`);
-      
-      if (response.success && response.data) {
-        return response.data.map((productData: any) => this.mapToProductAggregate(productData));
-      }
-      
-      return [];
-    } catch (error) {
-      console.error('Error finding popular products:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Create new product
-   */
-  async create(data: ProductCreateData): Promise<ProductAggregate> {
+  async create(data: ProductCreateData): Promise<Product> {
     try {
       const requestData = this.mapFromProductCreateData(data);
       
-      const response = await apiClient.post<ApiResponse<any>>(this.baseUrl, requestData);
+      const response = await apiClient.post(this.baseUrl, requestData);
       
       if (response.success && response.data) {
-        return this.mapToProductAggregate(response.data);
+        return this.mapToProduct(response.data);
       }
       
       throw new Error('Failed to create product');
@@ -173,14 +168,14 @@ export class ProductRepositoryImpl implements ProductRepository {
   /**
    * Update product
    */
-  async update(id: string, data: ProductUpdateData): Promise<ProductAggregate> {
+  async update(id: string, data: ProductUpdateData): Promise<Product> {
     try {
       const requestData = this.mapFromProductUpdateData(data);
       
-      const response = await apiClient.patch<ApiResponse<any>>(`${this.baseUrl}/${id}`, requestData);
+      const response = await apiClient.patch(`${this.baseUrl}/${id}`, requestData);
       
       if (response.success && response.data) {
-        return this.mapToProductAggregate(response.data);
+        return this.mapToProduct(response.data);
       }
       
       throw new Error('Failed to update product');
@@ -195,7 +190,7 @@ export class ProductRepositoryImpl implements ProductRepository {
    */
   async delete(id: string): Promise<boolean> {
     try {
-      const response = await apiClient.delete<ApiResponse<any>>(`${this.baseUrl}/${id}`);
+      const response = await apiClient.delete(`${this.baseUrl}/${id}`);
       return response.success;
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -204,38 +199,15 @@ export class ProductRepositoryImpl implements ProductRepository {
   }
 
   /**
-   * Activate product
+   * Check if slug exists
    */
-  async activate(id: string): Promise<ProductAggregate> {
+  async existsBySlug(slug: string): Promise<boolean> {
     try {
-      const response = await apiClient.patch<ApiResponse<any>>(`${this.baseUrl}/${id}/activate`);
-      
-      if (response.success && response.data) {
-        return this.mapToProductAggregate(response.data);
-      }
-      
-      throw new Error('Failed to activate product');
+      const response = await apiClient.get(`${this.baseUrl}/exists/slug/${slug}`);
+      return response.success && response.data?.exists === true;
     } catch (error) {
-      console.error('Error activating product:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Deactivate product
-   */
-  async deactivate(id: string): Promise<ProductAggregate> {
-    try {
-      const response = await apiClient.patch<ApiResponse<any>>(`${this.baseUrl}/${id}/deactivate`);
-      
-      if (response.success && response.data) {
-        return this.mapToProductAggregate(response.data);
-      }
-      
-      throw new Error('Failed to deactivate product');
-    } catch (error) {
-      console.error('Error deactivating product:', error);
-      throw error;
+      console.error('Error checking slug existence:', error);
+      return false;
     }
   }
 
@@ -250,76 +222,66 @@ export class ProductRepositoryImpl implements ProductRepository {
     byStatus: Record<string, number>;
   }> {
     try {
-      const response = await apiClient.get<ApiResponse<any>>(`${this.baseUrl}/statistics`);
+      const response = await apiClient.get(`${this.baseUrl}/statistics`);
       
       if (response.success && response.data) {
         return response.data;
       }
       
-      return { total: 0, active: 0, inactive: 0, byType: {}, byStatus: {} };
+      return {
+        total: 0,
+        active: 0,
+        inactive: 0,
+        byType: {},
+        byStatus: {}
+      };
     } catch (error) {
       console.error('Error getting product statistics:', error);
-      return { total: 0, active: 0, inactive: 0, byType: {}, byStatus: {} };
+      return {
+        total: 0,
+        active: 0,
+        inactive: 0,
+        byType: {},
+        byStatus: {}
+      };
     }
   }
 
   /**
-   * Map API response to ProductAggregate
+   * Map API response to Product entity
    */
-  private mapToProductAggregate(productData: any): ProductAggregate {
-    // Create Price value object
-    const price = Price.create(
-      productData.price.amount,
-      productData.price.currency
-    );
-
-    // Create Location value object
-    const location = Location.create(
-      productData.location.name,
-      productData.location.street,
-      productData.location.city,
-      productData.location.country,
-      productData.location.latitude || 0,
-      productData.location.longitude || 0
-    );
-
-    // Create Product entity
-    const product = Product.create(
-      productData.id,
-      productData.type as ProductType,
-      productData.slug,
-      productData.title,
-      productData.description,
-      productData.shortDescription,
-      price,
-      location,
-      productData.images || [],
-      productData.variants || [],
-      productData.options || [],
-      productData.status as ProductStatus,
-      productData.metadata || {},
-      productData.createdAt ? new Date(productData.createdAt) : new Date(),
-      productData.updatedAt ? new Date(productData.updatedAt) : new Date()
-    );
-
-    // Create ProductAggregate
-    const productAggregate = ProductAggregate.create(
-      product,
-      productData.availability || {
-        isAvailable: true,
-        availableFrom: new Date(),
-        availableTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-        maxParticipants: 100,
-        currentParticipants: 0
-      },
-      productData.ratings || {
-        average: 0,
-        count: 0,
-        distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-      }
-    );
-
-    return productAggregate;
+  private mapToProduct(productData: any): Product {
+    return {
+      id: productData.id,
+      title: productData.title,
+      slug: productData.slug,
+      description: productData.description,
+      short_description: productData.short_description,
+      type: productData.type,
+      status: productData.status,
+      price: productData.price,
+      currency: productData.currency,
+      images: productData.images || [],
+      featured_image: productData.featured_image,
+      location: productData.location ? {
+        address: productData.location.address,
+        city: productData.location.city,
+        country: productData.location.country,
+        latitude: productData.location.latitude,
+        longitude: productData.location.longitude
+      } : undefined,
+      duration: productData.duration,
+      max_capacity: productData.max_capacity,
+      min_age: productData.min_age,
+      max_age: productData.max_age,
+      included_services: productData.included_services || [],
+      excluded_services: productData.excluded_services || [],
+      what_to_bring: productData.what_to_bring || [],
+      cancellation_policy: productData.cancellation_policy,
+      created_at: productData.created_at,
+      updated_at: productData.updated_at,
+      metadata: productData.metadata
+    };
   }
 
   /**
@@ -331,24 +293,12 @@ export class ProductRepositoryImpl implements ProductRepository {
       slug: data.slug,
       title: data.title,
       description: data.description,
-      shortDescription: data.shortDescription,
-      price: {
-        amount: data.price.getAmount(),
-        currency: data.price.getCurrency().getCode()
-      },
-      location: {
-        name: data.location.getName(),
-        street: data.location.getStreet(),
-        city: data.location.getCity(),
-        country: data.location.getCountry(),
-        latitude: data.location.getLatitude(),
-        longitude: data.location.getLongitude()
-      },
+      short_description: data.short_description,
+      price: data.price,
+      currency: data.currency,
+      location: data.location,
       images: data.images,
-      variants: data.variants,
-      options: data.options,
-      status: data.status,
-      metadata: data.metadata
+      status: data.status
     };
   }
 
@@ -360,29 +310,12 @@ export class ProductRepositoryImpl implements ProductRepository {
 
     if (data.title !== undefined) updateData.title = data.title;
     if (data.description !== undefined) updateData.description = data.description;
-    if (data.shortDescription !== undefined) updateData.shortDescription = data.shortDescription;
+    if (data.short_description !== undefined) updateData.short_description = data.short_description;
+    if (data.price !== undefined) updateData.price = data.price;
+    if (data.currency !== undefined) updateData.currency = data.currency;
+    if (data.location !== undefined) updateData.location = data.location;
     if (data.images !== undefined) updateData.images = data.images;
-    if (data.variants !== undefined) updateData.variants = data.variants;
-    if (data.options !== undefined) updateData.options = data.options;
-    if (data.metadata !== undefined) updateData.metadata = data.metadata;
-
-    if (data.price !== undefined) {
-      updateData.price = {
-        amount: data.price.getAmount(),
-        currency: data.price.getCurrency().getCode()
-      };
-    }
-
-    if (data.location !== undefined) {
-      updateData.location = {
-        name: data.location.getName(),
-        street: data.location.getStreet(),
-        city: data.location.getCity(),
-        country: data.location.getCountry(),
-        latitude: data.location.getLatitude(),
-        longitude: data.location.getLongitude()
-      };
-    }
+    if (data.status !== undefined) updateData.status = data.status;
 
     return updateData;
   }

@@ -30,7 +30,7 @@ import {
 import { useTransfersService } from '@/lib/application/hooks/useTransfersService';
 import { useCart } from '@/lib/hooks/useCart';
 import { TransferRoute, TransferRoutePricing, TransferOption } from '@/lib/types/api';
-import { useCurrency } from '@/lib/currency-context';
+import { formatCurrency } from '@/lib/utils';
 
 interface BookingStep {
   id: number;
@@ -63,7 +63,7 @@ export default function TransferBookingPage() {
   const { refreshCart } = useCart();
   const t = useTranslations('transferBooking');
   const router = useRouter();
-  const { formatPrice, currency: userCurrency } = useCurrency();
+  const { formatPrice, currency: userCurrency } = formatCurrency();
   
   // Use the transfers service
   const { 

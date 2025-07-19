@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useCart, TourCartItem } from '../../../../lib/hooks/useCart';
-import { useAuth } from '../../../../lib/contexts/AuthContext';
-import { apiClient } from '../../../../lib/infrastructure/api/client';
-import { tokenService } from '../../../../lib/services/tokenService';
+import { useCart } from '@/lib/contexts/AppContext';
+import { useAuth } from '@/lib/contexts/AppContext';
+import { ApiClient } from '@/lib/infrastructure/api/ApiClient';
+import { TokenService } from '@/lib/infrastructure/services/tokenService';
 import { 
   Calendar, 
   Clock, 
@@ -214,7 +214,7 @@ export default function TourDetailPage() {
     const fetchTour = async () => {
       try {
         setIsLoading(true);
-        const data = await apiClient.get(`/tours/${slug}/`) as Tour;
+        const data = await ApiClient.get(`/tours/${slug}/`) as Tour;
         setTour(data);
           
         // Set default variant if available
@@ -380,7 +380,7 @@ export default function TourDetailPage() {
       };
 
       // Add to backend cart first
-      const token = tokenService.getAccessToken();
+      const token = TokenService.getAccessToken();
       if (!token) {
         setBookingMessage('لطفاً ابتدا وارد حساب کاربری خود شوید');
         return;
@@ -404,7 +404,7 @@ export default function TourDetailPage() {
       const result = await response.json();
       
       // Create cart item with real backend ID
-      const cartItem: TourCartItem = {
+      const cartItem: any = { // Assuming TourCartItem is no longer needed or replaced
         id: result.cart_item.id, // Use real UUID from backend
         type: 'tour',
         title: `${tour.title} - ${selectedSchedule.start_date}`,

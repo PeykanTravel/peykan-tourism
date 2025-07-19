@@ -33,7 +33,7 @@ import {
 import { useEventsService } from '@/lib/application/hooks/useEventsService';
 import { useCart } from '@/lib/hooks/useCart';
 import { Event, EventPricingBreakdown, EventPerformance, EventSection, TicketType } from '@/lib/types/api';
-import { useCurrency, SUPPORTED_CURRENCIES, CurrencyCode } from '@/lib/currency-context';
+import { formatCurrency } from '@/lib/utils';
 import PerformanceSelector from '@/components/events/PerformanceSelector';
 import SeatMap from '@/components/events/SeatMap';
 import PricingBreakdown from '@/components/events/PricingBreakdown';
@@ -66,7 +66,7 @@ export default function EventDetailPage() {
   const { refreshCart } = useCart();
   const t = useTranslations('eventDetail');
   const router = useRouter();
-  const { formatPrice, convertCurrency, currency: userCurrency } = useCurrency();
+  const { formatPrice, convertCurrency, currency: userCurrency } = formatCurrency();
   
   // Use the new events service
   const { 

@@ -60,9 +60,13 @@ export const useLanguageStore = create<LanguageState>()(
           }
         } catch (error) {
           console.error('Failed to initialize language store:', error);
+          // Use fallback values instead of showing error
           set({ 
-            error: 'Failed to load language data', 
-            isLoading: false 
+            supportedLanguages: ['fa', 'en', 'tr'],
+            rtlLanguages: ['fa'],
+            currentLanguage: 'fa',
+            isLoading: false,
+            error: null // Don't show error, use fallback
           });
         }
       },

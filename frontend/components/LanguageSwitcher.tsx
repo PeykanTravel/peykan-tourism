@@ -78,18 +78,36 @@ export default function LanguageSwitcher() {
     );
   }
 
-  // Error state
+  // Error state - show fallback with retry
   if (error) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        className="flex items-center gap-2 text-red-500"
-        onClick={() => initialize()}
-      >
-        <Globe className="w-4 h-4" />
-        <span>Error</span>
-      </Button>
+      <div className="relative group">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-2 text-red-500"
+          onClick={() => initialize()}
+        >
+          <Globe className="w-4 h-4" />
+          <span className="font-medium">
+            {languageNames[currentLocale as keyof typeof languageNames] || currentLocale}
+          </span>
+          <ChevronDown className="w-4 h-4" />
+        </Button>
+        
+        {/* Fallback dropdown */}
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+          <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+            Failed to load languages
+          </div>
+          <button
+            onClick={() => initialize()}
+            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+          >
+            <span>Retry</span>
+          </button>
+        </div>
+      </div>
     );
   }
 

@@ -64,9 +64,17 @@ export const useCurrencyStore = create<CurrencyState>()(
           }
         } catch (error) {
           console.error('Failed to initialize currency store:', error);
+          // Use fallback values instead of showing error
           set({ 
-            error: 'Failed to load currency data', 
-            isLoading: false 
+            supportedCurrencies: [
+              { currency_code: 'USD', currency_name: 'US Dollar', symbol: '$', is_active: true, is_default: true },
+              { currency_code: 'EUR', currency_name: 'Euro', symbol: '€', is_active: true, is_default: false },
+              { currency_code: 'IRR', currency_name: 'Iranian Rial', symbol: 'ریال', is_active: true, is_default: false }
+            ],
+            exchangeRates: { USD: 1, EUR: 0.85, IRR: 420000 },
+            currentCurrency: 'USD',
+            isLoading: false,
+            error: null // Don't show error, use fallback
           });
         }
       },

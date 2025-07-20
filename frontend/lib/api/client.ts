@@ -76,6 +76,12 @@ apiClient.interceptors.response.use(
       }
     }
     
+    // Handle rate limiting
+    if (error.response?.status === 429) {
+      console.log('Rate limit exceeded, using fallback values');
+      return Promise.reject(error);
+    }
+    
     // Handle network errors
     if (error.code === 'ECONNABORTED') {
       console.error('Request timeout');

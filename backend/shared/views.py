@@ -24,6 +24,7 @@ class SupportedCurrenciesView(APIView):
     """Get supported currencies and exchange rates."""
     
     permission_classes = [permissions.AllowAny]
+    throttle_scope = 'currency'
     
     def get(self, request):
         """Get all supported currencies with exchange rates."""
@@ -51,6 +52,7 @@ class CurrencyConversionView(APIView):
     """Convert currency amounts."""
     
     permission_classes = [permissions.AllowAny]
+    throttle_scope = 'currency'
     
     def post(self, request):
         """Convert amount from one currency to another."""
@@ -126,6 +128,7 @@ class CurrencyFormatView(APIView):
     """Format currency amounts."""
     
     permission_classes = [permissions.AllowAny]
+    throttle_scope = 'currency'
     
     def post(self, request):
         """Format amount with currency symbol."""
@@ -208,6 +211,7 @@ class SupportedLanguagesView(APIView):
     """Get supported languages and current language."""
     
     permission_classes = [permissions.AllowAny]
+    throttle_scope = 'language'
     
     def get(self, request):
         """Get all supported languages with current language."""

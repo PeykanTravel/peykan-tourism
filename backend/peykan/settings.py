@@ -218,18 +218,20 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
         'rest_framework.parsers.FormParser',
     ),
-    # Rate limiting
+    # Rate limiting - More generous for development
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
         'rest_framework.throttling.ScopedRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '1000/hour',
-        'auth': '10/minute',  # For login/register endpoints
-        'cart': '100/minute',  # For cart operations
-        'order': '10/minute',  # For order operations
+        'anon': '1000/hour',  # Increased from 100/hour
+        'user': '5000/hour',  # Increased from 1000/hour
+        'auth': '100/minute',  # Increased from 10/minute
+        'cart': '500/minute',  # Increased from 100/minute
+        'order': '100/minute',  # Increased from 10/minute
+        'currency': '1000/minute',  # New: High limit for currency endpoints
+        'language': '1000/minute',  # New: High limit for language endpoints
     },
     # Exception handling
     'EXCEPTION_HANDLER': 'shared.utils.custom_exception_handler',

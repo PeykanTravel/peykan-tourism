@@ -6,6 +6,7 @@ import { Metadata } from 'next';
 import Navbar from '../../components/Navbar';
 import { AuthProvider } from '../../lib/contexts/AuthContext';
 import { CartProvider } from '../../lib/contexts/CartContext';
+import StoreProvider from '../../components/providers/StoreProvider';
 import type { Locale } from '@/i18n/config';
 
 export const metadata: Metadata = {
@@ -45,16 +46,18 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={params.locale} dir={params.locale === 'fa' ? 'rtl' : 'ltr'}>
       <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white min-h-screen">
         <NextIntlClientProvider locale={params.locale} messages={messages}>
-          <AuthProvider>
-            <CartProvider>
-              <div className="min-h-screen flex flex-col">
-                <Navbar />
-                <main className="flex-1">
-                  {children}
-                </main>
-              </div>
-            </CartProvider>
-          </AuthProvider>
+          <StoreProvider>
+            <AuthProvider>
+              <CartProvider>
+                <div className="min-h-screen flex flex-col">
+                  <Navbar />
+                  <main className="flex-1">
+                    {children}
+                  </main>
+                </div>
+              </CartProvider>
+            </AuthProvider>
+          </StoreProvider>
         </NextIntlClientProvider>
       </body>
     </html>

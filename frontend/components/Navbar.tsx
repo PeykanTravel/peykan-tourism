@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import LanguageSwitcher from './LanguageSwitcher';
+import CurrencySelector from './CurrencySelector';
 import { User, ShoppingCart, LogOut, Settings, Heart, Package, Menu, X, Plane, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../lib/contexts/AuthContext';
 import { useCart } from '../lib/hooks/useCart';
@@ -126,6 +127,7 @@ export default function Navbar() {
               <Moon className={`absolute w-5 h-5 transition-all duration-300 ${isDark ? 'text-white' : 'text-gray-600'}`} />
             </Button>
 
+            <CurrencySelector />
             <LanguageSwitcher />
             
             {/* Cart */}

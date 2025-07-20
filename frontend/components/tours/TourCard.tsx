@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, Users, DollarSign } from 'lucide-react';
+import { PriceDisplay } from '../ui/Price';
 
 interface TourCardProps {
   tour: {
@@ -21,7 +22,7 @@ interface TourCardProps {
 }
 
 export default function TourCard({ tour, viewMode }: TourCardProps) {
-  // Helper for price formatting
+  // Helper for price formatting (fallback)
   const formatPrice = (price: string, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -78,7 +79,7 @@ export default function TourCard({ tour, viewMode }: TourCardProps) {
               </div>
               <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
                 <DollarSign className="w-4 h-4" />
-                <span>{formatPrice(tour.price, tour.currency)}</span>
+                <PriceDisplay amount={parseFloat(tour.price)} currency={tour.currency} />
               </div>
               {renderStars(tour.rating)}
             </div>
@@ -126,7 +127,7 @@ export default function TourCard({ tour, viewMode }: TourCardProps) {
             </div>
             <div className="flex items-center gap-1">
               <DollarSign className="w-4 h-4 text-white/80" />
-              <span>{formatPrice(tour.price, tour.currency)}</span>
+              <PriceDisplay amount={parseFloat(tour.price)} currency={tour.currency} className="text-white/80" />
             </div>
             <div className="flex items-center gap-1">
               <Clock className="w-4 h-4 text-white/80" />

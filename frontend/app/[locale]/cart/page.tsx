@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCart, CartItem, TourCartItem, EventCartItem, TransferCartItem } from '../../../lib/hooks/useCart';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 import { tokenService } from '../../../lib/services/tokenService';
+import { PriceDisplay } from '../../../components/ui/Price';
 import TourCartItemComponent from '../../../components/cart/TourCartItem';
 import EventCartItemComponent from '../../../components/cart/EventCartItem';
 import TransferCartItemComponent from '../../../components/cart/TransferCartItem';
@@ -336,16 +337,22 @@ export default function CartPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">{t('subtotal')}</span>
-                  <span className="font-medium">{formatPrice(totalPrice, currency)}</span>
+                  <span className="font-medium">
+                    <PriceDisplay amount={totalPrice} currency={currency} />
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">{t('tax')}</span>
-                  <span className="font-medium">{formatPrice(0, currency)}</span>
+                  <span className="font-medium">
+                    <PriceDisplay amount={0} currency={currency} />
+                  </span>
                 </div>
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-semibold">
                     <span>{t('total')}</span>
-                    <span>{formatPrice(totalPrice, currency)}</span>
+                    <span>
+                      <PriceDisplay amount={totalPrice} currency={currency} />
+                    </span>
                   </div>
                 </div>
               </div>

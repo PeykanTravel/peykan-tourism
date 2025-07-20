@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useCart } from '../../../lib/hooks/useCart';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 import ProtectedRoute from '../../../components/ProtectedRoute';
+import { PriceDisplay } from '../../../components/ui/Price';
 import { 
   CreditCard, 
   Ban, 
@@ -504,8 +505,8 @@ export default function CheckoutPage() {
                         
                         <p className="text-sm text-gray-600 mt-1">
                           {item.type === 'tour' 
-                            ? formatPrice(item.subtotal, item.currency)
-                            : `${item.quantity} × ${formatPrice(item.price, item.currency)}`
+                            ? <PriceDisplay amount={item.subtotal} currency={item.currency} />
+                            : <span>{item.quantity} × <PriceDisplay amount={item.price} currency={item.currency} /></span>
                           }
                         </p>
                       </div>
@@ -517,7 +518,9 @@ export default function CheckoutPage() {
                   {Object.entries(totalsByCurrency).map(([currency, total]) => (
                     <div key={currency} className="flex justify-between text-sm">
                       <span className="text-gray-600">{currency}:</span>
-                      <span className="font-medium">{formatPrice(total, currency)}</span>
+                      <span className="font-medium">
+                        <PriceDisplay amount={total} currency={currency} />
+                      </span>
                     </div>
                   ))}
                 </div>

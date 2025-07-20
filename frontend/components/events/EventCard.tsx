@@ -23,6 +23,7 @@ import {
   Palette
 } from 'lucide-react';
 import { Event } from '@/lib/types/api';
+import { PriceDisplay } from '../ui/Price';
 
 interface EventCardProps {
   event: Event;
@@ -213,7 +214,7 @@ export default function EventCard({
           {/* Price Badge */}
           <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1">
             <div className="text-sm font-bold text-gray-900">
-              {formatPrice(minPrice, 'USD')}
+              <PriceDisplay amount={minPrice} currency="USD" />
             </div>
             <div className="text-xs text-gray-500">{t('fromPrice')}</div>
           </div>

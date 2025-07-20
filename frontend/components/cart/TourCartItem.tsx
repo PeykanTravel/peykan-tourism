@@ -3,6 +3,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { TourCartItem as TourCartItemType } from '../../lib/hooks/useCart';
+import { PriceDisplay } from '../ui/Price';
 import { 
   Calendar, 
   Clock, 
@@ -205,14 +206,14 @@ export default function TourCartItem({
           {/* Pricing */}
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">
-              <div>{t('perPerson')}: {formatPrice(item.unit_price, item.currency)}</div>
+              <div>{t('perPerson')}: <PriceDisplay amount={item.unit_price} currency={item.currency} /></div>
               {item.options_total > 0 && (
-                <div>{t('options')}: {formatPrice(item.options_total, item.currency)}</div>
+                <div>{t('options')}: <PriceDisplay amount={item.options_total} currency={item.currency} /></div>
               )}
             </div>
             <div className="text-right">
               <div className="text-lg font-semibold text-gray-900">
-                {formatPrice(item.subtotal, item.currency)}
+                <PriceDisplay amount={item.subtotal} currency={item.currency} />
               </div>
             </div>
           </div>

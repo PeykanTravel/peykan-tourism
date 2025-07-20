@@ -1,55 +1,15 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import React from 'react';
+import Image from 'next/image';
 
 export default function AboutSection() {
-  const t = useTranslations('home')
-  const [counters, setCounters] = useState({
-    experience: 0,
-    countries: 0
-  })
-
-  useEffect(() => {
-    const animateCounters = () => {
-      const duration = 2000
-      const steps = 60
-      const stepDuration = duration / steps
-      
-      let currentStep = 0
-      const interval = setInterval(() => {
-        currentStep++
-        const progress = currentStep / steps
-        
-        setCounters({
-          experience: Math.floor(20 * progress),
-          countries: Math.floor(100 * progress)
-        })
-        
-        if (currentStep >= steps) {
-          clearInterval(interval)
-          setCounters({ experience: 20, countries: 100 })
-        }
-      }, stepDuration)
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            animateCounters()
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.5 }
-    )
-
-    const element = document.getElementById('about-section')
-    if (element) observer.observe(element)
-
-    return () => observer.disconnect()
-  }, [])
+  const stats = [
+    { number: '20+', label: 'سال تجربه' },
+    { number: '100+', label: 'کشور مقصد' },
+    { number: '10+', label: 'جایزه گردشگری' },
+    { number: '2M+', label: 'مشتری راضی' }
+  ];
 
   return (
     <section id="about-section" className="py-20 bg-white dark:bg-gray-900">
@@ -58,9 +18,11 @@ export default function AboutSection() {
           {/* Image Column */}
           <div className="relative order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img 
+              <Image 
                 src="/images/about-image.jpg" 
                 alt="About Us"
+                width={600}
+                height={500}
                 className="w-full h-[500px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -86,52 +48,23 @@ export default function AboutSection() {
               </div>
 
               {/* Counters */}
-              <div className="grid grid-cols-2 gap-8">
-                <div className="text-center lg:text-right">
-                  <div className="text-4xl lg:text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                    {counters.experience}+
+              <div className="grid grid-cols-2 gap-6 pt-8">
+                {stats.map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-3xl lg:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                      {stat.number}
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-gray-600 dark:text-gray-300 font-medium">
-                    سال تجربه
-                  </div>
-                </div>
-                
-                <div className="text-center lg:text-left">
-                  <div className="text-4xl lg:text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                    {counters.countries}+
-                  </div>
-                  <div className="text-gray-600 dark:text-gray-300 font-medium">
-                    کشور مقصد
-                  </div>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 rtl:gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-700 dark:text-gray-300">
-                    راهنمایان متخصص و باتجربه
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 rtl:gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-700 dark:text-gray-300">
-                    تجربیات فراموش‌نشدنی و منحصر به فرد
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 rtl:gap-3">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>
-                  <span className="text-gray-700 dark:text-gray-300">
-                    سفرهای پایدار و محیط زیست دوست
-                  </span>
-                </div>
+                ))}
               </div>
 
               {/* CTA Button */}
-              <div className="pt-4">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                  درباره ما بیشتر بدانید
+              <div className="pt-6">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300">
+                  بیشتر بدانید
                 </button>
               </div>
             </div>
@@ -139,5 +72,5 @@ export default function AboutSection() {
         </div>
       </div>
     </section>
-  )
+  );
 } 

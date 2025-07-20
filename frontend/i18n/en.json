@@ -40,7 +40,15 @@
     "featuredTransfers": "Featured Transfers",
     "viewAll": "View All",
     "bookNow": "Book Now",
-    "popularDestinations": "Popular Destinations"
+    "popularDestinations": "Popular Destinations",
+    "cta": {
+      "title": "Ready to Explore the World?",
+      "subtitle": "Let us create unforgettable memories with our special tours and destinations.",
+      "button": "Book Now",
+      "support": "24/7 Support",
+      "pricing": "Best Price Guarantee",
+      "cancellation": "Free Cancellation"
+    }
   },
   "tours": {
     "title": "Tours",

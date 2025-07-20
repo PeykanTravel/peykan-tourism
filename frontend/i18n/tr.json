@@ -39,7 +39,15 @@
     "featuredEvents": "Öne Çıkan Etkinlikler",
     "featuredTransfers": "Öne Çıkan Transferler",
     "viewAll": "Tümünü Gör",
-    "bookNow": "Şimdi Rezervasyon Yap"
+    "bookNow": "Şimdi Rezervasyon Yap",
+    "cta": {
+      "title": "Dünyayı Keşfetmeye Hazır mısınız?",
+      "subtitle": "Özel turlarımız ve destinasyonlarımızla unutulmaz anılar yaratmamıza izin verin.",
+      "button": "Şimdi Rezervasyon Yap",
+      "support": "7/24 Destek",
+      "pricing": "En İyi Fiyat Garantisi",
+      "cancellation": "Ücretsiz İptal"
+    }
   },
   "tours": {
     "title": "Turlar",

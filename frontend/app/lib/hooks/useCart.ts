@@ -1,4 +1,7 @@
-import useSWR, { mutate } from 'swr';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useCustomHook } from '../../../lib/hooks/hookFactory';
 import { 
   getCart, 
   getCartSummary, 
@@ -12,7 +15,6 @@ import type {
   AddToCartPayload, 
   UpdateCartItemPayload 
 } from '../types/api';
-import { useState, useEffect } from 'react';
 
 // Helper to get auth token
 const getAuthToken = () => {
@@ -24,84 +26,48 @@ const getAuthToken = () => {
   return token;
 };
 
-// Local cart storage helpers for guests
-const LOCAL_CART_KEY = 'peykan_local_cart';
-
+// Local storage helpers
 const getLocalCart = (): CartItem[] => {
-  if (typeof window === 'undefined') {
-    return [];
-  }
+  if (typeof window === 'undefined') return [];
   
   try {
-    const stored = localStorage.getItem(LOCAL_CART_KEY);
-    
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return parsed;
-    } else {
-      return [];
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      return parsedCart.items || [];
     }
   } catch (error) {
-    console.error('Error parsing local cart:', error);
-    return [];
+    console.error('Error loading cart from localStorage:', error);
   }
+  
+  return [];
 };
 
 const setLocalCart = (items: CartItem[]) => {
-  if (typeof window === 'undefined') {
-    return;
-  }
+  if (typeof window === 'undefined') return;
   
   try {
-    const jsonString = JSON.stringify(items);
-    localStorage.setItem(LOCAL_CART_KEY, jsonString);
+    localStorage.setItem('cart', JSON.stringify({ items }));
   } catch (error) {
-    console.error('Failed to save local cart:', error);
+    console.error('Error saving cart to localStorage:', error);
   }
 };
 
 const addToLocalCart = (itemData: AddToCartPayload): CartItem => {
   const items = getLocalCart();
-  
-  // Check if item already exists
-  const existingIndex = items.findIndex(item => 
-    item.product_type === itemData.product_type &&
-    item.product_id === itemData.product_id &&
-    item.variant_id === itemData.variant_id
-  );
-
-  if (existingIndex >= 0) {
-    // Update quantity
-    items[existingIndex].quantity += itemData.quantity;
-    items[existingIndex].total_price = items[existingIndex].unit_price * items[existingIndex].quantity;
-  } else {
-    // Add new item
-    const newItem: CartItem = {
-      id: `local_${Date.now()}_${Math.random()}`,
-      product_type: itemData.product_type,
-      product_id: itemData.product_id,
-      product_title: 'Unknown Product', // Will be updated when we have product details
-      product_slug: '',
-      variant_id: itemData.variant_id,
-      variant_name: itemData.variant_id ? 'Selected Variant' : undefined,
-      quantity: itemData.quantity,
-      unit_price: 0, // Will be updated when we have product details
-      total_price: 0, // Will be calculated
-      currency: 'USD',
-      selected_options: (itemData.selected_options || []).map(option => ({
-        ...option,
-        price: 0 // Will be updated when we have product details
-      })),
-      special_requests: itemData.special_requests,
-      created_at: new Date().toISOString(),
-    };
-    items.push(newItem);
+  let newItem = {
+    ...itemData,
+    id: `local_${Date.now()}`,
+  };
+  if (Array.isArray((itemData as any).selected_options) && (itemData as any).selected_options.length > 0) {
+    newItem.selected_options = (itemData as any).selected_options.map((opt: any) => ({
+      ...opt,
+      price: typeof opt.price === 'number' ? opt.price : 0,
+    }));
   }
-
+  items.push(newItem as any);
   setLocalCart(items);
-  
-  const resultItem = items[existingIndex >= 0 ? existingIndex : items.length - 1];
-  return resultItem;
+  return newItem as any;
 };
 
 const updateLocalCartItem = (itemId: string, itemData: UpdateCartItemPayload): CartItem | null => {
@@ -110,49 +76,43 @@ const updateLocalCartItem = (itemId: string, itemData: UpdateCartItemPayload): C
   
   if (itemIndex === -1) return null;
   
-  items[itemIndex] = {
-    ...items[itemIndex],
-    quantity: itemData.quantity || items[itemIndex].quantity,
-    total_price: items[itemIndex].unit_price * (itemData.quantity || items[itemIndex].quantity),
-    selected_options: (itemData.selected_options || []).map(option => ({
-      ...option,
-      price: 0 // Will be updated when we have product details
-    })),
-    special_requests: itemData.special_requests,
-  };
-  
+  const updatedItem = { ...items[itemIndex], ...itemData } as any;
+  items[itemIndex] = updatedItem;
   setLocalCart(items);
-  return items[itemIndex];
+  return updatedItem;
 };
 
 const removeFromLocalCart = (itemId: string): boolean => {
   const items = getLocalCart();
   const filteredItems = items.filter(item => item.id !== itemId);
   
-  if (filteredItems.length !== items.length) {
-    setLocalCart(filteredItems);
-    return true;
-  }
+  if (filteredItems.length === items.length) return false;
   
-  return false;
+  setLocalCart(filteredItems);
+  return true;
 };
 
 const clearLocalCart = (): boolean => {
   try {
-    localStorage.removeItem(LOCAL_CART_KEY);
+    localStorage.removeItem('cart');
     return true;
-  } catch {
+  } catch (error) {
+    console.error('Error clearing local cart:', error);
     return false;
   }
 };
 
-// SWR fetchers
-const cartFetcher = async (url: string, token: string) => {
+// Fetcher functions
+const cartFetcher = async () => {
+  const token = getAuthToken();
+  if (!token) throw new Error('Authentication required');
   const response = await getCart(token);
   return response.data;
 };
 
-const cartSummaryFetcher = async (url: string, token: string) => {
+const cartSummaryFetcher = async () => {
+  const token = getAuthToken();
+  if (!token) throw new Error('Authentication required');
   const response = await getCartSummary(token);
   return response.data;
 };
@@ -177,13 +137,9 @@ export const useCart = () => {
   const isAuthenticated = !!token;
   
   // For authenticated users, use SWR
-  const { data, error, isLoading, mutate } = useSWR(
-    isAuthenticated ? ['/api/cart', token] : null,
-    ([url, authToken]) => cartFetcher(url, authToken),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000, // 30 seconds
-    }
+  const { data, error, isLoading, mutate } = useCustomHook(
+    isAuthenticated ? 'cart' : null,
+    cartFetcher
   );
 
   const addItem = async (itemData: AddToCartPayload) => {
@@ -380,13 +336,9 @@ export const useCartSummary = () => {
   const token = getAuthToken();
   const isAuthenticated = !!token;
   
-  const { data, error, isLoading, mutate } = useSWR(
-    isAuthenticated ? ['/api/cart/summary', token] : null,
-    ([url, authToken]) => cartSummaryFetcher(url, authToken),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000, // 30 seconds
-    }
+  const { data, error, isLoading, mutate } = useCustomHook(
+    isAuthenticated ? 'cart-summary' : null,
+    cartSummaryFetcher
   );
 
   const summaryData = isAuthenticated ? data : {
@@ -411,8 +363,13 @@ export const useCartSummary = () => {
   };
 };
 
-// Hook for cart count (for navbar)
+// Hook for cart count (optimized for navbar)
 export const useCartCount = () => {
-  const { totalItems } = useCart();
-  return totalItems;
+  const { totalItems, isAuthenticated, isLoading } = useCart();
+  
+  return {
+    count: totalItems,
+    isAuthenticated,
+    isLoading,
+  };
 }; 

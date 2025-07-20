@@ -1,4 +1,4 @@
-import useSWR, { mutate } from 'swr';
+import { useCustomHook } from '../../../lib/hooks/hookFactory';
 import { getOrders, getOrderDetail, createOrder } from '../api/orders';
 import type { Order, CreateOrderPayload } from '../api/orders';
 
@@ -9,12 +9,16 @@ const getAuthToken = () => {
 };
 
 // Fetcher functions
-const ordersFetcher = async (url: string, token: string) => {
+const ordersFetcher = async () => {
+  const token = getAuthToken();
+  if (!token) throw new Error('Authentication required');
   const response = await getOrders(token);
   return response.data;
 };
 
-const orderDetailFetcher = async (orderNumber: string, token: string) => {
+const orderDetailFetcher = async (orderNumber: string) => {
+  const token = getAuthToken();
+  if (!token) throw new Error('Authentication required');
   const response = await getOrderDetail(orderNumber, token);
   return response.data;
 };
@@ -23,16 +27,13 @@ const orderDetailFetcher = async (orderNumber: string, token: string) => {
 export const useOrders = () => {
   const token = getAuthToken();
   
-  const { data, error, isLoading, mutate } = useSWR(
-    token ? ['/api/orders', token] : null,
-    ([url, authToken]) => ordersFetcher(url, authToken),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000, // 1 minute
-    }
+  const { data, error, isLoading, mutate } = useCustomHook(
+    token ? 'orders' : null,
+    ordersFetcher
   );
 
   const createNewOrder = async (orderData: CreateOrderPayload) => {
+    const token = getAuthToken();
     if (!token) throw new Error('Authentication required');
     
     try {
@@ -60,13 +61,9 @@ export const useOrders = () => {
 export const useOrderDetail = (orderNumber: string) => {
   const token = getAuthToken();
   
-  const { data, error, isLoading, mutate } = useSWR(
-    token && orderNumber ? [`/api/orders/${orderNumber}`, token] : null,
-    ([url, authToken]) => orderDetailFetcher(orderNumber, authToken),
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000, // 1 minute
-    }
+  const { data, error, isLoading, mutate } = useCustomHook(
+    token && orderNumber ? ['order-detail', orderNumber] : null,
+    () => orderDetailFetcher(orderNumber)
   );
 
   return {

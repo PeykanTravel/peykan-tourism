@@ -18,18 +18,18 @@ export default function CTASection() {
         <div className="space-y-8">
           {/* Main Heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-            آماده کاوش جهان هستید؟
+            {t('cta.title')}
           </h1>
           
           {/* Subheading */}
           <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto">
-            اجازه دهید با تورها و مقاصد ویژه‌مان، خاطرات فراموش‌نشدنی برایتان بسازیم.
+            {t('cta.subtitle')}
           </p>
 
           {/* CTA Button */}
           <div className="pt-8">
             <button className="group relative inline-flex items-center justify-center px-12 py-4 text-lg font-bold text-blue-600 bg-white rounded-full hover:bg-blue-50 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
-              <span className="relative z-10">همین حالا رزرو کنید</span>
+              <span className="relative z-10">{t('cta.button')}</span>
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
             </button>
           </div>
@@ -38,15 +38,15 @@ export default function CTASection() {
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-8 text-blue-100">
             <div className="flex items-center gap-2 rtl:gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
-              <span>پشتیبانی 24 ساعته</span>
+              <span>{t('cta.support')}</span>
             </div>
             <div className="flex items-center gap-2 rtl:gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
-              <span>بهترین قیمت تضمینی</span>
+              <span>{t('cta.pricing')}</span>
             </div>
             <div className="flex items-center gap-2 rtl:gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
-              <span>لغو رایگان</span>
+              <span>{t('cta.cancellation')}</span>
             </div>
           </div>
         </div>

@@ -79,13 +79,6 @@ export interface PricingCalculationResponse {
     round_trip_discount: number;
     final_price: number;
   };
-  options_breakdown: Array<{
-    option_id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    total: number;
-  }>;
   trip_info: {
     vehicle_type: string;
     is_round_trip: boolean;

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Package, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
 import { useTransferOptions } from '@/lib/hooks/useTransfers';
+import { useCurrency } from '@/lib/currency-context';
 
 interface OptionsSelectionProps {
   onNext: () => void;
@@ -13,6 +14,7 @@ interface OptionsSelectionProps {
 
 export default function OptionsSelection({ onNext, onBack }: OptionsSelectionProps) {
   const t = useTranslations('transfers');
+  const { currency, convertCurrency } = useCurrency();
   
   // Get booking state from store
   const {
@@ -22,6 +24,19 @@ export default function OptionsSelection({ onNext, onBack }: OptionsSelectionPro
     setOptions,
     isStepValid,
   } = useTransferBookingStore();
+
+  // Helper function to format price with currency
+  const formatPrice = (amount: number, fromCurrency: string = 'USD') => {
+    const convertedAmount = convertCurrency(amount, fromCurrency, currency);
+    const currencySymbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'TRY': '₺',
+      'IRR': 'ریال',
+    };
+    const symbol = currencySymbols[currency] || currency;
+    return `${symbol} ${convertedAmount.toFixed(2)}`;
+  };
 
   // Fetch options from API
   const { data: optionsResponse, error: optionsError, isLoading: optionsLoading } = useTransferOptions();
@@ -202,9 +217,9 @@ export default function OptionsSelection({ onNext, onBack }: OptionsSelectionPro
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{option.description}</p>
-                                             <div className="text-lg font-bold text-blue-600">
-                         ${parseFloat(option.price).toFixed(2)}
-                       </div>
+                      <div className="text-lg font-bold text-blue-600">
+                        {formatPrice(parseFloat(option.price))}
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-3 ml-4">
@@ -251,7 +266,7 @@ export default function OptionsSelection({ onNext, onBack }: OptionsSelectionPro
                     <span className="font-medium">{option.name}</span>
                   </div>
                   <span className="font-medium">
-                    ${parseFloat(option.price).toFixed(2)}
+                    {formatPrice(parseFloat(option.price))}
                   </span>
                 </div>
               );

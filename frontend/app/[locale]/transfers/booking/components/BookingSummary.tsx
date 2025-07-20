@@ -7,6 +7,7 @@ import { useAuth } from '../../../../../lib/contexts/AuthContext';
 import { MapPin, Calendar, Clock, Users, Package, ArrowRight, ArrowLeft, CheckCircle, CreditCard, Star, Percent, Award, Info, Car, Wifi, Shield, Zap } from 'lucide-react';
 import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
 import { useCart } from '@/lib/hooks/useCart';
+import { useCurrency } from '@/lib/currency-context';
 
 interface BookingSummaryProps {
   onBack: () => void;
@@ -19,6 +20,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
   const params = useParams();
   const locale = params.locale as string;
   const { isAuthenticated } = useAuth();
+  const { currency, convertCurrency } = useCurrency();
   
   // Get booking state from store
   const {
@@ -45,11 +47,23 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
     price_calculation_error,
   } = useTransferBookingStore();
 
+  // Helper function to format price with currency
+  const formatPrice = (amount: number, fromCurrency: string = 'USD') => {
+    const convertedAmount = convertCurrency(amount, fromCurrency, currency);
+    const currencySymbols: { [key: string]: string } = {
+      'USD': '$',
+      'EUR': '€',
+      'TRY': '₺',
+      'IRR': 'ریال',
+    };
+    const symbol = currencySymbols[currency] || currency;
+    return `${symbol} ${convertedAmount.toFixed(2)}`;
+  };
+
   // Debug logging
   console.log('BookingSummary - pricing_breakdown:', pricing_breakdown);
   console.log('BookingSummary - selected_options:', selected_options);
-  console.log('BookingSummary - options_breakdown:', pricing_breakdown?.options_breakdown);
-  console.log('BookingSummary - options_total:', pricing_breakdown?.price_breakdown?.options_total);
+  console.log('BookingSummary - current currency:', currency);
 
   // Get option details from store or pricing breakdown
   const getOptionDetails = (optionId: string) => {
@@ -67,18 +81,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
       };
     }
     
-    // Second try to get from pricing breakdown
-    const optionDetails = pricing_breakdown?.options_breakdown?.find(
-      opt => opt.option_id === optionId
-    );
-    
-    if (optionDetails) {
-      console.log(`Found option details in pricing breakdown for ${optionId}:`, optionDetails);
-      return optionDetails;
-    }
-    
-    // Fallback: if options_breakdown is not available but options_total > 0,
-    // we can estimate the price per option
+    // Fallback: if options_total > 0, we can estimate the price per option
     if (pricing_breakdown?.price_breakdown?.options_total && selected_options.length > 0) {
       const estimatedPricePerOption = pricing_breakdown.price_breakdown.options_total / selected_options.length;
       console.log(`Using estimated price for ${optionId}: ${estimatedPricePerOption}`);
@@ -304,7 +307,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                 {route_data.origin} → {route_data.destination}
               </div>
               <div className="text-sm text-gray-600">
-                {vehiclePricing ? `${vehiclePricing.base_price} USD` : t('priceOnRequest')}
+                {vehiclePricing ? formatPrice(parseFloat(vehiclePricing.base_price)) : t('priceOnRequest')}
               </div>
               {renderRouteBadges().length > 0 && (
                 <div className="flex gap-1 mt-2">
@@ -463,7 +466,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                     </span>
                     {optionDetails && (
                       <div className="text-xs text-gray-500 mt-1">
-                        {t('quantity')}: {optionDetails.quantity} × USD {optionDetails.price.toFixed(2)}
+                        {t('quantity')}: {optionDetails.quantity} × {formatPrice(optionDetails.price)}
                       </div>
                     )}
                     {!optionDetails && (
@@ -473,7 +476,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                     )}
                   </div>
                   <span className="font-medium">
-                    USD {optionDetails?.total ? optionDetails.total.toFixed(2) : '0.00'}
+                    {optionDetails?.total ? formatPrice(optionDetails.total) : formatPrice(0)}
                   </span>
                 </div>
               );
@@ -486,7 +489,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-700">{t('optionsTotal')}:</span>
                 <span className="font-bold text-gray-900">
-                  USD {pricing_breakdown.price_breakdown.options_total.toFixed(2)}
+                  {formatPrice(pricing_breakdown.price_breakdown.options_total)}
                 </span>
               </div>
             </div>
@@ -519,33 +522,33 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-gray-600">{t('basePrice')}</span>
-              <span className="font-medium">USD {pricing_breakdown.price_breakdown.base_price}</span>
+              <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.base_price)}</span>
             </div>
             {pricing_breakdown.price_breakdown.outbound_surcharge > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600">{t('timeSurcharge')}</span>
-                <span className="font-medium">USD {pricing_breakdown.price_breakdown.outbound_surcharge.toFixed(3)}</span>
+                <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.outbound_surcharge)}</span>
               </div>
             )}
             {pricing_breakdown.price_breakdown.round_trip_discount > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600">{t('roundTripDiscount')}</span>
-                <span className="font-medium text-green-600">-USD {pricing_breakdown.price_breakdown.round_trip_discount}</span>
+                <span className="font-medium text-green-600">-{formatPrice(pricing_breakdown.price_breakdown.round_trip_discount)}</span>
               </div>
             )}
             {pricing_breakdown.price_breakdown.options_total > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600">{t('optionsTotal')}</span>
-                <span className="font-medium">USD {pricing_breakdown.price_breakdown.options_total.toFixed(3)}</span>
+                <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.options_total)}</span>
               </div>
             )}
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-lg font-medium text-gray-900">{t('subtotal')}</span>
-              <span className="text-lg font-medium text-gray-900">USD {pricing_breakdown.price_breakdown.final_price.toFixed(3)}</span>
+              <span className="text-lg font-medium text-gray-900">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
             </div>
             <div className="flex justify-between items-center py-2 border-t border-gray-200">
               <span className="text-lg font-bold text-gray-900">{t('finalPrice')}</span>
-              <span className="text-xl font-bold text-blue-600">USD {pricing_breakdown.price_breakdown.final_price.toFixed(3)}</span>
+              <span className="text-xl font-bold text-blue-600">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
             </div>
           </div>
         ) : (

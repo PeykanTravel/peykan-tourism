@@ -13,6 +13,8 @@ module.exports = {
         sans: ['var(--font-sans)', 'Inter', 'Vazirmatn', 'ui-sans-serif', 'system-ui'],
         display: ['Poppins', 'Inter', 'ui-sans-serif', 'system-ui'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        persian: ['Vazirmatn', 'Tahoma', 'Arial', 'sans-serif'],
+        english: ['Inter', 'Arial', 'sans-serif'],
       },
       colors: {
         primary: {
@@ -209,11 +211,55 @@ module.exports = {
         'gradient-sunset': 'linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3)',
         'gradient-ocean': 'linear-gradient(45deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
       },
+      // RTL specific utilities
+      textAlign: {
+        'start': 'start',
+        'end': 'end',
+      },
+      // RTL spacing utilities
+      margin: {
+        'start': 'margin-inline-start',
+        'end': 'margin-inline-end',
+      },
+      padding: {
+        'start': 'padding-inline-start',
+        'end': 'padding-inline-end',
+      },
     },
   },
   plugins: [
     require('@tailwindcss/forms'), 
     require('@tailwindcss/typography'),
     require('@tailwindcss/aspect-ratio'),
+    // Custom RTL plugin
+    function({ addUtilities, theme }) {
+      const rtlUtilities = {
+        '.rtl\\:space-x-reverse > :not([hidden]) ~ :not([hidden])': {
+          '--tw-space-x-reverse': '1',
+        },
+        '.rtl\\:space-y-reverse > :not([hidden]) ~ :not([hidden])': {
+          '--tw-space-y-reverse': '1',
+        },
+        '.rtl\\:text-start': {
+          'text-align': 'start',
+        },
+        '.rtl\\:text-end': {
+          'text-align': 'end',
+        },
+        '.rtl\\:float-start': {
+          'float': 'start',
+        },
+        '.rtl\\:float-end': {
+          'float': 'end',
+        },
+        '.rtl\\:clear-start': {
+          'clear': 'start',
+        },
+        '.rtl\\:clear-end': {
+          'clear': 'end',
+        },
+      };
+      addUtilities(rtlUtilities);
+    },
   ],
 } 

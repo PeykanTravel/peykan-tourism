@@ -40,8 +40,8 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
   // Extract unique origins and destinations when routes change
   useEffect(() => {
     if (routes.length > 0) {
-      const origins = Array.from(new Set(routes.map(route => route.origin))).sort();
-      const destinations = Array.from(new Set(routes.map(route => route.destination))).sort();
+      const origins = Array.from(new Set(routes.map((route: any) => route.origin))).sort() as string[];
+      const destinations = Array.from(new Set(routes.map((route: any) => route.destination))).sort() as string[];
       setAvailableOrigins(origins);
       setAvailableDestinations(destinations);
     }

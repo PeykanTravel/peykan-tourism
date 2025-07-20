@@ -223,6 +223,9 @@ export const useTransferBookingStore = create<TransferBookingState & TransferBoo
         }));
         
         try {
+          // Get current currency from localStorage or default to USD
+          const currentCurrency = localStorage.getItem('selectedCurrency') || 'USD';
+          
           const pricingRequest: transfersApi.PricingCalculationRequest = {
             vehicle_type: state.vehicle_type,
             trip_type: state.trip_type,
@@ -233,7 +236,24 @@ export const useTransferBookingStore = create<TransferBookingState & TransferBoo
             selected_options: state.selected_options,
           };
           
-          const pricing = await transfersApi.calculateTransferPrice(state.route_id, pricingRequest);
+          // Use the public endpoint for price calculation
+          const response = await fetch('http://localhost:8000/api/v1/transfers/routes/calculate_price_public/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              route_id: state.route_id,
+              ...pricingRequest
+            })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Price calculation failed');
+          }
+          
+          const pricing = await response.json();
           
           set((state) => ({
             ...state,

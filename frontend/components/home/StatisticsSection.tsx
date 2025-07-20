@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 const statistics = [
   {
@@ -28,51 +29,40 @@ export default function StatisticsSection() {
     <section className="relative py-20 mb-16 overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
-        <img 
+        <Image 
           src="/ice-cave.jpg" 
           alt="Ice Cave Adventure" 
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          priority
         />
         <div className="absolute inset-0 bg-blue-900/60"></div>
       </div>
       
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Text Content */}
-          <div className="text-white">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-              ONLY THE BEST QUALITY FOR YOU
-            </h2>
-            <p className="text-xl lg:text-2xl mb-8 text-blue-100 leading-relaxed">
-              You deserve the ultimate best quality for your memorable experiences.
-            </p>
-            <p className="text-lg text-blue-200 leading-relaxed">
-              Take a look at our numbers for our credibility. Let&apos;s have an adventure!
-            </p>
-          </div>
-          
-          {/* Right Side - Statistics */}
-          <div className="grid grid-cols-2 gap-8">
-            {statistics.map((stat, index) => (
-              <div 
-                key={index} 
-                className="text-center text-white"
-                style={{
-                  animationDelay: `${index * 0.2}s`
-                }}
-              >
-                <div className="mb-4">
-                  <span className="text-4xl lg:text-5xl font-bold block">
-                    {stat.number}
-                  </span>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+            آمار و ارقام ما
+          </h2>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+            سال‌ها تجربه و هزاران مشتری راضی
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {statistics.map((stat, index) => (
+            <div key={index} className="text-center group">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <div className="text-4xl lg:text-5xl font-bold text-white mb-2 group-hover:text-blue-200 transition-colors">
+                  {stat.number}
                 </div>
-                <div className="text-blue-200 text-sm lg:text-base">
-                  {stat.label}
+                <div className="text-blue-100 text-sm lg:text-base font-medium">
+                  {stat.persianLabel}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
       

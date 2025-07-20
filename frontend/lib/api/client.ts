@@ -39,16 +39,13 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.error('API Response error:', error);
-    
     // Handle authentication errors
     if (error.response?.status === 401) {
       // Don't redirect to login for currency/language endpoints
       const url = error.config?.url || '';
       if (url.includes('/currency/') || url.includes('/language/')) {
-        // For currency/language endpoints, just reject the error
+        // For currency/language endpoints, just reject the error silently
         // The stores will handle it gracefully
-        console.log('Currency/Language API error (401) - user not authenticated, using fallback');
         return Promise.reject(error);
       }
       
@@ -89,6 +86,12 @@ apiClient.interceptors.response.use(
     
     if (!error.response) {
       console.error('Network error - backend may be down');
+    }
+    
+    // Only log other errors if they're not 401 for currency/language
+    const url = error.config?.url || '';
+    if (!(error.response?.status === 401 && (url.includes('/currency/') || url.includes('/language/')))) {
+      console.error('API Response error:', error);
     }
     
     return Promise.reject(error);

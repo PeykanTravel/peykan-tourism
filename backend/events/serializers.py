@@ -232,7 +232,21 @@ class EventListSerializer(serializers.ModelSerializer):
             
             # Return the minimum of available prices
             prices = [p for p in [section_min, event_price] if p is not None]
-            return float(min(prices)) if prices else None
+            min_price = float(min(prices)) if prices else None
+            
+            # Convert to user's preferred currency
+            if min_price is not None and min_price > 0:
+                from shared.services import CurrencyConverterService
+                request = self.context.get('request')
+                if request:
+                    user_currency = CurrencyConverterService.get_user_currency(request)
+                    if user_currency != obj.currency:
+                        converted_amount = CurrencyConverterService.convert_currency(
+                            min_price, obj.currency, user_currency
+                        )
+                        return float(converted_amount)
+            
+            return min_price
         except Exception:
             # Fallback to event base price
             return float(obj.price) if obj.price else None

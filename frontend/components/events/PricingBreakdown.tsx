@@ -1,183 +1,419 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, ChevronUp, Tag, CreditCard, Receipt } from 'lucide-react';
+import { 
+  Calculator, 
+  Tag, 
+  Info, 
+  AlertCircle, 
+  CheckCircle2, 
+  Percent, 
+  DollarSign,
+  Receipt,
+  TrendingDown,
+  TrendingUp,
+  HelpCircle
+} from 'lucide-react';
 import { EventPricingBreakdown } from '@/lib/types/api';
 
 interface PricingBreakdownProps {
-  pricing: EventPricingBreakdown;
+  breakdown: EventPricingBreakdown | null;
+  isLoading?: boolean;
+  discountCode?: string;
+  onDiscountCodeChange?: (code: string) => void;
+  onApplyDiscount?: () => void;
+  onRemoveDiscount?: (discountIndex: number) => void;
+  formatPrice: (price: number, currency: string) => string;
+  showDetails?: boolean;
+  onToggleDetails?: () => void;
 }
 
-export default function PricingBreakdown({ pricing }: PricingBreakdownProps) {
-  const t = useTranslations('eventDetail');
-  const [showDetails, setShowDetails] = useState(false);
+export default function PricingBreakdown({
+  breakdown,
+  isLoading = false,
+  discountCode = '',
+  onDiscountCodeChange,
+  onApplyDiscount,
+  onRemoveDiscount,
+  formatPrice,
+  showDetails = false,
+  onToggleDetails
+}: PricingBreakdownProps) {
+  const t = useTranslations('pricing');
+  const [expandedSections, setExpandedSections] = useState<{
+    options: boolean;
+    discounts: boolean;
+    fees: boolean;
+    taxes: boolean;
+  }>({
+    options: false,
+    discounts: false,
+    fees: false,
+    taxes: false
+  });
 
-  const formatPrice = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD'
-    }).format(amount);
-  };
+  const toggleSection = useCallback((section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  }, []);
+
+  const totalSavings = useMemo(() => {
+    if (!breakdown) return 0;
+    return breakdown.discounts.reduce((sum, discount) => sum + discount.amount, 0);
+  }, [breakdown]);
+
+  const totalExtras = useMemo(() => {
+    if (!breakdown) return 0;
+    return breakdown.fees_total + breakdown.taxes_total;
+  }, [breakdown]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="animate-pulse">
+          <div className="flex items-center justify-between mb-4">
+            <div className="h-5 bg-gray-200 rounded w-32"></div>
+            <div className="h-5 bg-gray-200 rounded w-20"></div>
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex justify-between">
+                <div className="h-4 bg-gray-200 rounded w-24"></div>
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+              </div>
+            ))}
+          </div>
+          <div className="border-t pt-4 mt-4">
+            <div className="flex justify-between">
+              <div className="h-6 bg-gray-200 rounded w-20"></div>
+              <div className="h-6 bg-gray-200 rounded w-24"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!breakdown) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+        <Calculator className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noPricingData')}</h3>
+        <p className="text-gray-600">{t('selectSeatsForPricing')}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">{t('pricingBreakdown')}</h3>
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
-        >
-          {showDetails ? (
-            <>
-              <ChevronUp className="h-4 w-4" />
-              <span className="text-sm">{t('hideDetails')}</span>
-            </>
-          ) : (
-            <>
-              <ChevronDown className="h-4 w-4" />
-              <span className="text-sm">{t('showDetails')}</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Summary */}
-      <div className="space-y-3">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Tag className="h-4 w-4 text-gray-500" />
-            <span>{t('tickets')}</span>
+          <div className="flex items-center">
+            <Receipt className="h-5 w-5 text-gray-600 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-900">{t('pricingBreakdown')}</h3>
           </div>
-          <span>{formatPrice(pricing.subtotal, pricing.currency)}</span>
-        </div>
-
-        {pricing.options_total > 0 && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Receipt className="h-4 w-4 text-gray-500" />
-              <span>{t('options')}</span>
-            </div>
-            <span>{formatPrice(pricing.options_total, pricing.currency)}</span>
-          </div>
-        )}
-
-        {pricing.fees_total > 0 && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <CreditCard className="h-4 w-4 text-gray-500" />
-              <span>{t('fees')}</span>
-            </div>
-            <span>{formatPrice(pricing.fees_total, pricing.currency)}</span>
-          </div>
-        )}
-
-        {pricing.discount_total > 0 && (
-          <div className="flex items-center justify-between text-green-600">
-            <span>{t('discount')}</span>
-            <span>-{formatPrice(pricing.discount_total, pricing.currency)}</span>
-          </div>
-        )}
-
-        <div className="border-t pt-3">
-          <div className="flex items-center justify-between font-semibold text-lg">
-            <span>{t('total')}</span>
-            <span>{formatPrice(pricing.final_price, pricing.currency)}</span>
-          </div>
+          
+          {onToggleDetails && (
+            <button
+              onClick={onToggleDetails}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {showDetails ? t('hideDetails') : t('showDetails')}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Detailed Breakdown */}
-      {showDetails && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h4 className="font-medium mb-4">{t('detailedBreakdown')}</h4>
-          
-          <div className="space-y-4">
-            {/* Base Price */}
+      <div className="p-4">
+        {/* Base Price */}
+        <div className="space-y-3 mb-4">
+          <div className="flex justify-between items-center">
             <div>
-              <h5 className="font-medium text-gray-900 mb-2">{t('basePrice')}</h5>
-              <div className="bg-white rounded-lg p-3 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{t('pricePerTicket')}</span>
-                  <span>{formatPrice(pricing.base_price, pricing.currency)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>{t('quantity')}</span>
-                  <span>{pricing.quantity}</span>
-                </div>
-                <div className="flex justify-between font-medium">
-                  <span>{t('subtotal')}</span>
-                  <span>{formatPrice(pricing.subtotal, pricing.currency)}</span>
-                </div>
+              <span className="font-medium text-gray-900">
+                {t('basePrice')} ({breakdown.quantity} {breakdown.quantity === 1 ? t('ticket') : t('tickets')})
+              </span>
+              <div className="text-sm text-gray-600">
+                {formatPrice(breakdown.base_price, 'USD')} × {breakdown.quantity}
               </div>
             </div>
+            <span className="font-semibold text-gray-900">
+              {formatPrice(breakdown.subtotal, 'USD')}
+            </span>
+          </div>
+        </div>
 
-            {/* Options */}
-            {pricing.options && pricing.options.length > 0 && (
-              <div>
-                <h5 className="font-medium text-gray-900 mb-2">{t('selectedOptions')}</h5>
-                <div className="bg-white rounded-lg p-3 space-y-2">
-                  {pricing.options.map((option, index) => (
-                    <div key={index} className="flex justify-between text-sm">
-                      <span>{option.name} × {option.quantity}</span>
-                      <span>{formatPrice(option.price * option.quantity, pricing.currency)}</span>
-                    </div>
-                  ))}
-                  <div className="flex justify-between font-medium pt-2 border-t">
-                    <span>{t('optionsTotal')}</span>
-                    <span>{formatPrice(pricing.options_total, pricing.currency)}</span>
-                  </div>
-                </div>
+        {/* Options */}
+        {breakdown.options.length > 0 && (
+          <div className="border-t pt-4 mb-4">
+            <button
+              onClick={() => toggleSection('options')}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center">
+                <span className="font-medium text-gray-900">{t('addOns')}</span>
+                <span className="ml-2 text-sm text-gray-600">
+                  ({breakdown.options.length} {breakdown.options.length === 1 ? t('item') : t('items')})
+                </span>
               </div>
-            )}
-
-            {/* Fees */}
-            {pricing.fees && pricing.fees.length > 0 && (
-              <div>
-                <h5 className="font-medium text-gray-900 mb-2">{t('feesAndCharges')}</h5>
-                <div className="bg-white rounded-lg p-3 space-y-2">
-                  {pricing.fees.map((fee, index) => (
-                    <div key={index} className="flex justify-between text-sm">
-                      <span>{fee.name}</span>
-                      <span>{formatPrice(fee.amount, pricing.currency)}</span>
-                    </div>
-                  ))}
-                  <div className="flex justify-between font-medium pt-2 border-t">
-                    <span>{t('feesTotal')}</span>
-                    <span>{formatPrice(pricing.fees_total, pricing.currency)}</span>
-                  </div>
-                </div>
+              <div className="flex items-center">
+                <span className="font-medium text-gray-900 mr-2">
+                  {formatPrice(breakdown.options_total, 'USD')}
+                </span>
+                <TrendingDown 
+                  className={`h-4 w-4 text-gray-400 transition-transform ${
+                    expandedSections.options ? 'rotate-180' : ''
+                  }`}
+                />
               </div>
-            )}
-
-            {/* Discounts */}
-            {pricing.discounts && pricing.discounts.length > 0 && (
-              <div>
-                <h5 className="font-medium text-gray-900 mb-2">{t('discounts')}</h5>
-                <div className="bg-green-50 rounded-lg p-3 space-y-2">
-                  {pricing.discounts.map((discount, index) => (
-                    <div key={index} className="flex justify-between text-sm text-green-700">
-                      <span>{discount.name}</span>
-                      <span>-{formatPrice(discount.amount, pricing.currency)}</span>
+            </button>
+            
+            {expandedSections.options && (
+              <div className="mt-3 pl-4 space-y-2">
+                {breakdown.options.map((option, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <div>
+                      <span className="text-gray-900">{option.name}</span>
+                      <span className="text-gray-600 ml-2">
+                        ({formatPrice(option.price, 'USD')} × {option.quantity})
+                      </span>
                     </div>
-                  ))}
-                  <div className="flex justify-between font-medium pt-2 border-t border-green-200 text-green-700">
-                    <span>{t('discountTotal')}</span>
-                    <span>-{formatPrice(pricing.discount_total, pricing.currency)}</span>
+                    <span className="text-gray-900">
+                      {formatPrice(option.total, 'USD')}
+                    </span>
                   </div>
-                </div>
+                ))}
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Additional Info */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="text-sm text-gray-600 space-y-1">
-          <p>{t('pricingIncludes')}</p>
-          <p>{t('allPricesIncludeTaxes')}</p>
-          <p>{t('pricesSubjectToChange')}</p>
+        {/* Discounts */}
+        {breakdown.discounts.length > 0 && (
+          <div className="border-t pt-4 mb-4">
+            <button
+              onClick={() => toggleSection('discounts')}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center">
+                <span className="font-medium text-green-700">{t('discounts')}</span>
+                <span className="ml-2 text-sm text-green-600">
+                  ({breakdown.discounts.length} {breakdown.discounts.length === 1 ? t('applied') : t('applied')})
+                </span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-medium text-green-700 mr-2">
+                  -{formatPrice(breakdown.discount_total, 'USD')}
+                </span>
+                <TrendingDown 
+                  className={`h-4 w-4 text-green-500 transition-transform ${
+                    expandedSections.discounts ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </button>
+            
+            {expandedSections.discounts && (
+              <div className="mt-3 pl-4 space-y-2">
+                {breakdown.discounts.map((discount, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <div className="flex items-center">
+                      <Tag className="h-3 w-3 text-green-500 mr-1" />
+                      <span className="text-gray-900">{discount.name}</span>
+                      {discount.percentage && (
+                        <span className="text-green-600 ml-2">
+                          ({discount.percentage}%)
+                        </span>
+                      )}
+                      {onRemoveDiscount && (
+                        <button
+                          onClick={() => onRemoveDiscount(index)}
+                          className="ml-2 text-red-500 hover:text-red-700 text-xs"
+                        >
+                          {t('remove')}
+                        </button>
+                      )}
+                    </div>
+                    <span className="text-green-700 font-medium">
+                      -{formatPrice(discount.amount, 'USD')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Discount Code Input */}
+        {onDiscountCodeChange && onApplyDiscount && (
+          <div className="border-t pt-4 mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder={t('enterDiscountCode')}
+                  value={discountCode}
+                  onChange={(e) => onDiscountCodeChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+              </div>
+              <button
+                onClick={onApplyDiscount}
+                disabled={!discountCode.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                {t('apply')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Fees */}
+        {breakdown.fees.length > 0 && (
+          <div className="border-t pt-4 mb-4">
+            <button
+              onClick={() => toggleSection('fees')}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center">
+                <span className="font-medium text-gray-900">{t('fees')}</span>
+                <HelpCircle className="h-4 w-4 text-gray-400 ml-1" />
+              </div>
+              <div className="flex items-center">
+                <span className="font-medium text-gray-900 mr-2">
+                  {formatPrice(breakdown.fees_total, 'USD')}
+                </span>
+                <TrendingDown 
+                  className={`h-4 w-4 text-gray-400 transition-transform ${
+                    expandedSections.fees ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </button>
+            
+            {expandedSections.fees && (
+              <div className="mt-3 pl-4 space-y-2">
+                {breakdown.fees.map((fee, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <div className="flex items-center">
+                      <span className="text-gray-900">{fee.name}</span>
+                      <span className="text-gray-600 ml-2">({fee.type})</span>
+                    </div>
+                    <span className="text-gray-900">
+                      {formatPrice(fee.amount, 'USD')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Taxes */}
+        {breakdown.taxes.length > 0 && (
+          <div className="border-t pt-4 mb-4">
+            <button
+              onClick={() => toggleSection('taxes')}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center">
+                <span className="font-medium text-gray-900">{t('taxes')}</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-medium text-gray-900 mr-2">
+                  {formatPrice(breakdown.taxes_total, 'USD')}
+                </span>
+                <TrendingDown 
+                  className={`h-4 w-4 text-gray-400 transition-transform ${
+                    expandedSections.taxes ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+            </button>
+            
+            {expandedSections.taxes && (
+              <div className="mt-3 pl-4 space-y-2">
+                {breakdown.taxes.map((tax, index) => (
+                  <div key={index} className="flex justify-between items-center text-sm">
+                    <div className="flex items-center">
+                      <span className="text-gray-900">{tax.name}</span>
+                      <span className="text-gray-600 ml-2">({tax.type})</span>
+                    </div>
+                    <span className="text-gray-900">
+                      {formatPrice(tax.amount, 'USD')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Summary Cards */}
+        {(totalSavings > 0 || totalExtras > 0) && (
+          <div className="border-t pt-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {totalSavings > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center">
+                    <TrendingDown className="h-4 w-4 text-green-500 mr-2" />
+                    <span className="text-sm font-medium text-green-800">{t('totalSavings')}</span>
+                  </div>
+                  <div className="text-lg font-bold text-green-700 mt-1">
+                    {formatPrice(totalSavings, 'USD')}
+                  </div>
+                </div>
+              )}
+              
+              {totalExtras > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center">
+                    <TrendingUp className="h-4 w-4 text-blue-500 mr-2" />
+                    <span className="text-sm font-medium text-blue-800">{t('feesAndTaxes')}</span>
+                  </div>
+                  <div className="text-lg font-bold text-blue-700 mt-1">
+                    {formatPrice(totalExtras, 'USD')}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Final Total */}
+        <div className="border-t-2 border-gray-200 pt-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="text-xl font-bold text-gray-900">{t('total')}</span>
+              <div className="text-sm text-gray-600">
+                {t('allFeesIncluded')}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-gray-900">
+                {formatPrice(breakdown.final_price, 'USD')}
+              </div>
+              {totalSavings > 0 && (
+                <div className="text-sm text-green-600">
+                  {t('youSave')} {formatPrice(totalSavings, 'USD')}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Security Notice */}
+        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-start">
+            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+            <div className="text-xs text-gray-600">
+              <p className="font-medium mb-1">{t('securePayment')}</p>
+              <p>{t('paymentSecurityNotice')}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

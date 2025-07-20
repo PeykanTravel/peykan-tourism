@@ -1,232 +1,271 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
-import { MapPin, User, Phone, MessageSquare } from 'lucide-react';
+import { User, Phone, MapPin, MessageSquare, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 interface ContactFormProps {
-  onSubmit: (data: {
-    pickup_address: string;
-    dropoff_address: string;
-    contact_name: string;
-    contact_phone: string;
-    special_requirements: string;
-  }) => void;
+  onNext: () => void;
   onBack: () => void;
-  initialData?: {
-    pickup_address: string;
-    dropoff_address: string;
-    contact_name: string;
-    contact_phone: string;
-    special_requirements: string;
-  };
 }
 
-export default function ContactForm({ onSubmit, onBack, initialData }: ContactFormProps) {
-  const params = useParams();
-  const locale = (params.locale as string) || 'fa';
+export default function ContactForm({ onNext, onBack }: ContactFormProps) {
   const t = useTranslations('transfers');
+  const { user, isAuthenticated } = useAuth();
   
-  const [formData, setFormData] = useState({
-    pickup_address: initialData?.pickup_address || '',
-    dropoff_address: initialData?.dropoff_address || '',
-    contact_name: initialData?.contact_name || '',
-    contact_phone: initialData?.contact_phone || '',
-    special_requirements: initialData?.special_requirements || ''
-  });
+  // Get booking state from store
+  const {
+    route_data,
+    pickup_address,
+    dropoff_address,
+    contact_name,
+    contact_phone,
+    special_requirements,
+    setContact,
+    isStepValid,
+  } = useTransferBookingStore();
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // Local state for form inputs
+  const [localPickupAddress, setLocalPickupAddress] = useState(pickup_address || '');
+  const [localDropoffAddress, setLocalDropoffAddress] = useState(dropoff_address || '');
+  const [localContactName, setLocalContactName] = useState(contact_name || '');
+  const [localContactPhone, setLocalContactPhone] = useState(contact_phone || '');
+  const [localSpecialRequirements, setLocalSpecialRequirements] = useState(special_requirements || '');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+  // Auto-fill user data if logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (!localContactName) {
+        setLocalContactName(`${user.first_name} ${user.last_name}`.trim());
+      }
+      if (!localContactPhone && user.phone_number) {
+        setLocalContactPhone(user.phone_number);
+      }
     }
-  };
+  }, [isAuthenticated, user, localContactName, localContactPhone]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.pickup_address.trim()) {
-      newErrors.pickup_address = t('pickupAddressRequired');
-    }
-
-    if (!formData.dropoff_address.trim()) {
-      newErrors.dropoff_address = t('dropoffAddressRequired');
-    }
-
-    if (!formData.contact_name.trim()) {
-      newErrors.contact_name = t('contactNameRequired');
-    }
-
-    if (!formData.contact_phone.trim()) {
-      newErrors.contact_phone = t('contactPhoneRequired');
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      onSubmit(formData);
+    if (isValid) {
+      setContact({
+        pickup_address: localPickupAddress,
+        dropoff_address: localDropoffAddress,
+        contact_name: localContactName,
+        contact_phone: localContactPhone,
+        special_requirements: localSpecialRequirements,
+      });
+      onNext();
     }
   };
 
+  // Check if form is valid - only name and phone are required
+  const isValid = localContactName.trim() && localContactPhone.trim();
+
+  if (!route_data) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {t('contactInformation')}
+          </h2>
+          <p className="text-gray-600">
+            {t('step6')}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-8">
+          <div className="text-center">
+            <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {t('noRouteSelected')}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {t('pleaseSelectRouteFirst')}
+            </p>
+            <button
+              onClick={onBack}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              {t('backToRouteSelection')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6" dir={locale === 'fa' ? 'rtl' : 'ltr'}>
-      <div className="mb-6">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           {t('contactInformation')}
         </h2>
         <p className="text-gray-600">
           {t('step6')}
         </p>
+        
+        {/* Route Info */}
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <div className="flex items-center gap-2 text-blue-800 mb-2">
+            <span className="font-medium">{route_data.origin}</span>
+            <ArrowRight className="w-4 h-4" />
+            <span className="font-medium">{route_data.destination}</span>
+          </div>
+          <div className="text-sm text-blue-700">
+            {route_data.pricing?.length || 0} {t('vehicleTypes')} {t('available')}
+          </div>
+        </div>
+
+        {/* User Info Notice */}
+        {isAuthenticated && user && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2 text-green-800">
+              <User className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {t('userDataAutoFilled')}
+              </span>
+            </div>
+            <p className="text-xs text-green-700 mt-1">
+              {t('userDataAutoFilledDescription')}
+            </p>
+          </div>
+        )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Pickup Address */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('pickupAddress')} *
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              name="pickup_address"
-              value={formData.pickup_address}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.pickup_address ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder={t('enterPickupAddress')}
-            />
-            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+      {/* Contact Form */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Contact Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('contactName')} *
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                value={localContactName}
+                onChange={(e) => setLocalContactName(e.target.value)}
+                placeholder={t('contactNamePlaceholder')}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
           </div>
-          {errors.pickup_address && (
-            <p className="mt-1 text-sm text-red-600">{errors.pickup_address}</p>
-          )}
-        </div>
 
-        {/* Dropoff Address */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('dropoffAddress')} *
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              name="dropoff_address"
-              value={formData.dropoff_address}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.dropoff_address ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder={t('enterDropoffAddress')}
-            />
-            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          {/* Contact Phone (WhatsApp) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('whatsappNumber')} *
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="tel"
+                value={localContactPhone}
+                onChange={(e) => setLocalContactPhone(e.target.value)}
+                placeholder={t('whatsappNumberPlaceholder')}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {t('whatsappNumberHelp')}
+            </p>
           </div>
-          {errors.dropoff_address && (
-            <p className="mt-1 text-sm text-red-600">{errors.dropoff_address}</p>
-          )}
-        </div>
 
-        {/* Contact Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('contactName')} *
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              name="contact_name"
-              value={formData.contact_name}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.contact_name ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder={t('enterContactName')}
-            />
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          {/* Pickup Address (Optional) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('pickupAddress')} ({t('optional')})
+            </label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                value={localPickupAddress}
+                onChange={(e) => setLocalPickupAddress(e.target.value)}
+                placeholder={t('pickupAddressPlaceholder')}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {t('pickupAddressHelp')}
+            </p>
           </div>
-          {errors.contact_name && (
-            <p className="mt-1 text-sm text-red-600">{errors.contact_name}</p>
-          )}
-        </div>
 
-        {/* Contact Phone */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('contactPhone')} *
-          </label>
-          <div className="relative">
-            <input
-              type="tel"
-              name="contact_phone"
-              value={formData.contact_phone}
-              onChange={handleInputChange}
-              className={`w-full px-4 py-3 pl-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.contact_phone ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder={t('enterContactPhone')}
-            />
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          {/* Dropoff Address (Optional) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('dropoffAddress')} ({t('optional')})
+            </label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                value={localDropoffAddress}
+                onChange={(e) => setLocalDropoffAddress(e.target.value)}
+                placeholder={t('dropoffAddressPlaceholder')}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {t('dropoffAddressHelp')}
+            </p>
           </div>
-          {errors.contact_phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.contact_phone}</p>
-          )}
-        </div>
 
-        {/* Special Requirements */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('specialRequirements')}
-          </label>
-          <div className="relative">
-            <textarea
-              name="special_requirements"
-              value={formData.special_requirements}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder={t('enterSpecialRequirements')}
-            />
-            <MessageSquare className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+          {/* Special Requirements */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('specialRequirements')}
+            </label>
+            <div className="relative">
+              <MessageSquare className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
+              <textarea
+                value={localSpecialRequirements}
+                onChange={(e) => setLocalSpecialRequirements(e.target.value)}
+                placeholder={t('specialRequirementsPlaceholder')}
+                rows={4}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {t('specialRequirementsHelp')}
+            </p>
           </div>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('specialRequirementsHelp')}
-          </p>
-        </div>
+        </form>
+      </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between pt-6">
+      {/* Navigation */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex justify-between">
           <button
-            type="button"
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
           >
+            <ArrowLeft className="w-4 h-4" />
             {t('previous')}
           </button>
           <button
-            type="submit"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            onClick={handleSubmit}
+            disabled={!isValid}
+            className={`
+              px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2
+              ${isValid
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }
+            `}
           >
             {t('next')}
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 } 

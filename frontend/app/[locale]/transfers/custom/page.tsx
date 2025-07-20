@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCart, TransferCartItem } from '../../../../lib/hooks/useCart';
-import { apiClient } from '../../../../lib/infrastructure/api/client';
+import { useCart, TransferCartItem } from '@/lib/hooks/useCart';
 import { 
   MapPin, 
   Clock, 
@@ -333,11 +332,11 @@ export default function CustomTransferBooking() {
     if (bookingData.origin && bookingData.destination) {
       setLoading(true);
       setError('');
-      apiClient.get(`/transfers/available-vehicles/?origin=${encodeURIComponent(bookingData.origin)}&destination=${encodeURIComponent(bookingData.destination)}`)
+      fetch(`/api/v1/transfers/routes/available_vehicles/?origin=${encodeURIComponent(bookingData.origin)}&destination=${encodeURIComponent(bookingData.destination)}`)
+        .then(res => res.json())
         .then(data => {
-          const responseData = data as any;
-          setAvailableVehicles(responseData.vehicles || []);
-          if (!responseData.route_found || (responseData.vehicles || []).length === 0) {
+          setAvailableVehicles(data.vehicles || []);
+          if (!data.route_found || (data.vehicles || []).length === 0) {
             setError('خودرویی برای این مسیر موجود نیست.');
           }
         })

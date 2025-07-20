@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getEvents, getEventFilters } from '@/lib/api/events';
+import { Event, EventCategory, Venue, EventListResponse } from '@/lib/types/api';
 import { 
   Search, 
   Filter, 
@@ -23,8 +25,6 @@ import {
 } from 'lucide-react';
 import EventCard from '@/components/events/EventCard';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
-import { useEventsStore } from '@/lib/application/stores/eventsStore';
-import { EventSearchParams } from '@/lib/types/api';
 
 interface EventFilters {
   search: string;
@@ -43,24 +43,16 @@ export default function EventsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  // Use events store
-  const {
-    events,
-    filters,
-    loadEvents,
-    loadEventFilters,
-    setEventFilters,
-    clearEventFilters,
-    clearErrors
-  } = useEventsStore();
-  
-  // Local state
+  // State management
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  // Set default viewMode to 'list'
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   
   // Filter state
-  const [localFilters, setLocalFilters] = useState<EventFilters>({
+  const [filters, setFilters] = useState<EventFilters>({
     search: searchParams.get('search') || '',
     category: searchParams.get('category') || '',
     venue: searchParams.get('venue') || '',
@@ -71,6 +63,22 @@ export default function EventsPage() {
     date_to: searchParams.get('date_to') || '',
     sort_by: searchParams.get('sort_by') || 'date_asc'
   });
+  
+  // Filter options
+  const [filterOptions, setFilterOptions] = useState<{
+    categories: EventCategory[];
+    venues: Venue[];
+    styles: Array<{ value: string; label: string }>;
+  }>({
+    categories: [],
+    venues: [],
+    styles: []
+  });
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   
   // Utility functions
   const formatDate = useCallback((date: string) => {
@@ -104,11 +112,62 @@ export default function EventsPage() {
     ));
   };
   
+  // Fetch filter options
+  const fetchFilterOptions = useCallback(async () => {
+    try {
+      const options = await getEventFilters();
+      setFilterOptions(options);
+    } catch (error) {
+      console.error('Error fetching filter options:', error);
+    }
+  }, []);
+  
+  // Fetch events
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const params = {
+        search: filters.search || undefined,
+        category: filters.category || undefined,
+        venue: filters.venue || undefined,
+        style: filters.style || undefined,
+        min_price: filters.min_price > 0 ? filters.min_price : undefined,
+        max_price: filters.max_price < 1000 ? filters.max_price : undefined,
+        date_from: filters.date_from || undefined,
+        date_to: filters.date_to || undefined,
+        ordering: filters.sort_by || undefined,
+        page: currentPage,
+        page_size: 12
+      };
+      
+      const response: EventListResponse = await getEvents(params);
+      
+      // Enhance event data with mock information for better display
+      const enhancedEvents = response.results.map((event: Event) => ({
+        ...event,
+        image: event.image || `https://picsum.photos/400/300?random=${event.id}`,
+        average_rating: event.average_rating || Math.floor(Math.random() * 2) + 4, // Random rating 4-5
+        review_count: event.review_count || Math.floor(Math.random() * 100) + 10
+      }));
+      
+      setEvents(enhancedEvents);
+      setTotalCount(response.count);
+      setTotalPages(Math.ceil(response.count / 12));
+    } catch (err) {
+      setError(t('errorLoading'));
+      console.error('Error fetching events:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, currentPage, t]);
+  
   // Update URL params
   const updateUrlParams = useCallback(() => {
     const params = new URLSearchParams();
     
-    Object.entries(localFilters).forEach(([key, value]) => {
+    Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== '' && value !== 0) {
         params.set(key, value.toString());
       }
@@ -120,11 +179,11 @@ export default function EventsPage() {
     
     const url = params.toString() ? `?${params.toString()}` : '';
     router.push(url, { scroll: false });
-  }, [localFilters, currentPage, router]);
+  }, [filters, currentPage, router]);
   
   // Handle filter changes
   const handleFilterChange = useCallback((key: keyof EventFilters, value: string | number) => {
-    setLocalFilters(prev => ({
+    setFilters(prev => ({
       ...prev,
       [key]: value
     }));
@@ -133,7 +192,7 @@ export default function EventsPage() {
   
   // Clear filters
   const clearFilters = useCallback(() => {
-    setLocalFilters({
+    setFilters({
       search: '',
       category: '',
       venue: '',
@@ -145,48 +204,32 @@ export default function EventsPage() {
       sort_by: 'date_asc'
     });
     setCurrentPage(1);
-    clearEventFilters();
-  }, [clearEventFilters]);
+  }, []);
   
   // Active filters count
   const activeFiltersCount = useMemo(() => {
-    return Object.entries(localFilters).filter(([key, value]) => {
+    return Object.entries(filters).filter(([key, value]) => {
       if (key === 'min_price' && value === 0) return false;
       if (key === 'max_price' && value === 1000) return false;
       if (key === 'sort_by' && value === 'date_asc') return false;
       return value && value !== '';
     }).length;
-  }, [localFilters]);
+  }, [filters]);
   
-  // Load events when filters change
+  // Initialize
   useEffect(() => {
-    const searchParams: EventSearchParams = {
-      query: localFilters.search || undefined,
-      category: localFilters.category || undefined,
-      venue: localFilters.venue || undefined,
-      style: localFilters.style || undefined,
-      min_price: localFilters.min_price > 0 ? localFilters.min_price : undefined,
-      max_price: localFilters.max_price < 1000 ? localFilters.max_price : undefined,
-      date_from: localFilters.date_from || undefined,
-      date_to: localFilters.date_to || undefined,
-      sort_by: localFilters.sort_by || undefined,
-    };
-    
-    setEventFilters(searchParams);
-    loadEvents(searchParams, currentPage);
-  }, [localFilters, currentPage, setEventFilters, loadEvents]);
+    fetchFilterOptions();
+  }, [fetchFilterOptions]);
   
-  // Load filters on mount
   useEffect(() => {
-    loadEventFilters();
-  }, [loadEventFilters]);
+    fetchEvents();
+  }, [fetchEvents]);
   
-  // Update URL when filters change
   useEffect(() => {
     updateUrlParams();
   }, [updateUrlParams]);
   
-  if (events.isLoading && events.items.length === 0) {
+  if (loading && events.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Page Banner */}
@@ -219,12 +262,12 @@ export default function EventsPage() {
     );
   }
   
-  if (events.error) {
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('error')}</h1>
-          <p className="text-gray-600 mb-8">{events.error}</p>
+          <p className="text-gray-600 mb-8">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
@@ -237,9 +280,9 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Page Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-900 dark:to-purple-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Events & Shows</h1>
@@ -247,302 +290,163 @@ export default function EventsPage() {
           </div>
         </div>
       </div>
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search and Filters */}
-        <div className="mb-8">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder={t('searchEvents')}
-                  value={localFilters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            
-            {/* Filter Toggle */}
-            <div className="flex items-center gap-4">
+        {/* Page Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Our Events</h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Found {totalCount} events</p>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative max-w-md w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={filters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            />
+          </div>
+        </div>
+
+        {/* Filters and View Toggle */}
+        <div className="w-full">
+          {/* Toolbar Row */}
+          <div className="flex w-full items-center justify-between gap-6 flex-wrap">
+            {/* Show Filter (always fixed position) */}
+            <div className="flex flex-col items-start w-full sm:w-auto">
               <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setShowFilters((prev) => !prev)}
+                className={`flex items-center gap-2 px-7 py-3 rounded-xl text-lg font-semibold transition-colors shadow-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-auto`}
               >
-                <Filter className="w-4 h-4" />
-                {t('filters')}
-                {activeFiltersCount > 0 && (
-                  <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
-                    {activeFiltersCount}
-                  </span>
-                )}
+                <Filter className="w-6 h-6" />
+                <span>Show Filter</span>
+                <ChevronDown className={`w-6 h-6 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
-              
-              {/* View Mode Toggle */}
-              <div className="flex bg-white border border-gray-300 rounded-lg p-1">
+              {/* Category Filters (collapsible, modern pill style) */}
+              {showFilters && (
+                <div className="flex flex-wrap gap-3 mt-4 animate-fade-in w-full">
+                  <button
+                    onClick={() => handleFilterChange('category', '')}
+                    className={`flex items-center gap-2 px-6 py-2 rounded-full text-base font-semibold shadow-md border-2 border-blue-400 bg-gradient-to-r from-blue-100 to-blue-300 dark:from-blue-900 dark:to-blue-700 text-blue-800 dark:text-blue-100 hover:scale-105 transition-transform w-full sm:w-auto ${filters.category === '' ? 'ring-2 ring-blue-500' : ''}`}
+                  >
+                    <Filter className="w-5 h-5" /> All ({totalCount})
+                  </button>
+                  {filterOptions.categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => handleFilterChange('category', category.id)}
+                      className={`flex items-center gap-2 px-6 py-2 rounded-full text-base font-semibold shadow-md border-2 border-blue-200 dark:border-blue-700 bg-gradient-to-r from-white to-blue-100 dark:from-gray-900 dark:to-blue-900 text-gray-700 dark:text-blue-100 hover:scale-105 transition-transform w-full sm:w-auto ${filters.category === category.id ? 'ring-2 ring-blue-500' : ''}`}
+                    >
+                      <span className="font-bold">{category.name}</span> <span className="opacity-70"> </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Sort & View controls (always fixed position, no resize) */}
+            <div className="flex items-center gap-4 flex-shrink-0 min-h-[56px] w-full sm:w-auto mt-4 sm:mt-0">
+              <select
+                value={filters.sort_by}
+                onChange={(e) => handleFilterChange('sort_by', e.target.value)}
+                className="px-7 py-3 rounded-xl text-lg font-semibold border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-blue-400 focus:border-transparent shadow-md w-full sm:w-auto"
+                style={{ minWidth: 200 }}
+              >
+                <option value="date_asc">Date: Earliest First</option>
+                <option value="date_desc">Date: Latest First</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="name_asc">Name: A to Z</option>
+                <option value="name_desc">Name: Z to A</option>
+              </select>
+              <div className="flex bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-md w-full sm:w-auto">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`px-7 py-3 text-lg font-semibold transition-colors w-1/2 sm:w-auto ${
+                    viewMode === 'grid' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-900'
+                  }`}
                 >
-                  <Grid className="w-4 h-4" />
+                  <Grid className="w-6 h-6 inline-block mr-2" /> Grid
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`px-7 py-3 text-lg font-semibold transition-colors w-1/2 sm:w-auto ${
+                    viewMode === 'list' 
+                      ? 'bg-blue-600 text-white' 
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-900'
+                  }`}
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-6 h-6 inline-block mr-2" /> List
                 </button>
               </div>
             </div>
           </div>
-          
-          {/* Filters Panel */}
-          {showFilters && (
-            <div className="mt-6 bg-white rounded-lg shadow-md p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('category')}
-                  </label>
-                  <select
-                    value={localFilters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">{t('allCategories')}</option>
-                    {filters.categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                {/* Venue Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('venue')}
-                  </label>
-                  <select
-                    value={localFilters.venue}
-                    onChange={(e) => handleFilterChange('venue', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">{t('allVenues')}</option>
-                    {filters.venues.map((venue) => (
-                      <option key={venue.id} value={venue.id}>
-                        {venue.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                {/* Price Range */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('priceRange')}
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder={t('min')}
-                      value={localFilters.min_price || ''}
-                      onChange={(e) => handleFilterChange('min_price', Number(e.target.value) || 0)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <input
-                      type="number"
-                      placeholder={t('max')}
-                      value={localFilters.max_price || ''}
-                      onChange={(e) => handleFilterChange('max_price', Number(e.target.value) || 1000)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                
-                {/* Sort By */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('sortBy')}
-                  </label>
-                  <select
-                    value={localFilters.sort_by}
-                    onChange={(e) => handleFilterChange('sort_by', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="date_asc">{t('dateAsc')}</option>
-                    <option value="date_desc">{t('dateDesc')}</option>
-                    <option value="price_asc">{t('priceAsc')}</option>
-                    <option value="price_desc">{t('priceDesc')}</option>
-                    <option value="name_asc">{t('nameAsc')}</option>
-                    <option value="name_desc">{t('nameDesc')}</option>
-                  </select>
-                </div>
+        </div>
+        {/* Cards Section with more spacing */}
+        <div className={viewMode === 'grid' 
+          ? 'mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+          : 'mt-16 space-y-6'
+        }>
+          {events.length === 0 ? (
+            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-2xl">
+              <div className="text-gray-400 dark:text-gray-500 mb-4">
+                <Search className="w-16 h-16 mx-auto" />
               </div>
-              
-              {/* Clear Filters */}
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                  {t('clearFilters')}
-                </button>
-              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No events found</h3>
+              <p className="text-gray-600 dark:text-gray-300">Try adjusting your search criteria or filters</p>
             </div>
+          ) : (
+            events.map((event) => (
+              <EventCard 
+                key={event.id} 
+                event={event} 
+                viewMode={viewMode}
+                formatDate={formatDate}
+                formatTime={formatTime}
+                formatPrice={formatPrice}
+              />
+            ))
           )}
         </div>
-        
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-gray-600">
-            {t('showingResults', { count: events.items.length, total: events.pagination.totalCount })}
-          </p>
-        </div>
-        
-        {/* Events Grid/List */}
-        <div className={`grid gap-6 ${
-          viewMode === 'grid' 
-            ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-            : 'grid-cols-1'
-        }`}>
-                     {events.items.map((event) => (
-             <EventCard
-               key={event.id}
-               event={event}
-               viewMode={viewMode}
-               formatDate={formatDate}
-               formatTime={formatTime}
-               formatPrice={formatPrice}
-             />
-           ))}
-        </div>
-        
-        {/* Loading More */}
-        {events.isLoading && events.items.length > 0 && (
-          <div className="mt-8 text-center">
-            <div className="inline-flex items-center gap-2 text-gray-600">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-              {t('loadingMore')}
-            </div>
-          </div>
-        )}
-        
-        {/* Pagination */}
-        {events.pagination.totalPages > 1 && (
-          <div className="mt-8">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={events.pagination.totalPages}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
-        )}
-        
-        {/* No Results */}
-        {!events.isLoading && events.items.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Calendar className="w-16 h-16 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noEventsFound')}</h3>
-            <p className="text-gray-600 mb-6">{t('tryAdjustingFilters')}</p>
-            <button
-              onClick={clearFilters}
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              {t('clearAllFilters')}
-            </button>
-          </div>
+        {/* Pagination always at the bottom, centered */}
+        {events.length > 0 && (
+          <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
         )}
       </div>
     </div>
   );
 }
 
-function Pagination({ 
-  currentPage, 
-  totalPages, 
-  setCurrentPage 
-}: { 
-  currentPage: number; 
-  totalPages: number; 
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>; 
-}) {
-  const pages = [];
-  const maxVisiblePages = 5;
-  
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-  
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-  }
-  
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-  
+// Add Pagination component
+function Pagination({ currentPage, totalPages, setCurrentPage }: { currentPage: number; totalPages: number; setCurrentPage: React.Dispatch<React.SetStateAction<number>> }) {
   return (
-    <div className="flex justify-center items-center gap-2">
-      <button
-        onClick={() => setCurrentPage(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-      >
-        Previous
-      </button>
-      
-      {startPage > 1 && (
-        <>
-          <button
-            onClick={() => setCurrentPage(1)}
-            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            1
-          </button>
-          {startPage > 2 && <span className="px-2">...</span>}
-        </>
-      )}
-      
-      {pages.map((page) => (
+    <div className="flex flex-col items-center mt-12">
+      <div className="flex items-center gap-x-2">
         <button
-          key={page}
-          onClick={() => setCurrentPage(page)}
-          className={`px-3 py-2 border rounded-lg ${
-            page === currentPage
-              ? 'bg-blue-500 text-white border-blue-500'
-              : 'border-gray-300 hover:bg-gray-50'
-          }`}
+          onClick={() => setCurrentPage((prev: number) => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+          className="rounded-full p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-400 shadow-md hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Previous page"
         >
-          {page}
+          <span className="sr-only">قبلی</span>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
         </button>
-      ))}
-      
-      {endPage < totalPages && (
-        <>
-          {endPage < totalPages - 1 && <span className="px-2">...</span>}
-          <button
-            onClick={() => setCurrentPage(totalPages)}
-            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            {totalPages}
-          </button>
-        </>
-      )}
-      
-      <button
-        onClick={() => setCurrentPage(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-      >
-        Next
-      </button>
+        <span className="text-5xl font-black text-blue-600 dark:text-blue-400 select-none tracking-wider drop-shadow-sm px-8">{currentPage}</span>
+        <button
+          onClick={() => setCurrentPage((prev: number) => Math.min(totalPages, prev + 1))}
+          disabled={currentPage === totalPages}
+          className="rounded-full p-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-blue-600 dark:text-blue-400 shadow-md hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Next page"
+        >
+          <span className="sr-only">بعدی</span>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
     </div>
   );
 } 

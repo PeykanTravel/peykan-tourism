@@ -19,55 +19,48 @@ from django.template.loader import render_to_string
 class CurrencyConverterService:
     """
     Service for currency conversion.
-    Uses external API for real-time rates with caching.
+    Uses fixed rates for consistent pricing display.
     """
     
     CACHE_TIMEOUT = 3600  # 1 hour
     BASE_CURRENCY = 'USD'
     
+    # Fixed exchange rates for consistent display
+    FIXED_RATES = {
+        'USD': 1.0,
+        'EUR': 0.85,
+        'TRY': 45.5,
+        'IRR': 920000.0,
+    }
+    
     @classmethod
     def get_exchange_rates(cls) -> Dict[str, float]:
         """
-        Get exchange rates from cache or API.
+        Get exchange rates from cache or fixed rates.
         """
         cache_key = 'exchange_rates'
         rates = cache.get(cache_key)
         
         if rates is None:
-            rates = cls._fetch_exchange_rates()
-            if rates:
-                cache.set(cache_key, rates, cls.CACHE_TIMEOUT)
+            rates = cls._get_fixed_rates()
+            cache.set(cache_key, rates, cls.CACHE_TIMEOUT)
         
-        return rates or {}
+        return rates or cls.FIXED_RATES
     
     @classmethod
-    def _fetch_exchange_rates(cls) -> Dict[str, float]:
+    def _get_fixed_rates(cls) -> Dict[str, float]:
         """
-        Fetch exchange rates from external API.
+        Get fixed exchange rates for consistent pricing.
         """
-        try:
-            # Using a free exchange rate API
-            url = f"https://api.exchangerate-api.com/v4/latest/{cls.BASE_CURRENCY}"
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            
-            data = response.json()
-            return data.get('rates', {})
-        except Exception as e:
-            # Fallback to mock rates for development
-            return cls._get_mock_rates()
+        return cls.FIXED_RATES.copy()
     
     @classmethod
-    def _get_mock_rates(cls) -> Dict[str, float]:
+    def get_last_update_time(cls) -> str:
         """
-        Mock exchange rates for development.
+        Get last update time for exchange rates.
         """
-        return {
-            'USD': 1.0,
-            'EUR': 0.85,
-            'TRY': 15.5,
-            'IRR': 420000,
-        }
+        from django.utils import timezone
+        return timezone.now().isoformat()
     
     @classmethod
     def convert_currency(
@@ -79,6 +72,14 @@ class CurrencyConverterService:
         """
         Convert amount from one currency to another.
         """
+        # Handle zero amount - always return zero regardless of currency
+        if amount == 0:
+            return Decimal('0')
+        
+        # Handle negative amount - preserve sign
+        is_negative = amount < 0
+        abs_amount = abs(amount)
+        
         if from_currency == to_currency:
             return amount
         
@@ -87,16 +88,19 @@ class CurrencyConverterService:
         if from_currency == cls.BASE_CURRENCY:
             # Converting from base currency
             rate = rates.get(to_currency, 1.0)
-            return amount * Decimal(str(rate))
+            converted = abs_amount * Decimal(str(rate))
         elif to_currency == cls.BASE_CURRENCY:
             # Converting to base currency
             rate = rates.get(from_currency, 1.0)
-            return amount / Decimal(str(rate))
+            converted = abs_amount / Decimal(str(rate))
         else:
             # Converting between two non-base currencies
             from_rate = rates.get(from_currency, 1.0)
             to_rate = rates.get(to_currency, 1.0)
-            return amount * Decimal(str(to_rate)) / Decimal(str(from_rate))
+            converted = abs_amount * Decimal(str(to_rate)) / Decimal(str(from_rate))
+        
+        # Restore sign
+        return -converted if is_negative else converted
     
     @classmethod
     def format_price(
@@ -120,13 +124,63 @@ class CurrencyConverterService:
         
         symbol = currency_symbols.get(currency, currency)
         
+        # Handle zero amount
+        if amount == 0:
+            if currency == 'IRR':
+                return f"{symbol}0"
+            else:
+                return f"{symbol}0.00"
+        
+        # Handle negative amount
+        is_negative = amount < 0
+        abs_amount = abs(amount)
+        
         if currency == 'IRR':
             # Format Iranian Rial with thousands separator
-            formatted_amount = f"{amount:,.0f}"
+            formatted_amount = f"{abs_amount:,.0f}"
         else:
-            formatted_amount = f"{amount:.2f}"
+            # Format other currencies with thousands separator
+            formatted_amount = f"{abs_amount:,.2f}"
         
-        return f"{symbol}{formatted_amount}"
+        # Add sign and symbol
+        result = f"{symbol}{formatted_amount}"
+        return f"-{result}" if is_negative else result
+    
+    @classmethod
+    def get_user_currency(cls, request) -> str:
+        """
+        Get user's preferred currency from session or user preference.
+        """
+        # Check if user is authenticated
+        if request.user.is_authenticated:
+            try:
+                from .models import UserCurrencyPreference
+                preference = UserCurrencyPreference.objects.get(user=request.user)
+                return preference.currency
+            except UserCurrencyPreference.DoesNotExist:
+                pass
+        
+        # Check session
+        return request.session.get('preferred_currency', 'USD')
+    
+    @classmethod
+    def set_user_currency(cls, request, currency: str) -> None:
+        """
+        Set user's preferred currency in session or user preference.
+        """
+        # Check if user is authenticated
+        if request.user.is_authenticated:
+            from .models import UserCurrencyPreference
+            preference, created = UserCurrencyPreference.objects.get_or_create(
+                user=request.user,
+                defaults={'currency': currency}
+            )
+            if not created:
+                preference.currency = currency
+                preference.save()
+        
+        # Set in session
+        request.session['preferred_currency'] = currency
 
 
 class LanguageService:
@@ -162,6 +216,39 @@ class LanguageService:
             'tr': 'Turkish',
         }
         return language_names.get(language_code, language_code)
+    
+    @classmethod
+    def get_user_language(cls, request) -> str:
+        """
+        Get user's preferred language from session or user preference.
+        """
+        # Check if user is authenticated
+        if request.user.is_authenticated:
+            return request.user.preferred_language
+        
+        # Check session
+        return request.session.get('preferred_language', 'fa')
+    
+    @classmethod
+    def set_user_language(cls, request, language: str) -> None:
+        """
+        Set user's preferred language in session or user preference.
+        """
+        # Validate language
+        if language not in cls.SUPPORTED_LANGUAGES:
+            raise ValueError(f"Unsupported language: {language}")
+        
+        # Check if user is authenticated
+        if request.user.is_authenticated:
+            request.user.preferred_language = language
+            request.user.save(update_fields=['preferred_language'])
+        
+        # Set in session
+        request.session['preferred_language'] = language
+        
+        # Set Django language
+        from django.utils.translation import activate
+        activate(language)
 
 
 class ValidationService:

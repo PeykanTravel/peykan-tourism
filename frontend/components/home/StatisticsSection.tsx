@@ -48,7 +48,7 @@ export default function StatisticsSection() {
               You deserve the ultimate best quality for your memorable experiences.
             </p>
             <p className="text-lg text-blue-200 leading-relaxed">
-              Take a look at our numbers for our credibility. Let's have an adventure!
+              Take a look at our numbers for our credibility. Let&apos;s have an adventure!
             </p>
           </div>
           

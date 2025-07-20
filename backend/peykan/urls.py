@@ -34,6 +34,7 @@ urlpatterns = [
     # API v1
     path('api/v1/', include([
         path('auth/', include('users.urls')),
+        path('shared/', include('shared.urls')),
         path('tours/', include('tours.urls')),
         path('events/', include('events.urls')),
         path('transfers/', include('transfers.urls')),

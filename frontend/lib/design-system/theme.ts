@@ -1,14 +1,5 @@
-/**
- * Modern Design System Theme
- * 
- * A comprehensive theme system following modern design principles
- * with support for light/dark modes and responsive design
- */
-
 export const theme = {
-  // Colors
   colors: {
-    // Primary Colors
     primary: {
       50: '#eff6ff',
       100: '#dbeafe',
@@ -21,23 +12,7 @@ export const theme = {
       800: '#1e40af',
       900: '#1e3a8a',
     },
-    
-    // Secondary Colors
     secondary: {
-      50: '#f8fafc',
-      100: '#f1f5f9',
-      200: '#e2e8f0',
-      300: '#cbd5e1',
-      400: '#94a3b8',
-      500: '#64748b',
-      600: '#475569',
-      700: '#334155',
-      800: '#1e293b',
-      900: '#0f172a',
-    },
-    
-    // Success Colors
-    success: {
       50: '#f0fdf4',
       100: '#dcfce7',
       200: '#bbf7d0',
@@ -49,36 +24,18 @@ export const theme = {
       800: '#166534',
       900: '#14532d',
     },
-    
-    // Warning Colors
-    warning: {
-      50: '#fffbeb',
-      100: '#fef3c7',
-      200: '#fde68a',
-      300: '#fcd34d',
-      400: '#fbbf24',
-      500: '#f59e0b',
-      600: '#d97706',
-      700: '#b45309',
-      800: '#92400e',
-      900: '#78350f',
+    accent: {
+      50: '#fef7ee',
+      100: '#fdedd1',
+      200: '#fbd7a3',
+      300: '#f8bb6a',
+      400: '#f5952e',
+      500: '#f3770e',
+      600: '#e45d09',
+      700: '#bd450b',
+      800: '#963710',
+      900: '#792f10',
     },
-    
-    // Error Colors
-    error: {
-      50: '#fef2f2',
-      100: '#fee2e2',
-      200: '#fecaca',
-      300: '#fca5a5',
-      400: '#f87171',
-      500: '#ef4444',
-      600: '#dc2626',
-      700: '#b91c1c',
-      800: '#991b1b',
-      900: '#7f1d1d',
-    },
-    
-    // Neutral Colors
     neutral: {
       50: '#fafafa',
       100: '#f5f5f5',
@@ -91,174 +48,196 @@ export const theme = {
       800: '#262626',
       900: '#171717',
     },
-    
-    // Background Colors
-    background: {
-      primary: '#ffffff',
-      secondary: '#f8fafc',
-      tertiary: '#f1f5f9',
-      dark: '#0f172a',
+    success: {
+      50: '#f0fdf4',
+      100: '#dcfce7',
+      200: '#bbf7d0',
+      300: '#86efac',
+      400: '#4ade80',
+      500: '#22c55e',
+      600: '#16a34a',
+      700: '#15803d',
+      800: '#166534',
+      900: '#14532d',
     },
-    
-    // Text Colors
-    text: {
-      primary: '#0f172a',
-      secondary: '#475569',
-      tertiary: '#64748b',
-      inverse: '#ffffff',
-      muted: '#94a3b8',
+    warning: {
+      50: '#fffbeb',
+      100: '#fef3c7',
+      200: '#fde68a',
+      300: '#fcd34d',
+      400: '#fbbf24',
+      500: '#f59e0b',
+      600: '#d97706',
+      700: '#b45309',
+      800: '#92400e',
+      900: '#78350f',
     },
-    
-    // Border Colors
-    border: {
-      light: '#e2e8f0',
-      medium: '#cbd5e1',
-      dark: '#94a3b8',
+    error: {
+      50: '#fef2f2',
+      100: '#fee2e2',
+      200: '#fecaca',
+      300: '#fca5a5',
+      400: '#f87171',
+      500: '#ef4444',
+      600: '#dc2626',
+      700: '#b91c1c',
+      800: '#991b1b',
+      900: '#7f1d1d',
     },
   },
-  
-  // Typography
   typography: {
     fontFamily: {
-      sans: ['Inter', 'system-ui', 'sans-serif'],
-      serif: ['Georgia', 'serif'],
-      mono: ['JetBrains Mono', 'monospace'],
+      sans: ['Inter', 'Vazirmatn', 'ui-sans-serif', 'system-ui'],
+      display: ['Poppins', 'Inter', 'ui-sans-serif', 'system-ui'],
+      mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
     },
-    
     fontSize: {
-      xs: '0.75rem',    // 12px
-      sm: '0.875rem',   // 14px
-      base: '1rem',     // 16px
-      lg: '1.125rem',   // 18px
-      xl: '1.25rem',    // 20px
-      '2xl': '1.5rem',  // 24px
-      '3xl': '1.875rem', // 30px
-      '4xl': '2.25rem',  // 36px
-      '5xl': '3rem',     // 48px
-      '6xl': '3.75rem',  // 60px
+      xs: ['0.75rem', { lineHeight: '1rem' }],
+      sm: ['0.875rem', { lineHeight: '1.25rem' }],
+      base: ['1rem', { lineHeight: '1.5rem' }],
+      lg: ['1.125rem', { lineHeight: '1.75rem' }],
+      xl: ['1.25rem', { lineHeight: '1.75rem' }],
+      '2xl': ['1.5rem', { lineHeight: '2rem' }],
+      '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+      '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+      '5xl': ['3rem', { lineHeight: '1' }],
+      '6xl': ['3.75rem', { lineHeight: '1' }],
+      '7xl': ['4.5rem', { lineHeight: '1' }],
+      '8xl': ['6rem', { lineHeight: '1' }],
+      '9xl': ['8rem', { lineHeight: '1' }],
     },
-    
     fontWeight: {
+      thin: '100',
+      extralight: '200',
       light: '300',
       normal: '400',
       medium: '500',
       semibold: '600',
       bold: '700',
       extrabold: '800',
-    },
-    
-    lineHeight: {
-      tight: '1.25',
-      normal: '1.5',
-      relaxed: '1.75',
+      black: '900',
     },
   },
-  
-  // Spacing
   spacing: {
-    0: '0',
-    1: '0.25rem',   // 4px
-    2: '0.5rem',    // 8px
-    3: '0.75rem',   // 12px
-    4: '1rem',      // 16px
-    5: '1.25rem',   // 20px
-    6: '1.5rem',    // 24px
-    8: '2rem',      // 32px
-    10: '2.5rem',   // 40px
-    12: '3rem',     // 48px
-    16: '4rem',     // 64px
-    20: '5rem',     // 80px
-    24: '6rem',     // 96px
-    32: '8rem',     // 128px
+    px: '1px',
+    0: '0px',
+    0.5: '0.125rem',
+    1: '0.25rem',
+    1.5: '0.375rem',
+    2: '0.5rem',
+    2.5: '0.625rem',
+    3: '0.75rem',
+    3.5: '0.875rem',
+    4: '1rem',
+    5: '1.25rem',
+    6: '1.5rem',
+    7: '1.75rem',
+    8: '2rem',
+    9: '2.25rem',
+    10: '2.5rem',
+    11: '2.75rem',
+    12: '3rem',
+    14: '3.5rem',
+    16: '4rem',
+    20: '5rem',
+    24: '6rem',
+    28: '7rem',
+    32: '8rem',
+    36: '9rem',
+    40: '10rem',
+    44: '11rem',
+    48: '12rem',
+    52: '13rem',
+    56: '14rem',
+    60: '15rem',
+    64: '16rem',
+    72: '18rem',
+    80: '20rem',
+    96: '24rem',
   },
-  
-  // Border Radius
   borderRadius: {
-    none: '0',
-    sm: '0.125rem',   // 2px
-    base: '0.25rem',  // 4px
-    md: '0.375rem',   // 6px
-    lg: '0.5rem',     // 8px
-    xl: '0.75rem',    // 12px
-    '2xl': '1rem',    // 16px
-    '3xl': '1.5rem',  // 24px
+    none: '0px',
+    sm: '0.125rem',
+    DEFAULT: '0.25rem',
+    md: '0.375rem',
+    lg: '0.5rem',
+    xl: '0.75rem',
+    '2xl': '1rem',
+    '3xl': '1.5rem',
     full: '9999px',
   },
-  
-  // Shadows
   shadows: {
     sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    base: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+    DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
     md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
     lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
     xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
     '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
     inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+    none: 'none',
   },
-  
-  // Transitions
-  transitions: {
-    fast: '150ms ease-in-out',
-    normal: '250ms ease-in-out',
-    slow: '350ms ease-in-out',
+  animation: {
+    'fade-in': 'fadeIn 0.5s ease-in-out',
+    'fade-out': 'fadeOut 0.5s ease-in-out',
+    'slide-up': 'slideUp 0.3s ease-out',
+    'slide-down': 'slideDown 0.3s ease-out',
+    'slide-left': 'slideLeft 0.3s ease-out',
+    'slide-right': 'slideRight 0.3s ease-out',
+    'scale-in': 'scaleIn 0.2s ease-out',
+    'scale-out': 'scaleOut 0.2s ease-out',
+    'bounce-in': 'bounceIn 0.6s ease-out',
+    'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+    'float': 'float 3s ease-in-out infinite',
+    'glow': 'glow 2s ease-in-out infinite alternate',
   },
-  
-  // Breakpoints
-  breakpoints: {
-    sm: '640px',
-    md: '768px',
-    lg: '1024px',
-    xl: '1280px',
-    '2xl': '1536px',
+  keyframes: {
+    fadeIn: {
+      '0%': { opacity: '0' },
+      '100%': { opacity: '1' },
+    },
+    fadeOut: {
+      '0%': { opacity: '1' },
+      '100%': { opacity: '0' },
+    },
+    slideUp: {
+      '0%': { transform: 'translateY(10px)', opacity: '0' },
+      '100%': { transform: 'translateY(0)', opacity: '1' },
+    },
+    slideDown: {
+      '0%': { transform: 'translateY(-10px)', opacity: '0' },
+      '100%': { transform: 'translateY(0)', opacity: '1' },
+    },
+    slideLeft: {
+      '0%': { transform: 'translateX(10px)', opacity: '0' },
+      '100%': { transform: 'translateX(0)', opacity: '1' },
+    },
+    slideRight: {
+      '0%': { transform: 'translateX(-10px)', opacity: '0' },
+      '100%': { transform: 'translateX(0)', opacity: '1' },
+    },
+    scaleIn: {
+      '0%': { transform: 'scale(0.95)', opacity: '0' },
+      '100%': { transform: 'scale(1)', opacity: '1' },
+    },
+    scaleOut: {
+      '0%': { transform: 'scale(1)', opacity: '1' },
+      '100%': { transform: 'scale(0.95)', opacity: '0' },
+    },
+    bounceIn: {
+      '0%': { transform: 'scale(0.3)', opacity: '0' },
+      '50%': { transform: 'scale(1.05)' },
+      '70%': { transform: 'scale(0.9)' },
+      '100%': { transform: 'scale(1)', opacity: '1' },
+    },
+    float: {
+      '0%, 100%': { transform: 'translateY(0px)' },
+      '50%': { transform: 'translateY(-10px)' },
+    },
+    glow: {
+      '0%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
+      '100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)' },
+    },
   },
-  
-  // Z-Index
-  zIndex: {
-    hide: -1,
-    auto: 'auto',
-    base: 0,
-    docked: 10,
-    dropdown: 1000,
-    sticky: 1100,
-    banner: 1200,
-    overlay: 1300,
-    modal: 1400,
-    popover: 1500,
-    skipLink: 1600,
-    toast: 1700,
-    tooltip: 1800,
-  },
-};
+} as const;
 
-// Dark theme variant
-export const darkTheme = {
-  ...theme,
-  colors: {
-    ...theme.colors,
-    background: {
-      primary: '#0f172a',
-      secondary: '#1e293b',
-      tertiary: '#334155',
-      dark: '#0f172a',
-    },
-    text: {
-      primary: '#f8fafc',
-      secondary: '#cbd5e1',
-      tertiary: '#94a3b8',
-      inverse: '#0f172a',
-      muted: '#64748b',
-    },
-    border: {
-      light: '#334155',
-      medium: '#475569',
-      dark: '#64748b',
-    },
-  },
-};
-
-// Export theme types
-export type Theme = typeof theme;
-export type ColorScale = keyof typeof theme.colors.primary;
-export type SpacingScale = keyof typeof theme.spacing;
-export type BorderRadiusScale = keyof typeof theme.borderRadius;
-export type ShadowScale = keyof typeof theme.shadows; 
+export type Theme = typeof theme; 

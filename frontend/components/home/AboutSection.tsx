@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
-import { Button } from '@/components/ui'
 
 export default function AboutSection() {
   const t = useTranslations('home')
@@ -131,13 +130,9 @@ export default function AboutSection() {
 
               {/* CTA Button */}
               <div className="pt-4">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className="shadow-lg hover:shadow-xl hover:scale-105"
-                >
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                   درباره ما بیشتر بدانید
-                </Button>
+                </button>
               </div>
             </div>
           </div>

@@ -71,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Re-enabled for security
+    'shared.middleware.CurrencyMiddleware',  # Currency management
+    'shared.middleware.LanguageMiddleware',  # Language management
 ]
 
 # Add whitenoise for static files in production
@@ -93,6 +95,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'shared.context_processors.currency_context',
+                'shared.context_processors.language_context',
             ],
         },
     },

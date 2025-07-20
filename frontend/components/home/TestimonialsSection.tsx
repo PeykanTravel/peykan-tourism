@@ -66,7 +66,7 @@ export default function TestimonialsSection() {
             
             {/* Comment */}
             <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed mb-6 italic">
-              "{t.comment}"
+              &quot;{t.comment}&quot;
             </p>
             
             {/* Rating */}

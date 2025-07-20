@@ -1,18 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useProductService } from '@/lib/application/hooks/useProductService';
-import Link from 'next/link';
 
 export default function TransferBookingSection() {
   const [carIn, setCarIn] = useState(false);
   const [isRTL, setIsRTL] = useState(false);
-  const [transfers, setTransfers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // New architecture hook
-  const { getTransfers } = useProductService();
   
   useEffect(() => {
     setTimeout(() => setCarIn(true), 100);
@@ -20,26 +12,6 @@ export default function TransferBookingSection() {
       setIsRTL(document.dir === 'rtl');
     }
   }, []);
-
-  // Fetch transfers on component mount
-  useEffect(() => {
-    const fetchTransfers = async () => {
-      try {
-        setIsLoading(true);
-        const response = await getTransfers({}, 1, 5);
-        if (response) {
-          setTransfers(response.results || []);
-        }
-      } catch (err) {
-        console.error('Error fetching transfers:', err);
-        setError('خطا در بارگذاری ترنسفرها');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTransfers();
-  }, [getTransfers]);
   
   return (
     <section className="py-20 bg-white dark:bg-gray-900">
@@ -64,38 +36,9 @@ export default function TransferBookingSection() {
                 <li className="flex items-center gap-2 rtl:gap-2"><span className="text-blue-600 text-xl">✔</span> Stable orders</li>
               </ul>
             </div>
-            
-            {/* Transfer Routes Preview */}
-            {!isLoading && transfers.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Popular Routes Available:
-                </h3>
-                <div className="space-y-2">
-                  {transfers.slice(0, 3).map((transfer: any) => (
-                    <div key={transfer.id} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-300">
-                        {transfer.route?.origin?.name} → {transfer.route?.destination?.name}
-                      </span>
-                      <span className="text-blue-600 font-semibold">
-                        ${transfer.price?.amount || 0}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-4 rounded-full shadow-lg transition-all duration-300 hover:scale-105">
-                BECOME A DRIVER
-              </button>
-              <Link href="/transfers">
-                <button className="mt-4 bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-bold text-lg px-12 py-4 rounded-full shadow-lg transition-all duration-300 hover:scale-105">
-                  BOOK TRANSFER
-                </button>
-              </Link>
-            </div>
+            <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-12 py-4 rounded-full shadow-lg transition-all duration-300 hover:scale-105">
+              BECOME A DRIVER
+            </button>
           </div>
         </div>
         {/* Car image: static and full width below text on md and below, absolutely positioned on lg+ */}
@@ -116,7 +59,7 @@ export default function TransferBookingSection() {
               src="/images/_car-big-side33.png"
               alt="Taxi Top View"
               fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="100vw"
               style={{
                 objectFit: 'contain',
                 objectPosition: isRTL ? 'left' : 'right',

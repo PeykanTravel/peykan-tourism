@@ -232,6 +232,16 @@ class CartSerializer(serializers.ModelSerializer):
         for item in obj.items.all():
             # Use the stored total_price from database which handles tour age-group pricing correctly
             total += item.total_price
+        
+        # Convert to user's preferred currency if different from cart currency
+        from shared.services import CurrencyConverterService
+        request = self.context.get('request')
+        if request and obj.currency != CurrencyConverterService.get_user_currency(request) and total > 0:
+            user_currency = CurrencyConverterService.get_user_currency(request)
+            total = CurrencyConverterService.convert_currency(
+                total, obj.currency, user_currency
+            )
+        
         return total
 
 

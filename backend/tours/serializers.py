@@ -136,14 +136,34 @@ class TourListSerializer(serializers.ModelSerializer):
     """Serializer for tour list view."""
     
     category = TourCategorySerializer(read_only=True)
+    formatted_price = serializers.SerializerMethodField()
+    converted_price = serializers.SerializerMethodField()
     
     class Meta:
         model = Tour
         fields = [
-            'id', 'slug', 'title', 'price', 'currency', 'duration_hours', 
-            'is_active', 'created_at', 'category', 'image', 'gallery',
+            'id', 'slug', 'title', 'price', 'currency', 'formatted_price', 'converted_price',
+            'duration_hours', 'is_active', 'created_at', 'category', 'image', 'gallery',
             'is_featured', 'is_popular', 'city', 'country'
         ]
+    
+    def get_formatted_price(self, obj):
+        """Get formatted price in original currency."""
+        from shared.services import CurrencyConverterService
+        return CurrencyConverterService.format_price(obj.price, obj.currency)
+    
+    def get_converted_price(self, obj):
+        """Get price converted to user's preferred currency."""
+        from shared.services import CurrencyConverterService
+        request = self.context.get('request')
+        if request:
+            user_currency = CurrencyConverterService.get_user_currency(request)
+            if user_currency != obj.currency and obj.price > 0:
+                converted_amount = CurrencyConverterService.convert_currency(
+                    obj.price, obj.currency, user_currency
+                )
+                return CurrencyConverterService.format_price(converted_amount, user_currency)
+        return self.get_formatted_price(obj)
 
 
 class TourDetailSerializer(serializers.ModelSerializer):

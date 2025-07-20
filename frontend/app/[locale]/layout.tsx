@@ -1,63 +1,62 @@
-/**
- * Root Layout Component
- * 
- * Main layout wrapper with navigation, footer, and global providers
- */
-
-import React from 'react';
-import { Inter } from 'next/font/google';
+import '../globals.css';
+import { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
+import { Metadata } from 'next';
+import Navbar from '../../components/Navbar';
+import { AuthProvider } from '../../lib/contexts/AuthContext';
+import { CartProvider } from '../../lib/contexts/CartContext';
+import type { Locale } from '@/i18n/config';
 
-// Components
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import { Toaster } from '@/components/ui/Toaster';
+export const metadata: Metadata = {
+  title: 'Peykan Tourism Platform',
+  description: 'Book tours, events, and transfers with ease',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  icons: {
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎭</text></svg>',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: 'Peykan Tourism Platform',
+    description: 'Book tours, events, and transfers with ease',
+    type: 'website',
+  },
+};
 
-// Providers
-import { AppProvider } from '@/lib/contexts/AppContext';
-import { ToastProvider } from '@/lib/contexts/ToastContext';
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
-// Styles
-import '@/styles/globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
-
-interface RootLayoutProps {
-  children: React.ReactNode;
+type Props = {
+  children: ReactNode;
   params: {
-    locale: string;
+    locale: Locale;
   };
-}
+};
 
-export default async function RootLayout({
-  children,
-  params: { locale },
-}: RootLayoutProps) {
+export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
-          <AppProvider>
-            <ToastProvider>
+    <html lang={params.locale} dir={params.locale === 'fa' ? 'rtl' : 'ltr'}>
+      <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white min-h-screen">
+        <NextIntlClientProvider locale={params.locale} messages={messages}>
+          <AuthProvider>
+            <CartProvider>
               <div className="min-h-screen flex flex-col">
                 <Navbar />
                 <main className="flex-1">
                   {children}
                 </main>
-                <Footer />
-                <Toaster />
               </div>
-            </ToastProvider>
-          </AppProvider>
+            </CartProvider>
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>
   );
-}
-
-export function generateStaticParams() {
-  return [{ locale: 'en' }, { locale: 'fa' }];
 } 

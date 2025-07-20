@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/utils';
-import { MapPin, Clock, Users, Star, DollarSign } from 'lucide-react';
+import { MapPin, Clock, Users, DollarSign } from 'lucide-react';
 
 interface TourCardProps {
   tour: {
@@ -24,7 +23,11 @@ interface TourCardProps {
 export default function TourCard({ tour, viewMode }: TourCardProps) {
   // Helper for price formatting
   const formatPrice = (price: string, currency: string) => {
-    return formatCurrency(parseFloat(price), currency);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency || 'USD',
+      maximumFractionDigits: 0
+    }).format(parseFloat(price));
   };
 
   // Helper for stars

@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { MapPin, Clock, Users, Car, DollarSign } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
 
 interface TransferCardProps {
   transfer: {
@@ -26,7 +25,11 @@ interface TransferCardProps {
 export default function TransferCard({ transfer, viewMode }: TransferCardProps) {
   // Helper for price formatting
   const formatPrice = (price: string, currency: string) => {
-    return formatCurrency(parseFloat(price), currency);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency || 'USD',
+      maximumFractionDigits: 0
+    }).format(parseFloat(price));
   };
 
   // Helper for duration

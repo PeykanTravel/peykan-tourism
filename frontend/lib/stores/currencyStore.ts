@@ -97,7 +97,12 @@ export const useCurrencyStore = create<CurrencyState>()(
             await currencyApi.setUserCurrencyPreference(currency);
           } catch (error) {
             // User not authenticated, set session currency
-            await currencyApi.setSessionCurrency(currency);
+            try {
+              await currencyApi.setSessionCurrency(currency);
+            } catch (sessionError) {
+              // Backend not available, just update local state
+              console.log('Backend not available, updating local currency state');
+            }
           }
 
           set({ 
@@ -106,9 +111,11 @@ export const useCurrencyStore = create<CurrencyState>()(
           });
         } catch (error) {
           console.error('Failed to set currency:', error);
+          // Don't show error, just update local state
           set({ 
-            error: 'Failed to set currency preference', 
-            isLoading: false 
+            currentCurrency: currency,
+            isLoading: false,
+            error: null
           });
         }
       },

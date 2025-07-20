@@ -89,7 +89,12 @@ export const useLanguageStore = create<LanguageState>()(
             await languageApi.setUserLanguagePreference(language);
           } catch (error) {
             // User not authenticated, set session language
-            await languageApi.setSessionLanguage(language);
+            try {
+              await languageApi.setSessionLanguage(language);
+            } catch (sessionError) {
+              // Backend not available, just update local state
+              console.log('Backend not available, updating local language state');
+            }
           }
 
           set({ 
@@ -98,9 +103,11 @@ export const useLanguageStore = create<LanguageState>()(
           });
         } catch (error) {
           console.error('Failed to set language:', error);
+          // Don't show error, just update local state
           set({ 
-            error: 'Failed to set language preference', 
-            isLoading: false 
+            currentLanguage: language,
+            isLoading: false,
+            error: null
           });
         }
       },

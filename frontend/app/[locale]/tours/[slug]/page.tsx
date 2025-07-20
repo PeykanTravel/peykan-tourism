@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCart, TourCartItem } from '../../../../lib/hooks/useCart';
 import { useAuth } from '../../../../lib/contexts/AuthContext';
+import { PriceDisplay } from '../../../../components/ui/Price';
 import { tokenService } from '../../../../lib/services/tokenService';
 import { 
   Calendar, 
@@ -939,7 +940,12 @@ export default function TourDetailPage() {
                       <div key={option.id} className="flex items-center justify-between p-2 border border-gray-200 rounded">
                         <div className="flex-1">
                           <div className="font-medium text-sm">{option.name}</div>
-                          <div className="text-xs text-gray-600">${option.price}</div>
+                          <div className="text-xs text-gray-600">
+                            <PriceDisplay 
+                              amount={option.price} 
+                              currency={option.currency || tour.currency} 
+                            />
+                          </div>
                         </div>
                         <div className="flex items-center space-x-2">
                           <button
@@ -1000,7 +1006,12 @@ export default function TourDetailPage() {
                       <div className="flex justify-between">
                         <span>{t('adults')} ({participants.adult})</span>
                         <span>
-                          {pricing.hasPricingError ? 'N/A' : `$${pricing.breakdown.adult.toFixed(2)}`}
+                          {pricing.hasPricingError ? 'N/A' : (
+                            <PriceDisplay 
+                              amount={pricing.breakdown.adult} 
+                              currency={tour.currency} 
+                            />
+                          )}
                         </span>
                       </div>
                     )}
@@ -1008,7 +1019,12 @@ export default function TourDetailPage() {
                       <div className="flex justify-between">
                         <span>{t('children')} ({participants.child})</span>
                         <span>
-                          {pricing.hasPricingError ? 'N/A' : `$${pricing.breakdown.child.toFixed(2)}`}
+                          {pricing.hasPricingError ? 'N/A' : (
+                            <PriceDisplay 
+                              amount={pricing.breakdown.child} 
+                              currency={tour.currency} 
+                            />
+                          )}
                         </span>
                       </div>
                     )}
@@ -1028,13 +1044,23 @@ export default function TourDetailPage() {
                     {pricing.breakdown.options > 0 && (
                       <div className="flex justify-between">
                         <span>{t('options')}</span>
-                        <span>${pricing.breakdown.options.toFixed(2)}</span>
+                        <span>
+                          <PriceDisplay 
+                            amount={pricing.breakdown.options} 
+                            currency={tour.currency} 
+                          />
+                        </span>
                       </div>
                     )}
                     <div className="border-t pt-2 flex justify-between font-semibold">
                       <span>{t('total')}</span>
                       <span>
-                        {pricing.hasPricingError ? 'N/A' : `$${pricing.total.toFixed(2)}`}
+                        {pricing.hasPricingError ? 'N/A' : (
+                          <PriceDisplay 
+                            amount={pricing.total} 
+                            currency={tour.currency} 
+                          />
+                        )}
                       </span>
                     </div>
                   </div>

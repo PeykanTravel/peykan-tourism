@@ -48,6 +48,7 @@ apiClient.interceptors.response.use(
       if (url.includes('/currency/') || url.includes('/language/')) {
         // For currency/language endpoints, just reject the error
         // The stores will handle it gracefully
+        console.log('Currency/Language API error (401) - user not authenticated, using fallback');
         return Promise.reject(error);
       }
       

@@ -43,7 +43,15 @@ apiClient.interceptors.response.use(
     
     // Handle authentication errors
     if (error.response?.status === 401) {
-      // Try to refresh token
+      // Don't redirect to login for currency/language endpoints
+      const url = error.config?.url || '';
+      if (url.includes('/currency/') || url.includes('/language/')) {
+        // For currency/language endpoints, just reject the error
+        // The stores will handle it gracefully
+        return Promise.reject(error);
+      }
+      
+      // Try to refresh token for other endpoints
       const refreshSuccess = await tokenService.refreshToken();
       
       if (refreshSuccess) {

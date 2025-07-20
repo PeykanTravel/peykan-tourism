@@ -61,6 +61,7 @@ export const useCurrencyStore = create<CurrencyState>()(
           } catch (error) {
             // User not authenticated or no preference set, use default
             console.log('No user currency preference found, using default');
+            // Don't change currentCurrency, keep the one from supported currencies
           }
         } catch (error) {
           console.error('Failed to initialize currency store:', error);

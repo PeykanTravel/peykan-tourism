@@ -57,6 +57,7 @@ export const useLanguageStore = create<LanguageState>()(
           } catch (error) {
             // User not authenticated or no preference set, use current language
             console.log('No user language preference found, using current language');
+            // Don't change currentLanguage, keep the one from supported languages
           }
         } catch (error) {
           console.error('Failed to initialize language store:', error);

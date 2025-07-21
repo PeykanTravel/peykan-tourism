@@ -327,10 +327,10 @@ export default function SeatMap({
             selectedSection && (
               <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-6">
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                     {t('section')} {selectedSection.name}
                   </h4>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-gray-300">
                     {formatPrice(selectedSection.base_price, selectedSection.currency)} • {selectedSection.available_capacity} {t('available')}
                   </p>
                 </div>
@@ -341,7 +341,7 @@ export default function SeatMap({
                     .map(([rowNumber, rowSeats]) => (
                       <div key={rowNumber} className="flex items-center justify-center space-x-1">
                         {/* Row Label */}
-                        <div className="w-8 text-center text-sm font-medium text-gray-500">
+                        <div className="w-8 text-center text-sm font-medium text-gray-500 dark:text-gray-400">
                           {rowNumber}
                         </div>
                         
@@ -376,58 +376,58 @@ export default function SeatMap({
 
         {/* Legend */}
         {showLegend && (
-          <div className="w-64 bg-gray-50 border-l border-gray-200 p-4">
-            <h4 className="font-semibold text-gray-900 mb-3">{t('legend')}</h4>
+          <div className="w-64 bg-gray-50 dark:bg-gray-700 border-l border-gray-200 dark:border-gray-600 p-4">
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t('legend')}</h4>
             
             <div className="space-y-3 text-sm">
               <div className="flex items-center">
-                <div className="w-5 h-5 bg-gray-100 border border-gray-300 rounded-sm mr-2"></div>
-                <span>{t('available')}</span>
+                <div className="w-5 h-5 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-sm mr-2"></div>
+                <span className="text-gray-900 dark:text-white">{t('available')}</span>
               </div>
               
               <div className="flex items-center">
                 <div className="w-5 h-5 bg-blue-600 border border-blue-700 rounded-sm mr-2"></div>
-                <span>{t('selected')}</span>
+                <span className="text-gray-900 dark:text-white">{t('selected')}</span>
               </div>
               
               <div className="flex items-center">
-                <div className="w-5 h-5 bg-yellow-100 border border-yellow-300 rounded-sm mr-2 flex items-center justify-center">
-                  <Star className="h-3 w-3 text-yellow-600" />
+                <div className="w-5 h-5 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-600 rounded-sm mr-2 flex items-center justify-center">
+                  <Star className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <span>{t('premium')}</span>
-              </div>
-              
-                             <div className="flex items-center">
-                 <div className="w-5 h-5 bg-green-100 border border-green-300 rounded-sm mr-2 flex items-center justify-center">
-                   <User className="h-3 w-3 text-green-600" />
-                 </div>
-                 <span>{t('wheelchairAccessible')}</span>
-               </div>
-              
-              <div className="flex items-center">
-                <div className="w-5 h-5 bg-orange-200 border border-orange-300 rounded-sm mr-2"></div>
-                <span>{t('reserved')}</span>
+                <span className="text-gray-900 dark:text-white">{t('premium')}</span>
               </div>
               
               <div className="flex items-center">
-                <div className="w-5 h-5 bg-red-200 border border-red-300 rounded-sm mr-2"></div>
-                <span>{t('sold')}</span>
+                <div className="w-5 h-5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded-sm mr-2 flex items-center justify-center">
+                  <User className="h-3 w-3 text-green-600 dark:text-green-400" />
+                </div>
+                <span className="text-gray-900 dark:text-white">{t('wheelchairAccessible')}</span>
+              </div>
+              
+              <div className="flex items-center">
+                <div className="w-5 h-5 bg-orange-200 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-600 rounded-sm mr-2"></div>
+                <span className="text-gray-900 dark:text-white">{t('reserved')}</span>
+              </div>
+              
+              <div className="flex items-center">
+                <div className="w-5 h-5 bg-red-200 dark:bg-red-900/30 border border-red-300 dark:border-red-600 rounded-sm mr-2"></div>
+                <span className="text-gray-900 dark:text-white">{t('sold')}</span>
               </div>
             </div>
             
             {selectedSeats.length > 0 && (
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <h5 className="font-medium text-gray-900 mb-2">{t('selectedSeats')}</h5>
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+                <h5 className="font-medium text-gray-900 dark:text-white mb-2">{t('selectedSeats')}</h5>
                 <div className="space-y-1 text-sm">
                   {selectedSeats.map((seat) => (
-                    <div key={seat.id} className="flex justify-between">
+                    <div key={seat.id} className="flex justify-between text-gray-700 dark:text-gray-300">
                       <span>{seat.section} {seat.row_number}-{seat.seat_number}</span>
                       <span className="font-medium">{formatPrice(seat.price, seat.currency)}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-2 pt-2 border-t border-gray-300">
-                  <div className="flex justify-between font-semibold">
+                <div className="mt-2 pt-2 border-t border-gray-300 dark:border-gray-500">
+                  <div className="flex justify-between font-semibold text-gray-900 dark:text-white">
                     <span>{t('total')}</span>
                     <span>
                       {formatPrice(

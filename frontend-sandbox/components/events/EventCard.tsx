@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useCurrency } from '@/lib/stores/currencyStore';
 import { Heart, Share2, MapPin, Calendar, Clock, TrendingUp, Music, Theater, Film, Gamepad2, Palette, Camera, BookOpen, Globe, Star, Trophy, Drama, Sparkles, Briefcase, Ticket, Users } from 'lucide-react';
 import { OptimizedImage } from '../ui/OptimizedImage';
 import { Event } from '@/lib/types/api';
@@ -55,6 +56,7 @@ export default function EventCard({
   isFavorite = false
 }: EventCardProps) {
   const t = useTranslations('events');
+  const { currentCurrency } = useCurrency();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const nextPerformance = event.performances?.[0];
@@ -200,7 +202,7 @@ export default function EventCard({
           {/* Price Badge */}
           <div className="absolute bottom-2 right-2 bg-white dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-2 py-1">
             <div className="text-sm font-bold text-gray-900 dark:text-white">
-              <PriceDisplay amount={minPrice} currency="USD" />
+              <PriceDisplay amount={minPrice} currency={currentCurrency} />
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">{t('fromPrice')}</div>
           </div>

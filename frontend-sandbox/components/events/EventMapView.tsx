@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { MapPin, Calendar, Clock, Users, Star, X, Navigation } from 'lucide-react';
+import { useCurrency } from '@/lib/stores/currencyStore';
+import { MapPin, Calendar, Clock, Star, Users, TrendingUp, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { Event } from '@/lib/types/api';
 
 interface EventMapViewProps {
@@ -30,6 +31,7 @@ export default function EventMapView({
   formatPrice
 }: EventMapViewProps) {
   const t = useTranslations('events');
+  const { currentCurrency } = useCurrency();
   const mapRef = useRef<HTMLDivElement>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -139,7 +141,7 @@ export default function EventMapView({
             className="bg-white p-2 rounded-lg shadow-md hover:shadow-lg transition-shadow"
             title={t('showMyLocation')}
           >
-            <Navigation className="h-5 w-5 text-gray-600" />
+            <MapPin className="h-5 w-5 text-gray-600" />
           </button>
           
           <button
@@ -224,7 +226,7 @@ export default function EventMapView({
             
             <div className="text-right">
               <div className="text-lg font-bold text-gray-900">
-                {formatPrice(minPrice, 'USD')}
+                {formatPrice(minPrice, currentCurrency)}
               </div>
               <div className="text-xs text-gray-500">{t('fromPrice')}</div>
             </div>

@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useCart } from '../../../lib/hooks/useCart';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 import { PriceDisplay } from '../../../components/ui/Price';
+import { useCurrency } from '../../../lib/stores/currencyStore';
 import { 
   CreditCard, 
   User, 
@@ -39,6 +40,7 @@ export default function CheckoutPage() {
   const t = useTranslations('Checkout');
   const { items, totalItems, totalPrice, currency, clearCart } = useCart();
   const { isAuthenticated, user, isLoading } = useAuth();
+  const { initialize: initializeCurrency } = useCurrency();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -58,6 +60,11 @@ export default function CheckoutPage() {
     cvv: '',
     cardholderName: ''
   });
+
+  // Initialize currency
+  useEffect(() => {
+    initializeCurrency();
+  }, [initializeCurrency]);
 
   // Redirect if not authenticated or cart is empty
   useEffect(() => {

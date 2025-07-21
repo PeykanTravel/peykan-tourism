@@ -7,6 +7,7 @@ import { useCart } from '../../../../lib/hooks/useCart';
 import { useAuth } from '../../../../lib/contexts/AuthContext';
 import { PriceDisplay } from '../../../../components/ui/Price';
 import { tokenService } from '../../../../lib/services/tokenService';
+import { useCurrency } from '../../../../lib/stores/currencyStore';
 import { 
   Calendar, 
   Clock, 
@@ -174,6 +175,7 @@ export default function TourDetailPage() {
   
   const { addItem, totalItems } = useCart();
   const { user, isAuthenticated } = useAuth();
+  const { initialize: initializeCurrency } = useCurrency();
   
   // State
   const [tour, setTour] = useState<Tour | null>(null);
@@ -196,6 +198,11 @@ export default function TourDetailPage() {
   // UI state
   const [activeTab, setActiveTab] = useState<'overview' | 'itinerary' | 'reviews' | 'pricing'>('overview');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+
+  // Initialize currency
+  useEffect(() => {
+    initializeCurrency();
+  }, [initializeCurrency]);
 
   // Fetch tour data
   useEffect(() => {

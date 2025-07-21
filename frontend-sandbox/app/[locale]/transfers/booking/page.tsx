@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../../lib/contexts/AuthContext';
 import { useCart } from '../../../../lib/hooks/useCart';
 import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
+import { useCurrency } from '@/lib/stores/currencyStore';
 import { BookingStep } from '@/lib/types/transfers';
 import BookingSteps from './components/BookingSteps';
 import RouteSelection from './components/RouteSelection';
@@ -35,6 +36,7 @@ export default function TransferBookingPage() {
   const locale = params.locale as string;
   const { isAuthenticated } = useAuth();
   const { refreshCart } = useCart();
+  const { initialize: initializeCurrency } = useCurrency();
   
   // Get booking state from store
   const {
@@ -48,6 +50,11 @@ export default function TransferBookingPage() {
     clearBookingData,
     updateBookingData,
   } = useTransferBookingStore();
+
+  // Initialize currency
+  useEffect(() => {
+    initializeCurrency();
+  }, [initializeCurrency]);
 
   // Initialize from URL params
   useEffect(() => {

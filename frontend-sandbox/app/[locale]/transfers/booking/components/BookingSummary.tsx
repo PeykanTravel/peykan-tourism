@@ -7,7 +7,8 @@ import { useAuth } from '../../../../../lib/contexts/AuthContext';
 import { MapPin, Calendar, Clock, Users, Package, ArrowRight, ArrowLeft, CheckCircle, CreditCard, Star, Percent, Award, Info, Car, Wifi, Shield, Zap } from 'lucide-react';
 import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
 import { useCart } from '@/lib/hooks/useCart';
-import { useCurrency } from '@/lib/currency-context';
+import { useCurrency } from '@/lib/stores/currencyStore';
+import { PriceDisplay } from '@/components/ui/Price';
 
 interface BookingSummaryProps {
   onBack: () => void;
@@ -20,7 +21,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
   const params = useParams();
   const locale = params.locale as string;
   const { isAuthenticated } = useAuth();
-  const { currency, convertCurrency } = useCurrency();
+  const { currentCurrency } = useCurrency();
   
   // Get booking state from store
   const {
@@ -47,23 +48,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
     price_calculation_error,
   } = useTransferBookingStore();
 
-  // Helper function to format price with currency
-  const formatPrice = (amount: number, fromCurrency: string = 'USD') => {
-    const convertedAmount = convertCurrency(amount, fromCurrency, currency);
-    const currencySymbols: { [key: string]: string } = {
-      'USD': '$',
-      'EUR': '€',
-      'TRY': '₺',
-      'IRR': 'ریال',
-    };
-    const symbol = currencySymbols[currency] || currency;
-    return `${symbol} ${convertedAmount.toFixed(2)}`;
-  };
-
   // Debug logging
   console.log('BookingSummary - pricing_breakdown:', pricing_breakdown);
   console.log('BookingSummary - selected_options:', selected_options);
-  console.log('BookingSummary - current currency:', currency);
+  console.log('BookingSummary - current currency:', currentCurrency);
 
   // Get option details from store or pricing breakdown
   const getOptionDetails = (optionId: string) => {
@@ -307,7 +295,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                 {route_data.origin} → {route_data.destination}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">
-                {vehiclePricing ? formatPrice(parseFloat(vehiclePricing.base_price)) : t('priceOnRequest')}
+                {vehiclePricing ? <PriceDisplay amount={parseFloat(vehiclePricing.base_price)} /> : t('priceOnRequest')}
               </div>
               {renderRouteBadges().length > 0 && (
                 <div className="flex gap-1 mt-2">
@@ -466,7 +454,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                     </span>
                     {optionDetails && (
                       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {t('quantity')}: {optionDetails.quantity} × {formatPrice(optionDetails.price)}
+                        {t('quantity')}: {optionDetails.quantity} × <PriceDisplay amount={optionDetails.price} />
                       </div>
                     )}
                     {!optionDetails && (
@@ -476,7 +464,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                     )}
                   </div>
                   <span className="font-medium">
-                    {optionDetails?.total ? formatPrice(optionDetails.total) : formatPrice(0)}
+                    {optionDetails?.total ? <PriceDisplay amount={optionDetails.total} /> : <PriceDisplay amount={0} />}
                   </span>
                 </div>
               );
@@ -489,7 +477,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-700 dark:text-gray-300">{t('optionsTotal')}:</span>
                 <span className="font-bold text-gray-900 dark:text-white">
-                  {formatPrice(pricing_breakdown.price_breakdown.options_total)}
+                  <PriceDisplay amount={pricing_breakdown.price_breakdown.options_total} />
                 </span>
               </div>
             </div>
@@ -522,33 +510,33 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-gray-600 dark:text-gray-300">{t('basePrice')}</span>
-              <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.base_price)}</span>
+              <span className="font-medium"><PriceDisplay amount={pricing_breakdown.price_breakdown.base_price} /></span>
             </div>
             {pricing_breakdown.price_breakdown.outbound_surcharge > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600 dark:text-gray-300">{t('timeSurcharge')}</span>
-                <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.outbound_surcharge)}</span>
+                <span className="font-medium"><PriceDisplay amount={pricing_breakdown.price_breakdown.outbound_surcharge} /></span>
               </div>
             )}
             {pricing_breakdown.price_breakdown.round_trip_discount > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600 dark:text-gray-300">{t('roundTripDiscount')}</span>
-                <span className="font-medium text-green-600">-{formatPrice(pricing_breakdown.price_breakdown.round_trip_discount)}</span>
+                <span className="font-medium text-green-600">-<PriceDisplay amount={pricing_breakdown.price_breakdown.round_trip_discount} /></span>
               </div>
             )}
             {pricing_breakdown.price_breakdown.options_total > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600 dark:text-gray-300">{t('optionsTotal')}</span>
-                <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.options_total)}</span>
+                <span className="font-medium"><PriceDisplay amount={pricing_breakdown.price_breakdown.options_total} /></span>
               </div>
             )}
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-lg font-medium text-gray-900 dark:text-white">{t('subtotal')}</span>
-              <span className="text-lg font-medium text-gray-900 dark:text-white">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
+              <span className="text-lg font-medium text-gray-900 dark:text-white"><PriceDisplay amount={pricing_breakdown.price_breakdown.final_price} /></span>
             </div>
             <div className="flex justify-between items-center py-2 border-t border-gray-200 dark:border-gray-700">
               <span className="text-lg font-bold text-gray-900 dark:text-white">{t('finalPrice')}</span>
-              <span className="text-xl font-bold text-blue-600">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
+              <span className="text-xl font-bold text-blue-600"><PriceDisplay amount={pricing_breakdown.price_breakdown.final_price} /></span>
             </div>
           </div>
         ) : (

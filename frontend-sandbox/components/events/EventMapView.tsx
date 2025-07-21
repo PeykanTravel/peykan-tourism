@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { MapPin, Calendar, Clock, Users, Star, Info, TrendingUp, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { useCurrency } from '@/lib/stores/currencyStore';
-import { MapPin, Calendar, Clock, Star, Users, TrendingUp, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { PriceDisplay } from '@/components/ui/Price';
 import { Event } from '@/lib/types/api';
 
 interface EventMapViewProps {
@@ -226,7 +227,7 @@ export default function EventMapView({
             
             <div className="text-right">
               <div className="text-lg font-bold text-gray-900">
-                {formatPrice(minPrice, currentCurrency)}
+                <PriceDisplay amount={minPrice} currency={currentCurrency} />
               </div>
               <div className="text-xs text-gray-500">{t('fromPrice')}</div>
             </div>

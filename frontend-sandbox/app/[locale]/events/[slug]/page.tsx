@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCurrency } from '@/lib/stores/currencyStore';
+import { PriceDisplay } from '@/components/ui/Price';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -62,7 +63,7 @@ export default function EventDetailPage() {
   const { slug } = useParams();
   const { user } = useAuth();
   const { refreshCart } = useCart();
-  const { currentCurrency } = useCurrency();
+  const { currentCurrency, initialize: initializeCurrency } = useCurrency();
   const t = useTranslations('eventDetail');
   const router = useRouter();
   
@@ -116,6 +117,11 @@ export default function EventDetailPage() {
     }
   ]);
   
+  // Initialize currency
+  useEffect(() => {
+    initializeCurrency();
+  }, [initializeCurrency]);
+
   // Fetch event data
   useEffect(() => {
     const fetchEvent = async () => {
@@ -170,9 +176,12 @@ export default function EventDetailPage() {
   };
 
   const formatPrice = (price: number, currency: string) => {
+    // Use the selected currency if no currency is provided
+    const targetCurrency = currency || currentCurrency;
+    
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency || currentCurrency
+      currency: targetCurrency
     }).format(price);
   };
 
@@ -526,7 +535,7 @@ export default function EventDetailPage() {
                           <h4 className="font-medium text-gray-900 dark:text-white">{option.name}</h4>
                           <p className="text-sm text-gray-600 dark:text-gray-300">{option.description}</p>
                           <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {formatPrice(option.price, option.currency)}
+                            <PriceDisplay amount={option.price} currency={option.currency} />
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -641,7 +650,7 @@ export default function EventDetailPage() {
                                   {seat.is_premium ? ' (Premium)' : ''}
                                   {seat.is_wheelchair_accessible ? ' (Wheelchair)' : ''}
                                 </span>
-                                <span>{formatPrice(Number(seat.price), seat.currency)}</span>
+                                <span><PriceDisplay amount={Number(seat.price)} currency={seat.currency} /></span>
                               </li>
                             ))}
                           </ul>
@@ -657,7 +666,7 @@ export default function EventDetailPage() {
                         {selectedOptions.map(opt => (
                           <li key={opt.id} className="flex justify-between text-gray-700 dark:text-gray-300">
                             <span>{opt.name} ({opt.quantity}x)</span>
-                            <span>{formatPrice(Number(opt.price) * Number(opt.quantity), opt.currency || currentCurrency)}</span>
+                            <span><PriceDisplay amount={Number(opt.price) * Number(opt.quantity)} currency={opt.currency || currentCurrency} /></span>
                           </li>
                         ))}
                       </ul>
@@ -666,11 +675,13 @@ export default function EventDetailPage() {
                   {/* Total */}
                   <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
                     <span>{t('total') || 'Total'}</span>
-                    <span>{formatPrice(
-                      selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0) +
-                      selectedOptions.reduce((sum, opt) => sum + Number(opt.price) * Number(opt.quantity), 0),
-                      currentCurrency)}
-                    </span>
+                    <span><PriceDisplay 
+                      amount={
+                        selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0) +
+                        selectedOptions.reduce((sum, opt) => sum + Number(opt.price) * Number(opt.quantity), 0)
+                      } 
+                      currency={selectedSeats.length > 0 ? selectedSeats[0].currency : currentCurrency} 
+                    /></span>
                   </div>
                 </div>
               </div>

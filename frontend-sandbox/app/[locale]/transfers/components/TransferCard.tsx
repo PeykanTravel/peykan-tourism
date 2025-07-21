@@ -3,6 +3,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin, Clock, Car, ArrowRight } from 'lucide-react';
+import { PriceDisplay } from '@/components/ui/Price';
 
 interface TransferRoute {
   id: string;
@@ -76,7 +77,7 @@ export default function TransferCard({ route, onBook }: TransferCardProps) {
         {/* Price */}
         <div className="mb-4">
           <div className="text-xl font-bold text-blue-600">
-            ${route.pricing?.[0]?.base_price || 0}
+            <PriceDisplay amount={route.pricing?.[0]?.base_price || 0} currency="USD" />
           </div>
           <div className="text-sm text-gray-500">
             {t('startingFrom')}

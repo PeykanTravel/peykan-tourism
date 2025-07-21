@@ -16,6 +16,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { EventPricingBreakdown } from '@/lib/types/api';
+import { PriceDisplay } from '@/components/ui/Price';
 
 interface PricingBreakdownProps {
   breakdown: EventPricingBreakdown | null;
@@ -131,18 +132,13 @@ export default function PricingBreakdown({
       <div className="p-4">
         {/* Base Price */}
         <div className="space-y-3 mb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <span className="font-medium text-gray-900 dark:text-white">
-                {t('basePrice')} ({breakdown.quantity} {breakdown.quantity === 1 ? t('ticket') : t('tickets')})
-              </span>
-              <div className="text-sm text-gray-600 dark:text-gray-300">
-                {formatPrice(breakdown.base_price, 'USD')} × {breakdown.quantity}
-              </div>
-            </div>
-            <span className="font-semibold text-gray-900 dark:text-white">
-              {formatPrice(breakdown.subtotal, 'USD')}
-            </span>
+          <div className="flex justify-between text-sm">
+            <span>{t('basePrice')}</span>
+            <span><PriceDisplay amount={breakdown.base_price} currency="USD" /> × {breakdown.quantity}</span>
+          </div>
+          <div className="flex justify-between font-medium">
+            <span>{t('subtotal')}</span>
+            <span><PriceDisplay amount={breakdown.subtotal} currency="USD" /></span>
           </div>
         </div>
 
@@ -161,7 +157,7 @@ export default function PricingBreakdown({
               </div>
               <div className="flex items-center">
                 <span className="font-medium text-gray-900 dark:text-white mr-2">
-                  {formatPrice(breakdown.options_total, 'USD')}
+                  <PriceDisplay amount={breakdown.options_total} currency="USD" />
                 </span>
                 <TrendingDown 
                   className={`h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform ${
@@ -178,11 +174,11 @@ export default function PricingBreakdown({
                     <div>
                       <span className="text-gray-900 dark:text-white">{option.name}</span>
                       <span className="text-gray-600 dark:text-gray-300 ml-2">
-                        ({formatPrice(option.price, 'USD')} × {option.quantity})
+                        (<PriceDisplay amount={option.price} currency="USD" /> × {option.quantity})
                       </span>
                     </div>
                     <span className="text-gray-900 dark:text-white">
-                      {formatPrice(option.total, 'USD')}
+                      <PriceDisplay amount={option.total} currency="USD" />
                     </span>
                   </div>
                 ))}
@@ -206,7 +202,7 @@ export default function PricingBreakdown({
               </div>
               <div className="flex items-center">
                 <span className="font-medium text-green-700 mr-2">
-                  -{formatPrice(breakdown.discount_total, 'USD')}
+                  -<PriceDisplay amount={breakdown.discount_total} currency="USD" />
                 </span>
                 <TrendingDown 
                   className={`h-4 w-4 text-green-500 transition-transform ${
@@ -238,7 +234,7 @@ export default function PricingBreakdown({
                       )}
                     </div>
                     <span className="text-green-700 font-medium">
-                      -{formatPrice(discount.amount, 'USD')}
+                      -<PriceDisplay amount={discount.amount} currency="USD" />
                     </span>
                   </div>
                 ))}
@@ -284,7 +280,7 @@ export default function PricingBreakdown({
               </div>
               <div className="flex items-center">
                 <span className="font-medium text-gray-900 mr-2">
-                  {formatPrice(breakdown.fees_total, 'USD')}
+                  <PriceDisplay amount={breakdown.fees_total} currency="USD" />
                 </span>
                 <TrendingDown 
                   className={`h-4 w-4 text-gray-400 transition-transform ${
@@ -303,7 +299,7 @@ export default function PricingBreakdown({
                       <span className="text-gray-600 ml-2">({fee.type})</span>
                     </div>
                     <span className="text-gray-900">
-                      {formatPrice(fee.amount, 'USD')}
+                      <PriceDisplay amount={fee.amount} currency="USD" />
                     </span>
                   </div>
                 ))}
@@ -324,7 +320,7 @@ export default function PricingBreakdown({
               </div>
               <div className="flex items-center">
                 <span className="font-medium text-gray-900 mr-2">
-                  {formatPrice(breakdown.taxes_total, 'USD')}
+                  <PriceDisplay amount={breakdown.taxes_total} currency="USD" />
                 </span>
                 <TrendingDown 
                   className={`h-4 w-4 text-gray-400 transition-transform ${
@@ -343,7 +339,7 @@ export default function PricingBreakdown({
                       <span className="text-gray-600 ml-2">({tax.type})</span>
                     </div>
                     <span className="text-gray-900">
-                      {formatPrice(tax.amount, 'USD')}
+                      <PriceDisplay amount={tax.amount} currency="USD" />
                     </span>
                   </div>
                 ))}
@@ -363,7 +359,7 @@ export default function PricingBreakdown({
                     <span className="text-sm font-medium text-green-800">{t('totalSavings')}</span>
                   </div>
                   <div className="text-lg font-bold text-green-700 mt-1">
-                    {formatPrice(totalSavings, 'USD')}
+                    <PriceDisplay amount={totalSavings} currency="USD" />
                   </div>
                 </div>
               )}
@@ -375,7 +371,7 @@ export default function PricingBreakdown({
                     <span className="text-sm font-medium text-blue-800">{t('feesAndTaxes')}</span>
                   </div>
                   <div className="text-lg font-bold text-blue-700 mt-1">
-                    {formatPrice(totalExtras, 'USD')}
+                    <PriceDisplay amount={totalExtras} currency="USD" />
                   </div>
                 </div>
               )}
@@ -394,11 +390,11 @@ export default function PricingBreakdown({
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-gray-900">
-                {formatPrice(breakdown.final_price, 'USD')}
+                <PriceDisplay amount={breakdown.final_price} currency="USD" />
               </div>
               {totalSavings > 0 && (
                 <div className="text-sm text-green-600">
-                  {t('youSave')} {formatPrice(totalSavings, 'USD')}
+                  {t('youSave')} <PriceDisplay amount={totalSavings} currency="USD" />
                 </div>
               )}
             </div>

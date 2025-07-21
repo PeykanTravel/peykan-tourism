@@ -4,7 +4,8 @@ import React, { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Car, Users, Package, ArrowRight, ArrowLeft, CheckCircle, Star, Award, Wifi, Snowflake, Shield, Zap, Heart, Clock, MapPin } from 'lucide-react';
 import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
-import { useCurrency } from '@/lib/currency-context';
+import { useCurrency } from '@/lib/stores/currencyStore';
+import { PriceDisplay } from '@/components/ui/Price';
 
 interface VehicleSelectionProps {
   onNext: () => void;
@@ -13,7 +14,7 @@ interface VehicleSelectionProps {
 
 export default function VehicleSelection({ onNext, onBack }: VehicleSelectionProps) {
   const t = useTranslations('transfers');
-  const { currency, convertCurrency } = useCurrency();
+  const { currentCurrency } = useCurrency();
   
   // Get booking state from store
   const {
@@ -22,19 +23,6 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
     setVehicleType,
     isStepValid,
   } = useTransferBookingStore();
-
-  // Helper function to format price with currency
-  const formatPrice = (amount: number, fromCurrency: string = 'USD') => {
-    const convertedAmount = convertCurrency(amount, fromCurrency, currency);
-    const currencySymbols: { [key: string]: string } = {
-      'USD': '$',
-      'EUR': '€',
-      'TRY': '₺',
-      'IRR': 'ریال',
-    };
-    const symbol = currencySymbols[currency] || currency;
-    return `${symbol} ${convertedAmount.toFixed(2)}`;
-  };
 
   // Get available vehicles from route data
   const availableVehicles = route_data?.pricing ? 
@@ -296,7 +284,7 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
               {/* Price */}
               <div className="text-right mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <div className="text-lg font-bold text-blue-600">
-                  {formatPrice(parseFloat(vehicle.base_price))}
+                  <PriceDisplay amount={parseFloat(vehicle.base_price)} currency="USD" />
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">{t('basePrice')}</div>
               </div>

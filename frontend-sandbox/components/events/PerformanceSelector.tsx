@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Calendar, Clock, Users, Star, MapPin, AlertCircle, CheckCircle2, TrendingUp } from 'lucide-react';
 import { EventPerformance } from '@/lib/types/api';
+import { PriceDisplay } from '@/components/ui/Price';
 
 interface PerformanceSelectorProps {
   performances: EventPerformance[];
@@ -188,7 +189,7 @@ export default function PerformanceSelector({
 
                     <div className="text-right ml-4">
                       <div className="text-lg font-bold text-gray-900 dark:text-white">
-                        {formatPrice(minPrice, 'USD')}
+                        <PriceDisplay amount={minPrice} currency="USD" />
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">{t('fromPrice')}</div>
                     </div>
@@ -263,7 +264,7 @@ export default function PerformanceSelector({
                         
                         <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-2">
                           <span>{performance.available_capacity} {t('available')}</span>
-                          <span className="font-medium">{formatPrice(minPrice, 'USD')}</span>
+                          <span className="font-medium"><PriceDisplay amount={minPrice} currency="USD" /></span>
                         </div>
                         
                         <div className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getStatusColor(status)}`}>

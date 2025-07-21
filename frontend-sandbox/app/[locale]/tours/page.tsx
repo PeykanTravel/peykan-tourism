@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import TourCard from '../../../components/tours/TourCard';
 import { SkeletonLoader } from '../../../components/ui/SkeletonLoader';
+import { PriceDisplay } from '../../../components/ui/Price';
+import { useCurrency } from '../../../lib/stores/currencyStore';
 
 // Mock categories for demonstration
 const categories = [
@@ -45,6 +47,7 @@ interface Tour {
 
 export default function ToursListPage() {
   const t = useTranslations('tours');
+  const { initialize: initializeCurrency } = useCurrency();
   const [tours, setTours] = useState<Tour[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +58,11 @@ export default function ToursListPage() {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 5000 });
   const [sortBy, setSortBy] = useState('name');
   const [showCategoryFilters, setShowCategoryFilters] = useState(false);
+
+  // Initialize currency
+  useEffect(() => {
+    initializeCurrency();
+  }, [initializeCurrency]);
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -111,13 +119,6 @@ export default function ToursListPage() {
         return (a.title || '').localeCompare(b.title || '');
     }
   });
-
-  const formatPrice = (price: string, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD'
-    }).format(parseFloat(price));
-  };
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (

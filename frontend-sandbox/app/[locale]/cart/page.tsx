@@ -9,6 +9,7 @@ import { CartItem } from '../../../lib/contexts/UnifiedCartContext';
 import { useAuth } from '../../../lib/contexts/AuthContext';
 import { tokenService } from '../../../lib/services/tokenService';
 import { PriceDisplay } from '../../../components/ui/Price';
+import { useCurrency } from '../../../lib/stores/currencyStore';
 import ImprovedCartItem from '../../../components/cart/ImprovedCartItem';
 import { 
   ShoppingCart, 
@@ -27,9 +28,15 @@ export default function CartPage() {
   const t = useTranslations('Cart');
   const { items, totalItems, totalPrice, currency, updateItem, removeItem, clearCart, refreshCart } = useCart();
   const { isAuthenticated, user, isLoading } = useAuth();
+  const { initialize: initializeCurrency } = useCurrency();
   
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  // Initialize currency
+  useEffect(() => {
+    initializeCurrency();
+  }, [initializeCurrency]);
 
   // Redirect to login if not authenticated
   useEffect(() => {

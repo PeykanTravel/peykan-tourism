@@ -5,7 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Package, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useTransferBookingStore } from '@/lib/stores/transferBookingStore';
 import { useTransferOptions } from '@/lib/hooks/useTransfers';
-import { useCurrency } from '@/lib/currency-context';
+import { useCurrency } from '@/lib/stores/currencyStore';
+import { PriceDisplay } from '@/components/ui/Price';
 
 interface OptionsSelectionProps {
   onNext: () => void;
@@ -14,7 +15,7 @@ interface OptionsSelectionProps {
 
 export default function OptionsSelection({ onNext, onBack }: OptionsSelectionProps) {
   const t = useTranslations('transfers');
-  const { currency, convertCurrency } = useCurrency();
+  const { currentCurrency } = useCurrency();
   
   // Get booking state from store
   const {
@@ -24,19 +25,6 @@ export default function OptionsSelection({ onNext, onBack }: OptionsSelectionPro
     setOptions,
     isStepValid,
   } = useTransferBookingStore();
-
-  // Helper function to format price with currency
-  const formatPrice = (amount: number, fromCurrency: string = 'USD') => {
-    const convertedAmount = convertCurrency(amount, fromCurrency, currency);
-    const currencySymbols: { [key: string]: string } = {
-      'USD': '$',
-      'EUR': '€',
-      'TRY': '₺',
-      'IRR': 'ریال',
-    };
-    const symbol = currencySymbols[currency] || currency;
-    return `${symbol} ${convertedAmount.toFixed(2)}`;
-  };
 
   // Fetch options from API
   const { data: optionsResponse, error: optionsError, isLoading: optionsLoading } = useTransferOptions();
@@ -218,7 +206,7 @@ export default function OptionsSelection({ onNext, onBack }: OptionsSelectionPro
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{option.description}</p>
                       <div className="text-lg font-bold text-blue-600">
-                        {formatPrice(parseFloat(option.price))}
+                        <PriceDisplay amount={parseFloat(option.price)} currency={currentCurrency} />
                       </div>
                     </div>
                     
@@ -266,7 +254,7 @@ export default function OptionsSelection({ onNext, onBack }: OptionsSelectionPro
                     <span className="font-medium">{option.name}</span>
                   </div>
                   <span className="font-medium">
-                    {formatPrice(parseFloat(option.price))}
+                    <PriceDisplay amount={parseFloat(option.price)} currency={currentCurrency} />
                   </span>
                 </div>
               );

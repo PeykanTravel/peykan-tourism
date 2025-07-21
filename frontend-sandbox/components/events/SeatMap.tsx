@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCurrency } from '@/lib/stores/currencyStore';
+import { PriceDisplay } from '@/components/ui/Price';
 import { 
   MapPin, 
   Users, 
@@ -299,7 +300,7 @@ export default function SeatMap({
                         {section.available_capacity} / {section.total_capacity}
                       </div>
                       <div className="text-xs opacity-75 mb-2 dark:text-gray-400">
-                        {formatPrice(section.base_price, section.currency)}
+                        <PriceDisplay amount={section.base_price} currency={section.currency} />
                       </div>
                       
                       {/* Features */}
@@ -333,7 +334,7 @@ export default function SeatMap({
                     {t('section')} {selectedSection.name}
                   </h4>
                   <p className="text-gray-600 dark:text-gray-300">
-                    {formatPrice(selectedSection.base_price, selectedSection.currency)} • {selectedSection.available_capacity} {t('available')}
+                    <PriceDisplay amount={selectedSection.base_price} currency={selectedSection.currency} /> • {selectedSection.available_capacity} {t('available')}
                   </p>
                 </div>
                 
@@ -424,7 +425,9 @@ export default function SeatMap({
                   {selectedSeats.map((seat) => (
                     <div key={seat.id} className="flex justify-between text-gray-700 dark:text-gray-300">
                       <span>{seat.section} {seat.row_number}-{seat.seat_number}</span>
-                      <span className="font-medium">{formatPrice(seat.price, seat.currency)}</span>
+                      <span className="font-medium">
+                        <PriceDisplay amount={seat.price} currency={seat.currency} />
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -432,10 +435,10 @@ export default function SeatMap({
                   <div className="flex justify-between font-semibold text-gray-900 dark:text-white">
                     <span>{t('total')}</span>
                     <span>
-                      {formatPrice(
-                        selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0),
-                        currentCurrency
-                      )}
+                      <PriceDisplay 
+                        amount={selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0)} 
+                        currency={selectedSeats.length > 0 ? selectedSeats[0].currency : currentCurrency} 
+                      />
                     </span>
                   </div>
                 </div>

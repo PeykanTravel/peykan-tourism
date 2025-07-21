@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { PriceDisplay } from '../ui/Price';
 
 export function TourDetail({ tour }: { tour: any }) {
   const [variant, setVariant] = useState(tour.variants[0]?.id || '');
@@ -17,7 +18,9 @@ export function TourDetail({ tour }: { tour: any }) {
           onChange={e => setVariant(e.target.value)}
         >
           {tour.variants.map((v: any) => (
-            <option key={v.id} value={v.id}>{v.name} (${v.price})</option>
+            <option key={v.id} value={v.id}>
+              {v.name} (<PriceDisplay amount={v.price} currency={tour.currency || 'USD'} />)
+            </option>
           ))}
         </select>
       </div>

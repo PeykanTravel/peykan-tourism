@@ -7,6 +7,7 @@ import { useCurrency } from '../../../lib/stores/currencyStore';
 import { useLanguage } from '../../../lib/stores/languageStore';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
+import { PriceDisplay } from '../../../components/ui/Price';
 import LoadingSpinner from '../../../components/ui/LoadingSpinner';
 
 export default function TestBasicFeaturesPage() {
@@ -124,6 +125,9 @@ export default function TestBasicFeaturesPage() {
                 >
                   <option value="all">All Tests</option>
                   <option value="currency">Currency Features</option>
+                  <option value="currency-components">Currency Components</option>
+                  <option value="event-system-currency">Event System Currency</option>
+                  <option value="cart-checkout-currency">Cart/Checkout Currency</option>
                   <option value="language">Language Features</option>
                   <option value="ui">UI Components</option>
                   <option value="storage">Local Storage</option>
@@ -220,6 +224,80 @@ export default function TestBasicFeaturesPage() {
             </div>
           </Card>
         </div>
+
+        {/* Currency Components Test */}
+        <Card className="mb-8">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Currency Components Test
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* PriceDisplay Test */}
+              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">PriceDisplay Component</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>100 USD:</span>
+                    <span className="font-mono">
+                      <PriceDisplay amount={100} currency="USD" />
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>50 EUR:</span>
+                    <span className="font-mono">
+                      <PriceDisplay amount={50} currency="EUR" />
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>75 TRY:</span>
+                    <span className="font-mono">
+                      <PriceDisplay amount={75} currency="TRY" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Currency Conversion Test */}
+              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Currency Conversion</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Original:</span>
+                    <span className="font-mono">$100.00</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Converted:</span>
+                    <span className="font-mono">
+                      <PriceDisplay amount={100} currency="USD" />
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Current: {currentCurrency}
+                  </div>
+                </div>
+              </div>
+
+              {/* Currency Store Test */}
+              <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Currency Store</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Current:</span>
+                    <span className="font-mono">{currentCurrency}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Available:</span>
+                    <span className="font-mono">{supportedCurrencies.length}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Store Status: Active
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* Test Results */}
         {testReport && (

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { useCurrency } from '@/lib/stores/currencyStore';
 import { 
   MapPin, 
   Users, 
@@ -56,6 +57,7 @@ export default function SeatMap({
   formatPrice
 }: SeatMapProps) {
   const t = useTranslations('seatMap');
+  const { currentCurrency } = useCurrency();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [showLegend, setShowLegend] = useState(true);
   const [viewMode, setViewMode] = useState<'sections' | 'seats'>('sections');
@@ -432,7 +434,7 @@ export default function SeatMap({
                     <span>
                       {formatPrice(
                         selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0),
-                        'USD'
+                        currentCurrency
                       )}
                     </span>
                   </div>

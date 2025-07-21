@@ -533,11 +533,11 @@ export default function EventDetailPage() {
                               const currentQuantity = selectedOptions.find(opt => opt.id === option.id)?.quantity || 0;
                               handleOptionChange(option, Math.max(0, currentQuantity - 1));
                             }}
-                            className="p-1 rounded-md bg-gray-100 hover:bg-gray-200"
+                            className="p-1 rounded-md bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300"
                           >
                             <Minus className="h-4 w-4" />
                           </button>
-                          <span className="w-8 text-center">
+                          <span className="w-8 text-center text-gray-900 dark:text-white">
                             {selectedOptions.find(opt => opt.id === option.id)?.quantity || 0}
                           </span>
                           <button
@@ -545,7 +545,7 @@ export default function EventDetailPage() {
                               const currentQuantity = selectedOptions.find(opt => opt.id === option.id)?.quantity || 0;
                               handleOptionChange(option, Math.min(option.max_quantity, currentQuantity + 1));
                             }}
-                            className="p-1 rounded-md bg-gray-100 hover:bg-gray-200"
+                            className="p-1 rounded-md bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300"
                           >
                             <Plus className="h-4 w-4" />
                           </button>
@@ -578,7 +578,7 @@ export default function EventDetailPage() {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('bookingSummary')}</h3>
                 </div>
                 <div className="p-4 space-y-3">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm text-gray-900 dark:text-white">
                     <span>{t('performance')}</span>
                     <span>{selectedPerformance ? formatDate(selectedPerformance.date) : '-'}</span>
                   </div>
@@ -621,19 +621,19 @@ export default function EventDetailPage() {
                     }
                     return (
                       <div key={key} className="mt-2">
-                        <div className="flex justify-between text-sm font-medium">
+                        <div className="flex justify-between text-sm font-medium text-gray-900 dark:text-white">
                           <span>{t('section')}</span>
                           <span>{seats[0].section}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
+                        <div className="flex justify-between text-sm text-gray-900 dark:text-white">
                           <span>{t('ticketType') || 'Ticket Type'}</span>
                           <span>{ticketTypeName || '-'}</span>
                         </div>
-                        <div className="text-sm mt-1">
+                        <div className="text-sm mt-1 text-gray-900 dark:text-white">
                           <span>{t('seats')}:</span>
                           <ul className="ml-2 mt-1">
                             {seats.map(seat => (
-                              <li key={seat.id} className="flex justify-between">
+                              <li key={seat.id} className="flex justify-between text-gray-700 dark:text-gray-300">
                                 <span>
                                   Row {seat.row_number}, Seat {seat.seat_number}
                                   {seat.is_premium ? ' (Premium)' : ''}
@@ -650,10 +650,10 @@ export default function EventDetailPage() {
                   {/* Options */}
                   {selectedOptions.length > 0 && (
                     <div className="mt-2">
-                      <div className="font-medium text-sm mb-1">{t('options')}</div>
+                      <div className="font-medium text-sm mb-1 text-gray-900 dark:text-white">{t('options')}</div>
                       <ul className="ml-2">
                         {selectedOptions.map(opt => (
-                          <li key={opt.id} className="flex justify-between">
+                          <li key={opt.id} className="flex justify-between text-gray-700 dark:text-gray-300">
                             <span>{opt.name} ({opt.quantity}x)</span>
                             <span>{formatPrice(Number(opt.price) * Number(opt.quantity), opt.currency || 'USD')}</span>
                           </li>
@@ -662,7 +662,7 @@ export default function EventDetailPage() {
                     </div>
                   )}
                   {/* Total */}
-                  <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
                     <span>{t('total') || 'Total'}</span>
                     <span>{formatPrice(
                       selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0) +

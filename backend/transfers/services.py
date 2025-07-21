@@ -168,20 +168,33 @@ class TransferPricingService:
                 round_trip_discount, 'USD', user_currency
             )
         
+        # Return the structure expected by TransferPriceResponseSerializer
         return {
-            'outbound_price': outbound_price,
-            'return_price': return_price,
-            'options_total': options_total,
-            'round_trip_discount': round_trip_discount,
-            'final_price': final_price,
-            'currency': user_currency,
-            'pricing_breakdown': {
-                'base_price_per_leg': pricing.base_price,
-                'outbound_surcharges': outbound_price - pricing.base_price,
-                'return_surcharges': return_price - pricing.base_price if return_price > 0 else 0,
-                'options': options_total,
-                'discount': round_trip_discount,
-                'total': final_price
+            'price_breakdown': {
+                'base_price': float(pricing.base_price),
+                'outbound_price': float(outbound_price),
+                'outbound_surcharge': float(outbound_price - pricing.base_price),
+                'return_price': float(return_price),
+                'return_surcharge': float(return_price - pricing.base_price) if return_price > 0 else 0,
+                'options_total': float(options_total),
+                'round_trip_discount': float(round_trip_discount),
+                'final_price': float(final_price)
+            },
+            'trip_info': {
+                'vehicle_type': vehicle_type,
+                'is_round_trip': trip_type == 'round_trip',
+                'booking_time': outbound_time,
+                'return_time': return_time
+            },
+            'route_info': {
+                'origin': route.origin,
+                'destination': route.destination,
+                'name': route.name or f"{route.origin} → {route.destination}"
+            },
+            'time_info': {
+                'booking_hour': outbound_hour,
+                'time_category': TransferPricingService._get_time_category(outbound_hour),
+                'surcharge_percentage': TransferPricingService._get_surcharge_percentage(route, outbound_hour)
             }
         }
     
@@ -235,6 +248,26 @@ class TransferPricingService:
                 continue
         
         return total
+    
+    @staticmethod
+    def _get_time_category(hour: int) -> str:
+        """Get time category for the given hour."""
+        if 7 <= hour <= 9 or 17 <= hour <= 19:
+            return 'peak_hours'
+        elif 22 <= hour <= 23 or 0 <= hour <= 6:
+            return 'midnight_hours'
+        else:
+            return 'normal_hours'
+    
+    @staticmethod
+    def _get_surcharge_percentage(route: TransferRoute, hour: int) -> float:
+        """Get surcharge percentage for the given hour."""
+        if 7 <= hour <= 9 or 17 <= hour <= 19:
+            return float(route.peak_hour_surcharge or 0)
+        elif 22 <= hour <= 23 or 0 <= hour <= 6:
+            return float(route.midnight_surcharge or 0)
+        else:
+            return 0.0
 
 
 class TransferBookingService:

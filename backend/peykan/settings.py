@@ -167,9 +167,9 @@ AUTH_USER_MODEL = 'users.User'
 SITE_ID = 1
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,https://peykantravelistanbul.com,https://www.peykantravelistanbul.com', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001,https://peykantravelistanbul.com,https://www.peykantravelistanbul.com', cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)  # Secure by default
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)  # Temporary for testing
 CORS_ALLOWED_HEADERS = [
     'accept',
     'accept-encoding',

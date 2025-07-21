@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useCurrency } from '@/lib/stores/currencyStore';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -61,6 +62,7 @@ export default function EventDetailPage() {
   const { slug } = useParams();
   const { user } = useAuth();
   const { refreshCart } = useCart();
+  const { currentCurrency } = useCurrency();
   const t = useTranslations('eventDetail');
   const router = useRouter();
   
@@ -170,7 +172,7 @@ export default function EventDetailPage() {
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency || 'USD'
+      currency: currency || currentCurrency
     }).format(price);
   };
 
@@ -655,7 +657,7 @@ export default function EventDetailPage() {
                         {selectedOptions.map(opt => (
                           <li key={opt.id} className="flex justify-between text-gray-700 dark:text-gray-300">
                             <span>{opt.name} ({opt.quantity}x)</span>
-                            <span>{formatPrice(Number(opt.price) * Number(opt.quantity), opt.currency || 'USD')}</span>
+                            <span>{formatPrice(Number(opt.price) * Number(opt.quantity), opt.currency || currentCurrency)}</span>
                           </li>
                         ))}
                       </ul>
@@ -667,7 +669,7 @@ export default function EventDetailPage() {
                     <span>{formatPrice(
                       selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0) +
                       selectedOptions.reduce((sum, opt) => sum + Number(opt.price) * Number(opt.quantity), 0),
-                      'USD')}
+                      currentCurrency)}
                     </span>
                   </div>
                 </div>

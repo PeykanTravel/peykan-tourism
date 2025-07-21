@@ -164,13 +164,13 @@ export default function SeatMap({
     const isHovered = hoveredSection?.id === section.id;
     const occupancyRate = ((section.total_capacity - section.available_capacity) / section.total_capacity) * 100;
     
-    let colorClass = 'bg-green-100 border-green-300 text-green-800'; // Default: available
-    if (occupancyRate > 80) colorClass = 'bg-red-100 border-red-300 text-red-800';
-    else if (occupancyRate > 50) colorClass = 'bg-yellow-100 border-yellow-300 text-yellow-800';
+    let colorClass = 'bg-green-100 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'; // Default: available
+    if (occupancyRate > 80) colorClass = 'bg-red-100 dark:bg-red-900/20 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200';
+    else if (occupancyRate > 50) colorClass = 'bg-yellow-100 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200';
     
     return `relative p-4 rounded-lg border-2 cursor-pointer transition-all ${
       isSelected 
-        ? 'border-blue-500 bg-blue-50 shadow-lg' 
+        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg' 
         : isHovered 
           ? `${colorClass} shadow-md scale-105` 
           : `${colorClass} hover:shadow-md`
@@ -189,28 +189,28 @@ export default function SeatMap({
   }, []);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               {t('seatSelection')}
             </h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               {selectedSeats.length} / {maxSelectableSeats} {t('seatsSelected')}
             </p>
           </div>
           
           <div className="flex items-center space-x-2">
             {/* View Mode Toggle */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex bg-gray-100 dark:bg-gray-600 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('sections')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   viewMode === 'sections'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-500 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
                 }`}
               >
                 {t('sections')}
@@ -220,8 +220,8 @@ export default function SeatMap({
                 disabled={!selectedSection}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                   viewMode === 'seats'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900 disabled:opacity-50'
+                    ? 'bg-white dark:bg-gray-500 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 disabled:opacity-50'
                 }`}
               >
                 {t('seats')}
@@ -229,10 +229,10 @@ export default function SeatMap({
             </div>
             
             {/* Controls */}
-            <div className="flex items-center space-x-1 border-l pl-2">
+            <div className="flex items-center space-x-1 border-l border-gray-200 dark:border-gray-600 pl-2">
               <button
                 onClick={() => handleZoom('out')}
-                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+                className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
                 disabled={zoomLevel <= 0.5}
               >
                 <ZoomOut className="h-4 w-4" />
@@ -240,14 +240,14 @@ export default function SeatMap({
               
               <button
                 onClick={() => handleZoom('reset')}
-                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+                className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
               >
                 <RotateCcw className="h-4 w-4" />
               </button>
               
               <button
                 onClick={() => handleZoom('in')}
-                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+                className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
                 disabled={zoomLevel >= 2}
               >
                 <ZoomIn className="h-4 w-4" />
@@ -255,7 +255,7 @@ export default function SeatMap({
               
               <button
                 onClick={() => setShowLegend(!showLegend)}
-                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+                className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
               >
                 {showLegend ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -292,11 +292,11 @@ export default function SeatMap({
                     onMouseLeave={() => setHoveredSection(null)}
                   >
                     <div className="text-center">
-                      <h4 className="font-bold text-lg mb-1">{section.name}</h4>
-                      <div className="text-sm opacity-90 mb-2">
+                      <h4 className="font-bold text-lg mb-1 dark:text-white">{section.name}</h4>
+                      <div className="text-sm opacity-90 mb-2 dark:text-gray-300">
                         {section.available_capacity} / {section.total_capacity}
                       </div>
-                      <div className="text-xs opacity-75 mb-2">
+                      <div className="text-xs opacity-75 mb-2 dark:text-gray-400">
                         {formatPrice(section.base_price, section.currency)}
                       </div>
                       

@@ -72,24 +72,24 @@ export default function PricingBreakdown({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="animate-pulse">
           <div className="flex items-center justify-between mb-4">
-            <div className="h-5 bg-gray-200 rounded w-32"></div>
-            <div className="h-5 bg-gray-200 rounded w-20"></div>
+            <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-32"></div>
+            <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-20"></div>
           </div>
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex justify-between">
-                <div className="h-4 bg-gray-200 rounded w-24"></div>
-                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-16"></div>
               </div>
             ))}
           </div>
-          <div className="border-t pt-4 mt-4">
+          <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4">
             <div className="flex justify-between">
-              <div className="h-6 bg-gray-200 rounded w-20"></div>
-              <div className="h-6 bg-gray-200 rounded w-24"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-20"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded w-24"></div>
             </div>
           </div>
         </div>
@@ -99,28 +99,28 @@ export default function PricingBreakdown({
 
   if (!breakdown) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-        <Calculator className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noPricingData')}</h3>
-        <p className="text-gray-600">{t('selectSeatsForPricing')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
+        <Calculator className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('noPricingData')}</h3>
+        <p className="text-gray-600 dark:text-gray-300">{t('selectSeatsForPricing')}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Receipt className="h-5 w-5 text-gray-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">{t('pricingBreakdown')}</h3>
+            <Receipt className="h-5 w-5 text-gray-600 dark:text-gray-400 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('pricingBreakdown')}</h3>
           </div>
           
           {onToggleDetails && (
             <button
               onClick={onToggleDetails}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
             >
               {showDetails ? t('hideDetails') : t('showDetails')}
             </button>
@@ -133,14 +133,14 @@ export default function PricingBreakdown({
         <div className="space-y-3 mb-4">
           <div className="flex justify-between items-center">
             <div>
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-gray-900 dark:text-white">
                 {t('basePrice')} ({breakdown.quantity} {breakdown.quantity === 1 ? t('ticket') : t('tickets')})
               </span>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {formatPrice(breakdown.base_price, 'USD')} × {breakdown.quantity}
               </div>
             </div>
-            <span className="font-semibold text-gray-900">
+            <span className="font-semibold text-gray-900 dark:text-white">
               {formatPrice(breakdown.subtotal, 'USD')}
             </span>
           </div>
@@ -148,23 +148,23 @@ export default function PricingBreakdown({
 
         {/* Options */}
         {breakdown.options.length > 0 && (
-          <div className="border-t pt-4 mb-4">
+          <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mb-4">
             <button
               onClick={() => toggleSection('options')}
               className="flex items-center justify-between w-full text-left"
             >
               <div className="flex items-center">
-                <span className="font-medium text-gray-900">{t('addOns')}</span>
-                <span className="ml-2 text-sm text-gray-600">
+                <span className="font-medium text-gray-900 dark:text-white">{t('addOns')}</span>
+                <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
                   ({breakdown.options.length} {breakdown.options.length === 1 ? t('item') : t('items')})
                 </span>
               </div>
               <div className="flex items-center">
-                <span className="font-medium text-gray-900 mr-2">
+                <span className="font-medium text-gray-900 dark:text-white mr-2">
                   {formatPrice(breakdown.options_total, 'USD')}
                 </span>
                 <TrendingDown 
-                  className={`h-4 w-4 text-gray-400 transition-transform ${
+                  className={`h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform ${
                     expandedSections.options ? 'rotate-180' : ''
                   }`}
                 />
@@ -176,12 +176,12 @@ export default function PricingBreakdown({
                 {breakdown.options.map((option, index) => (
                   <div key={index} className="flex justify-between items-center text-sm">
                     <div>
-                      <span className="text-gray-900">{option.name}</span>
-                      <span className="text-gray-600 ml-2">
+                      <span className="text-gray-900 dark:text-white">{option.name}</span>
+                      <span className="text-gray-600 dark:text-gray-300 ml-2">
                         ({formatPrice(option.price, 'USD')} × {option.quantity})
                       </span>
                     </div>
-                    <span className="text-gray-900">
+                    <span className="text-gray-900 dark:text-white">
                       {formatPrice(option.total, 'USD')}
                     </span>
                   </div>

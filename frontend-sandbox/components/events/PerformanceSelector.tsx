@@ -36,10 +36,10 @@ export default function PerformanceSelector({
 
   const getStatusColor = useCallback((status: string) => {
     switch (status) {
-      case 'sold_out': return 'bg-red-100 text-red-800 border-red-200';
-      case 'few_left': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'filling_up': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-green-100 text-green-800 border-green-200';
+      case 'sold_out': return 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200 border-red-200 dark:border-red-800';
+      case 'few_left': return 'bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-800';
+      case 'filling_up': return 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-800';
+      default: return 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800';
     }
   }, []);
 
@@ -77,36 +77,36 @@ export default function PerformanceSelector({
 
   if (performances.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-        <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noPerformancesAvailable')}</h3>
-        <p className="text-gray-600">{t('checkBackLater')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+        <Calendar className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('noPerformancesAvailable')}</h3>
+        <p className="text-gray-600 dark:text-gray-300">{t('checkBackLater')}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {t('selectPerformance')}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {performances.length} {t('performancesAvailable')}
             </p>
           </div>
           
           {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setViewMode('list')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
               }`}
             >
               {t('listView')}
@@ -115,8 +115,8 @@ export default function PerformanceSelector({
               onClick={() => setViewMode('calendar')}
               className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'calendar'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
               }`}
             >
               {t('calendarView')}
@@ -141,37 +141,37 @@ export default function PerformanceSelector({
                   key={performance.id}
                   className={`border rounded-lg p-4 cursor-pointer transition-all ${
                     isSelected 
-                      ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' 
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-200 dark:ring-blue-800' 
                       : isSelectable 
-                        ? 'border-gray-200 hover:border-gray-300 hover:shadow-md' 
-                        : 'border-gray-200 opacity-60 cursor-not-allowed'
+                        ? 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md' 
+                        : 'border-gray-200 dark:border-gray-700 opacity-60 cursor-not-allowed'
                   }`}
                   onClick={() => isSelectable && onPerformanceSelect(performance)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-4 mb-3">
-                        <div className="flex items-center text-gray-900">
+                        <div className="flex items-center text-gray-900 dark:text-white">
                           <Calendar className="h-5 w-5 mr-2" />
                           <span className="font-medium">
                             {formatDate(performance.date)}
                           </span>
                         </div>
                         
-                        <div className="flex items-center text-gray-600">
+                        <div className="flex items-center text-gray-600 dark:text-gray-300">
                           <Clock className="h-4 w-4 mr-1" />
                           <span>{formatTime(performance.start_time)}</span>
                         </div>
 
                         {performance.is_special && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-200">
                             <Star className="h-3 w-3 mr-1" />
                             {t('specialPerformance')}
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center space-x-6 text-sm text-gray-600">
+                      <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center">
                           <Users className="h-4 w-4 mr-1" />
                           <span>
@@ -187,22 +187,22 @@ export default function PerformanceSelector({
                     </div>
 
                     <div className="text-right ml-4">
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
                         {formatPrice(minPrice, 'USD')}
                       </div>
-                      <div className="text-sm text-gray-500">{t('fromPrice')}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{t('fromPrice')}</div>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
                   <div className="mt-3">
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                       <span>{t('capacity')}</span>
                       <span>
                         {((performance.max_capacity - performance.available_capacity) / performance.max_capacity * 100).toFixed(0)}% {t('sold')}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all ${
                           status === 'sold_out' ? 'bg-red-500' :
@@ -223,9 +223,9 @@ export default function PerformanceSelector({
           /* Calendar View */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(performancesByDate).map(([date, dayPerformances]) => (
-              <div key={date} className="border rounded-lg overflow-hidden">
-                <div className="bg-gray-50 px-4 py-3 border-b">
-                  <h3 className="font-medium text-gray-900">
+              <div key={date} className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 border-b border-gray-200 dark:border-gray-600">
+                  <h3 className="font-medium text-gray-900 dark:text-white">
                     {formatDate(date)}
                   </h3>
                 </div>
@@ -243,15 +243,15 @@ export default function PerformanceSelector({
                         key={performance.id}
                         className={`p-3 rounded-lg border cursor-pointer transition-all ${
                           isSelected 
-                            ? 'border-blue-500 bg-blue-50' 
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
                             : isSelectable 
-                              ? 'border-gray-200 hover:border-gray-300' 
-                              : 'border-gray-200 opacity-60 cursor-not-allowed'
+                              ? 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500' 
+                              : 'border-gray-200 dark:border-gray-600 opacity-60 cursor-not-allowed'
                         }`}
                         onClick={() => isSelectable && onPerformanceSelect(performance)}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center text-sm font-medium text-gray-900">
+                          <div className="flex items-center text-sm font-medium text-gray-900 dark:text-white">
                             <Clock className="h-4 w-4 mr-1" />
                             {formatTime(performance.start_time)}
                           </div>
@@ -261,7 +261,7 @@ export default function PerformanceSelector({
                           )}
                         </div>
                         
-                        <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+                        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 mb-2">
                           <span>{performance.available_capacity} {t('available')}</span>
                           <span className="font-medium">{formatPrice(minPrice, 'USD')}</span>
                         </div>

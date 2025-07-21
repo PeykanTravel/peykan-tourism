@@ -42,7 +42,7 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
   // Don't render until client-side to prevent hydration mismatch
   if (!isClient) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => (
             <div key={step.key} className="flex items-center">
@@ -50,8 +50,8 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
                 <span className="text-sm font-medium">{index + 1}</span>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-gray-900">{step.title}</h3>
-                <p className="text-xs text-gray-600">{step.description}</p>
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white">{step.title}</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-300">{step.description}</p>
               </div>
               {index < steps.length - 1 && (
                 <div className="flex-1 h-0.5 mx-4 bg-gray-200" />
@@ -64,7 +64,7 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between">
         {steps.map((step, index) => {
           const status = getStepStatus(step);
@@ -96,7 +96,7 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
                     : isCurrent
                     ? 'bg-blue-500 text-white'
                     : canClick
-                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    ? 'bg-gray-200 text-gray-600 dark:text-gray-300 hover:bg-gray-300'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }
                 `}
@@ -117,7 +117,7 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
                     : isCurrent
                     ? 'text-blue-600'
                     : canClick
-                    ? 'text-gray-900'
+                    ? 'text-gray-900 dark:text-white'
                     : 'text-gray-400'
                   }
                 `}>
@@ -130,7 +130,7 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
                     : isCurrent
                     ? 'text-blue-500'
                     : canClick
-                    ? 'text-gray-600'
+                    ? 'text-gray-600 dark:text-gray-300'
                     : 'text-gray-400'
                   }
                 `}>
@@ -142,7 +142,7 @@ export default function BookingSteps({ steps, currentStep, onStepClick, isStepVa
               {index < steps.length - 1 && (
                 <div className={`
                   flex-1 h-0.5 mx-4
-                  ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
+                  ${isCompleted ? 'bg-green-50 dark:bg-green-900/200' : 'bg-gray-200'}
                 `} />
               )}
             </div>

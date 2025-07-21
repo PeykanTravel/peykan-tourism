@@ -446,7 +446,7 @@ export default function TourDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -455,11 +455,11 @@ export default function TourDetailPage() {
   // Error state
   if (error || !tour) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="text-center py-16">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('tourNotFound')}</h1>
-            <p className="text-gray-600 mb-8">{error || t('tourNotFoundMessage')}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{t('tourNotFound')}</h1>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">{error || t('tourNotFoundMessage')}</p>
             <div className="space-x-4">
               <Link
                 href={`/${locale}/tours`}
@@ -481,7 +481,7 @@ export default function TourDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <div className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -511,8 +511,8 @@ export default function TourDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Navigation Tabs */}
-            <div className="bg-white rounded-lg shadow-sm">
-              <div className="border-b border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <div className="border-b border-gray-200 dark:border-gray-700">
                 <nav className="flex space-x-8 px-6">
                   {[
                     { id: 'overview', label: t('overview'), icon: Info },
@@ -525,8 +525,8 @@ export default function TourDetailPage() {
                       onClick={() => setActiveTab(id as any)}
                       className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
                         activeTab === id
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       <Icon className="w-4 h-4 mr-2" />
@@ -542,46 +542,46 @@ export default function TourDetailPage() {
                   <div className="space-y-6">
                     {/* Tour Info */}
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('information')}</h2>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('information')}</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex items-center">
                           <Calendar className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('type')}: {tour.tour_type === 'day' ? t('dayTour') : t('nightTour')}</span>
+                          <span className="text-gray-600 dark:text-gray-300">{t('type')}: {tour.tour_type === 'day' ? t('dayTour') : t('nightTour')}</span>
                         </div>
                         <div className="flex items-center">
                           <Bus className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('transport')}: {tour.transport_type === 'boat' ? t('boat') : tour.transport_type === 'air' ? t('air') : t('land')}</span>
+                          <span className="text-gray-600 dark:text-gray-300">{t('transport')}: {tour.transport_type === 'boat' ? t('boat') : tour.transport_type === 'air' ? t('air') : t('land')}</span>
                         </div>
                         <div className="flex items-center">
                           <Clock className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('duration')}: {tour.duration_hours} {t('hours')}</span>
+                          <span className="text-gray-600 dark:text-gray-300">{t('duration')}: {tour.duration_hours} {t('hours')}</span>
                         </div>
                         <div className="flex items-center">
                           <Users className="w-5 h-5 text-gray-400 mr-3" />
-                          <span className="text-gray-600">{t('capacity')}: {tour.min_participants}-{tour.max_participants} {t('people')}</span>
+                          <span className="text-gray-600 dark:text-gray-300">{t('capacity')}: {tour.min_participants}-{tour.max_participants} {t('people')}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Description */}
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('description')}</h3>
-                      <p className="text-gray-700 leading-relaxed">{tour.description}</p>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{t('description')}</h3>
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{tour.description}</p>
                     </div>
 
                     {/* Highlights */}
                     {tour.highlights && (
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('highlights')}</h3>
-                        <div className="bg-blue-50 rounded-lg p-4">
-                          <p className="text-blue-800">{tour.highlights}</p>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{t('highlights')}</h3>
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                          <p className="text-blue-800 dark:text-blue-200">{tour.highlights}</p>
                         </div>
                       </div>
                     )}
 
                     {/* Included Services */}
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('includedServices')}</h3>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{t('includedServices')}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {tour.includes_transfer && (
                           <div className="flex items-center">
@@ -613,18 +613,18 @@ export default function TourDetailPage() {
                     {/* Rules and Required Items */}
                     {tour.rules && (
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('rulesAndRegulations')}</h3>
-                        <div className="bg-yellow-50 rounded-lg p-4">
-                          <p className="text-yellow-800">{tour.rules}</p>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{t('rulesAndRegulations')}</h3>
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+                          <p className="text-yellow-800 dark:text-yellow-200">{tour.rules}</p>
                         </div>
                       </div>
                     )}
 
                     {tour.required_items && (
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('requiredItems')}</h3>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="text-gray-700">{tour.required_items}</p>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{t('requiredItems')}</h3>
+                        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                          <p className="text-gray-700 dark:text-gray-300">{tour.required_items}</p>
                         </div>
                       </div>
                     )}
@@ -634,20 +634,20 @@ export default function TourDetailPage() {
                 {/* Itinerary Tab */}
                 {activeTab === 'itinerary' && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('tourItinerary')}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('tourItinerary')}</h2>
                     {tour.itinerary && tour.itinerary.length > 0 ? (
                       tour.itinerary.map((item, index) => (
-                        <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={item.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center mb-2">
                                 <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
                                   {index + 1}
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{item.title}</h3>
                               </div>
-                              <p className="text-gray-600 mb-2">{item.description}</p>
-                              <div className="flex items-center text-sm text-gray-500">
+                              <p className="text-gray-600 dark:text-gray-300 mb-2">{item.description}</p>
+                              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                                 <MapPin className="w-4 h-4 mr-1" />
                                 <span>{item.location}</span>
                                 <span className="mx-2">•</span>
@@ -668,7 +668,7 @@ export default function TourDetailPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">{t('noItineraryAvailable')}</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('noItineraryAvailable')}</p>
                     )}
                   </div>
                 )}
@@ -677,21 +677,21 @@ export default function TourDetailPage() {
                 {activeTab === 'reviews' && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-bold text-gray-900">{t('reviewsAndRatings')}</h2>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('reviewsAndRatings')}</h2>
                       <div className="flex items-center">
                         <Star className="w-5 h-5 text-yellow-400 mr-1" />
                         <span className="font-semibold">{tour.average_rating?.toFixed(1) || 'N/A'}</span>
-                        <span className="text-gray-500 ml-1">({tour.review_count || 0} {t('reviews')})</span>
+                        <span className="text-gray-500 dark:text-gray-400 ml-1">({tour.review_count || 0} {t('reviews')})</span>
                       </div>
                     </div>
                     
                     {tour.reviews && tour.reviews.length > 0 ? (
                       tour.reviews.map((review) => (
-                        <div key={review.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={review.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <h3 className="font-semibold text-gray-900">{review.title}</h3>
-                              <p className="text-sm text-gray-500">{review.user_name}</p>
+                              <h3 className="font-semibold text-gray-900 dark:text-white">{review.title}</h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{review.user_name}</p>
                             </div>
                             <div className="flex items-center">
                               {[...Array(5)].map((_, i) => (
@@ -702,8 +702,8 @@ export default function TourDetailPage() {
                               ))}
                             </div>
                           </div>
-                          <p className="text-gray-700">{review.comment}</p>
-                          <div className="flex items-center mt-2 text-sm text-gray-500">
+                          <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
+                          <div className="flex items-center mt-2 text-sm text-gray-500 dark:text-gray-400">
                             <span>{new Date(review.created_at).toLocaleDateString()}</span>
                             {review.is_verified && (
                               <>
@@ -716,7 +716,7 @@ export default function TourDetailPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">{t('noReviewsAvailable')}</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('noReviewsAvailable')}</p>
                     )}
                   </div>
                 )}
@@ -724,12 +724,12 @@ export default function TourDetailPage() {
                 {/* Pricing Tab */}
                 {activeTab === 'pricing' && (
                   <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900">{t('pricing')} {t('information')}</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('pricing')} {t('information')}</h2>
                     
                     {/* Variants */}
                     {tour.variants && tour.variants.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('tourVariants')}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('tourVariants')}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {tour.variants.map((variant) => (
                             <div 
@@ -737,35 +737,35 @@ export default function TourDetailPage() {
                               className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                                 selectedVariant?.id === variant.id
                                   ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300'
+                                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:border-gray-600'
                               }`}
                               onClick={() => setSelectedVariant(variant)}
                             >
-                              <h4 className="font-semibold text-gray-900 mb-2">{variant.name}</h4>
-                              <p className="text-sm text-gray-600 mb-3">{variant.description}</p>
+                              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{variant.name}</h4>
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{variant.description}</p>
                               
                               {/* Services included */}
                               <div className="space-y-1 mb-3">
                                 {variant.includes_transfer && (
-                                  <div className="flex items-center text-xs text-gray-600">
+                                  <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <CheckCircle className="w-3 h-3 mr-1" />
                                     {t('transfer')}
                                   </div>
                                 )}
                                 {variant.includes_guide && (
-                                  <div className="flex items-center text-xs text-gray-600">
+                                  <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <CheckCircle className="w-3 h-3 mr-1" />
                                     {t('guide')}
                                   </div>
                                 )}
                                 {variant.includes_meal && (
-                                  <div className="flex items-center text-xs text-gray-600">
+                                  <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <CheckCircle className="w-3 h-3 mr-1" />
                                     {t('meal')}
                                   </div>
                                 )}
                                 {variant.includes_photographer && (
-                                  <div className="flex items-center text-xs text-gray-600">
+                                  <div className="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <CheckCircle className="w-3 h-3 mr-1" />
                                     {t('photographer')}
                                   </div>
@@ -776,7 +776,7 @@ export default function TourDetailPage() {
                               <div className="space-y-1">
                                 {variant.pricing.map((price) => (
                                   <div key={price.id} className="flex justify-between text-sm">
-                                    <span className="text-gray-600">{price.age_group_display}:</span>
+                                    <span className="text-gray-600 dark:text-gray-300">{price.age_group_display}:</span>
                                     <span className="font-semibold">
                                       {price.is_free && !price.requires_services ? t('free') : `$${price.factor}`}
                                     </span>
@@ -791,12 +791,12 @@ export default function TourDetailPage() {
 
                     {/* Cancellation Policy */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('cancellationPolicy')}</h3>
-                      <div className="bg-red-50 rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('cancellationPolicy')}</h3>
+                      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
                         <div className="flex items-start">
                           <AlertCircle className="w-5 h-5 text-red-500 mr-2 mt-0.5" />
                           <div>
-                            <p className="text-red-800 font-medium mb-1">{t('cancellationPolicyText')}</p>
+                            <p className="text-red-800 dark:text-red-200 font-medium mb-1">{t('cancellationPolicyText')}</p>
                             <p className="text-red-700 text-sm">
                               {tour.cancellation_hours} {t('hoursBeforeTour')}: {tour.refund_percentage}% {t('refund')}
                             </p>
@@ -815,15 +815,15 @@ export default function TourDetailPage() {
 
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('bookThisTour')}</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 sticky top-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('bookThisTour')}</h2>
 
               {/* Booking Error Message */}
               {bookingError && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-lg">
                   <div className="flex items-center">
                     <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-                    <div className="text-sm text-red-800">
+                    <div className="text-sm text-red-800 dark:text-red-200">
                       <strong>⚠️ {t('bookingNotAvailable')}</strong>
                       <p className="mt-1">{bookingError}</p>
                     </div>
@@ -833,7 +833,7 @@ export default function TourDetailPage() {
 
               {/* Schedule Selection */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('selectDate')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('selectDate')}</h3>
                 {tour.schedules && tour.schedules.length > 0 ? (
                   <div className="space-y-2">
                     {tour.schedules
@@ -845,10 +845,10 @@ export default function TourDetailPage() {
                           className={`w-full text-left p-3 rounded-lg border transition-colors ${
                             selectedSchedule?.id === schedule.id
                               ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:border-gray-600'
                           }`}
                         >
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium text-gray-900 dark:text-white">
                             {new Date(schedule.start_date).toLocaleDateString('en-US', {
                               weekday: 'long',
                               year: 'numeric',
@@ -856,24 +856,24 @@ export default function TourDetailPage() {
                               day: 'numeric'
                             })}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 dark:text-gray-300">
                             {schedule.start_time} - {schedule.end_time}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {t('availableSpots')}: {schedule.available_capacity} {t('spots')}
                           </div>
                         </button>
                       ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm">{t('noAvailableDates')}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">{t('noAvailableDates')}</p>
                 )}
               </div>
 
               {/* Variant Selection */}
               {selectedSchedule && tour.variants && tour.variants.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('selectPackage')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('selectPackage')}</h3>
                   <div className="space-y-2">
                     {tour.variants.map((variant) => (
                       <button
@@ -882,11 +882,11 @@ export default function TourDetailPage() {
                         className={`w-full text-left p-3 rounded-lg border transition-colors ${
                           selectedVariant?.id === variant.id
                             ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-gray-300'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:border-gray-600'
                         }`}
                       >
-                        <div className="font-medium text-gray-900">{variant.name}</div>
-                        <div className="text-sm text-gray-600">{variant.description}</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{variant.name}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-300">{variant.description}</div>
                       </button>
                     ))}
                   </div>
@@ -896,7 +896,7 @@ export default function TourDetailPage() {
               {/* Participant Selection */}
               {selectedVariant && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('participants')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('participants')}</h3>
                   <div className="space-y-3">
                     {[
                       { key: 'adult', label: t('adults'), icon: User },
@@ -906,7 +906,7 @@ export default function TourDetailPage() {
                       <div key={key} className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Icon className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-700">{label}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <button
@@ -914,7 +914,7 @@ export default function TourDetailPage() {
                               ...prev,
                               [key]: Math.max(0, prev[key as keyof typeof prev] - 1)
                             }))}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 dark:bg-gray-900"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
@@ -924,7 +924,7 @@ export default function TourDetailPage() {
                               ...prev,
                               [key]: prev[key as keyof typeof prev] + 1
                             }))}
-                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 dark:bg-gray-900"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
@@ -938,13 +938,13 @@ export default function TourDetailPage() {
               {/* Options Selection */}
               {tour.options && tour.options.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('additionalOptions')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('additionalOptions')}</h3>
                   <div className="space-y-2">
                     {tour.options.map((option) => (
-                      <div key={option.id} className="flex items-center justify-between p-2 border border-gray-200 rounded">
+                      <div key={option.id} className="flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded">
                         <div className="flex-1">
                           <div className="font-medium text-sm">{option.name}</div>
-                          <div className="text-xs text-gray-600">
+                          <div className="text-xs text-gray-600 dark:text-gray-300">
                             <PriceDisplay 
                               amount={option.price} 
                               currency={option.currency || tour.currency} 
@@ -957,7 +957,7 @@ export default function TourDetailPage() {
                               ...prev,
                               [option.id]: Math.max(0, (prev[option.id] || 0) - 1)
                             }))}
-                            className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 dark:bg-gray-900"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
@@ -967,7 +967,7 @@ export default function TourDetailPage() {
                               ...prev,
                               [option.id]: (prev[option.id] || 0) + 1
                             }))}
-                            className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 dark:bg-gray-900"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -980,12 +980,12 @@ export default function TourDetailPage() {
 
               {/* Special Requests */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('specialRequests')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('specialRequests')}</h3>
                 <textarea
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder={t('specialRequestsPlaceholder')}
-                  className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none"
                   rows={3}
                 />
               </div>
@@ -993,14 +993,14 @@ export default function TourDetailPage() {
               {/* Pricing Summary */}
               {pricing && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('priceSummary')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('priceSummary')}</h3>
                   
                   {/* Pricing Error */}
                   {pricing.hasPricingError && (
-                    <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 rounded-lg">
                       <div className="flex items-center">
                         <AlertCircle className="w-4 h-4 text-yellow-600 mr-2" />
-                        <span className="text-sm text-yellow-800">{pricing.pricingError}</span>
+                        <span className="text-sm text-yellow-800 dark:text-yellow-200">{pricing.pricingError}</span>
                       </div>
                     </div>
                   )}
@@ -1036,7 +1036,7 @@ export default function TourDetailPage() {
                       <div className="flex justify-between">
                         <span className="flex items-center">
                           {t('infants')} ({participants.infant})
-                          <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                          <span className="ml-2 text-xs bg-green-100 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
                             {t('free')}
                           </span>
                         </span>
@@ -1093,8 +1093,8 @@ export default function TourDetailPage() {
               {bookingMessage && (
                 <div className={`mt-3 p-3 rounded-lg text-sm ${
                   bookingMessage.includes('successfully')
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 text-green-800 dark:text-green-200'
+                    : 'bg-red-100 text-red-800 dark:text-red-200'
                 }`}>
                   {bookingMessage}
                 </div>
@@ -1102,8 +1102,8 @@ export default function TourDetailPage() {
 
               {/* Guest Info */}
               {!isAuthenticated && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
+                <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
                     <strong>{t('guestUser')}:</strong> {t('guestUserMessage')} 
                     <Link href={`/${locale}/login`} className="text-blue-600 hover:underline ml-1">
                       {t('loginToSync')}

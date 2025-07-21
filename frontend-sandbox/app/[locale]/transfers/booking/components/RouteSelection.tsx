@@ -68,7 +68,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
     
     if (route.is_popular) {
       badges.push(
-        <span key="popular" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+        <span key="popular" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-200">
           <Star className="w-3 h-3 mr-1" />
           {t('popularBadge')}
         </span>
@@ -77,7 +77,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
     
     if (route.round_trip_discount_enabled) {
       badges.push(
-        <span key="discount" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span key="discount" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:text-green-200">
           <Percent className="w-3 h-3 mr-1" />
           {t('discountBadge')}
         </span>
@@ -132,10 +132,10 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('loading')}</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">{t('loading')}</p>
         </div>
       </div>
     );
@@ -143,13 +143,13 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
         <div className="text-center">
           <div className="text-red-500 text-lg mb-4">⚠️</div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {t('errorLoadingRoutes')}
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
             {error.message || t('errorLoadingRoutes')}
           </p>
           <button
@@ -166,17 +166,17 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           {t('selectRouteAndVehicle')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           {t('step1')}
         </p>
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {/* Search */}
           <div className="relative">
@@ -186,7 +186,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
               placeholder={t('searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -194,7 +194,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
           <select
             value={selectedOrigin}
             onChange={(e) => setSelectedOrigin(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">{t('allOrigins')}</option>
             {availableOrigins.map((origin: string) => (
@@ -206,7 +206,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
           <select
             value={selectedDestination}
             onChange={(e) => setSelectedDestination(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">{t('allDestinations')}</option>
             {availableDestinations.map((destination: string) => (
@@ -222,25 +222,25 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
             setSelectedOrigin('');
             setSelectedDestination('');
           }}
-          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 bg-gray-100 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
         >
           {t('clearFilters')}
         </button>
       </div>
 
       {/* Routes List */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('availableRoutes')} ({routes.length})
         </h3>
 
         {routes.length === 0 ? (
           <div className="text-center py-8">
             <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('noRoutesFound')}
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {t('noRoutesFoundDescription')}
             </p>
           </div>
@@ -254,14 +254,14 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
                   p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
                   ${route_data?.id === route.id
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 dark:bg-gray-900'
                   }
                 `}
               >
                 {/* Route Info */}
                 <div className="mb-3">
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-gray-900">
+                    <h4 className="font-medium text-gray-900 dark:text-white">
                       {route.name || `${route.origin} → ${route.destination}`}
                     </h4>
                     <div className="flex gap-1">
@@ -269,7 +269,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2">
                     <MapPin className="w-4 h-4" />
                     <span>{route.origin}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -277,7 +277,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
                   </div>
                   
                   {route.description && (
-                    <p className="text-sm text-gray-500 mb-3">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                       {route.description}
                     </p>
                   )}
@@ -289,7 +289,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
                 </div>
 
                 {/* Vehicle Types Available */}
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-3">
                   <Car className="w-4 h-4" />
                   <span>{route.pricing.length} {t('vehicleTypes')} {t('available')}</span>
                 </div>
@@ -318,7 +318,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
       </div>
 
       {/* Navigation */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex justify-end">
           <button
             onClick={handleNext}
@@ -327,7 +327,7 @@ export default function RouteSelection({ onNext }: RouteSelectionProps) {
               px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2
               ${isValid
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-300 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }
             `}
           >

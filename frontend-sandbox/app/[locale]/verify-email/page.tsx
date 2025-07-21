@@ -127,16 +127,16 @@ export default function VerifyEmailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
               <Mail className="w-8 h-8 text-blue-600" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {t('verifyEmail')}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {t('enterVerificationCode')}
             </p>
           </div>
@@ -145,8 +145,8 @@ export default function VerifyEmailPage() {
           {message && (
             <div className={`mb-6 p-4 rounded-lg flex items-center space-x-3 ${
               messageType === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-red-50 text-red-800 border border-red-200'
+                ? 'bg-green-50 dark:bg-green-900/20 text-green-800 border border-green-200' 
+                : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200'
             }`}>
               {messageType === 'success' ? (
                 <CheckCircle className="w-5 h-5 text-green-600" />
@@ -161,7 +161,7 @@ export default function VerifyEmailPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Display */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('email')}
               </label>
               <div className="relative">
@@ -169,7 +169,7 @@ export default function VerifyEmailPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={t('enterEmail')}
                   required
                 />
@@ -179,7 +179,7 @@ export default function VerifyEmailPage() {
 
             {/* OTP Code */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('verificationCode')}
               </label>
               <div className="relative">
@@ -187,13 +187,13 @@ export default function VerifyEmailPage() {
                   type="text"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-mono tracking-widest"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-mono tracking-widest"
                   placeholder="000000"
                   maxLength={6}
                   required
                 />
               </div>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 {t('enter6DigitCode')}
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function VerifyEmailPage() {
 
           {/* Resend OTP */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
               {t('didntReceiveCode')}
             </p>
             <button
@@ -242,7 +242,7 @@ export default function VerifyEmailPage() {
           <div className="mt-8 text-center">
             <Link
               href="/login"
-              className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-800 transition-colors duration-200"
             >
               {t('backToLogin')}
             </Link>

@@ -292,25 +292,25 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-4xl mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('title')}</h1>
-            <p className="text-gray-600">{t('subtitle')}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('title')}</h1>
+            <p className="text-gray-600 dark:text-gray-300">{t('subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Sidebar Navigation */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <div className="space-y-2">
                   <button 
                     onClick={() => setActiveTab('profile')}
                     className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
                       activeTab === 'profile' 
                         ? 'text-blue-600 bg-blue-50 font-medium' 
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20'
                     }`}
                   >
                     <User className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function ProfilePage() {
                     className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
                       activeTab === 'orders' 
                         ? 'text-blue-600 bg-blue-50 font-medium' 
-                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20'
                     }`}
                   >
                     <Package className="w-4 h-4" />
@@ -329,28 +329,28 @@ export default function ProfilePage() {
                   </button>
                   <button 
                     onClick={() => router.push('/wishlist')}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors"
                   >
                     <Heart className="w-4 h-4" />
                     {t('wishlistTab')}
                   </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors">
                     <CreditCard className="w-4 h-4" />
                     {t('paymentMethods')}
                   </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors">
                     <Bell className="w-4 h-4" />
                     {t('notifications')}
                   </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors">
                     <Shield className="w-4 h-4" />
                     {t('security')}
                   </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded-lg transition-colors">
                     <Globe className="w-4 h-4" />
                     {t('languageRegion')}
                   </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors" onClick={handleLogout}>
+                  <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-red-600 hover:text-red-700 hover:bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors" onClick={handleLogout}>
                     <LogOut className="w-4 h-4" />
                     {t('logout')}
                   </button>
@@ -360,11 +360,11 @@ export default function ProfilePage() {
 
             {/* Main Content */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 {activeTab === 'profile' ? (
                   <>
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-xl font-semibold text-gray-900">{t('personalInfo')}</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('personalInfo')}</h2>
                       {!isEditing ? (
                         <button
                           onClick={() => setIsEditing(true)}
@@ -385,7 +385,7 @@ export default function ProfilePage() {
                           </button>
                           <button
                             onClick={handleCancel}
-                            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:text-gray-300 transition-colors"
                           >
                             <X className="w-4 h-4" />
                             {t('cancel')}
@@ -396,13 +396,13 @@ export default function ProfilePage() {
 
                     {/* Error/Success Messages */}
                     {error && (
-                      <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-lg">
                         <p className="text-red-600 text-sm">{error}</p>
                       </div>
                     )}
 
                     {success && (
-                      <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-lg">
                         <p className="text-green-600 text-sm">{success}</p>
                       </div>
                     )}
@@ -410,7 +410,7 @@ export default function ProfilePage() {
                     {/* Email & Phone verification status */}
                     <div className="flex flex-col gap-2 mb-6">
                       <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-gray-500" />
+                        <Mail className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                         <span className="text-sm">{profileData.email}</span>
                         {user?.is_email_verified ? (
                           <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">{t('verified')}</span>
@@ -419,7 +419,7 @@ export default function ProfilePage() {
                             <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full">{t('notVerified')}</span>
                             <button
                               onClick={handleResendEmailOTP}
-                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800"
+                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800 dark:text-blue-200"
                             >
                               {t('resendVerificationCode')}
                             </button>
@@ -428,7 +428,7 @@ export default function ProfilePage() {
                       </div>
                       {/* بخش شماره تلفن */}
                       <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-gray-500" />
+                        <Phone className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                         {isEditingPhone ? (
                           <>
                             <input
@@ -438,7 +438,7 @@ export default function ProfilePage() {
                               value={profileData.phone_number}
                               onChange={handleInputChange}
                               placeholder={t('phonePlaceholder')}
-                              className="w-40 px-2 py-1 border border-gray-300 rounded-lg text-sm"
+                              className="w-40 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
                               disabled={isRequestingOTP}
                             />
                             <button
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                                 await handleSensitiveFieldChange('phone_number');
                                 setIsEditingPhone(false);
                               }}
-                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800"
+                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800 dark:text-blue-200"
                               disabled={!profileData.phone_number || isRequestingOTP}
                             >
                               {t('saveAndVerifyPhone')}
@@ -457,7 +457,7 @@ export default function ProfilePage() {
                                 setProfileData(prev => ({ ...prev, phone_number: user?.phone_number || '' }));
                                 setIsEditingPhone(false);
                               }}
-                              className="ml-2 text-xs text-gray-500 underline hover:text-gray-700"
+                              className="ml-2 text-xs text-gray-500 underline hover:text-gray-700 dark:text-gray-300"
                             >
                               {t('cancel')}
                             </button>
@@ -472,14 +472,14 @@ export default function ProfilePage() {
                             )}
                             <button
                               onClick={handleResendPhoneOTP}
-                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800"
+                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800 dark:text-blue-200"
                               disabled={isRequestingOTP}
                             >
                               {t('resendVerificationCode')}
                             </button>
                             <button
                               onClick={() => setIsEditingPhone(true)}
-                              className="ml-2 text-xs text-gray-500 underline hover:text-gray-700"
+                              className="ml-2 text-xs text-gray-500 underline hover:text-gray-700 dark:text-gray-300"
                             >
                               {t('editPhone')}
                             </button>
@@ -493,7 +493,7 @@ export default function ProfilePage() {
                               value={profileData.phone_number}
                               onChange={handleInputChange}
                               placeholder={t('phonePlaceholder')}
-                              className="w-40 px-2 py-1 border border-gray-300 rounded-lg text-sm"
+                              className="w-40 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm"
                               disabled={isRequestingOTP}
                             />
                             <button
@@ -501,7 +501,7 @@ export default function ProfilePage() {
                                 if (!profileData.phone_number) return;
                                 await handleSensitiveFieldChange('phone_number');
                               }}
-                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800"
+                              className="ml-2 text-xs text-blue-600 underline hover:text-blue-800 dark:text-blue-200"
                               disabled={!profileData.phone_number || isRequestingOTP}
                             >
                               {t('addAndVerifyPhone')}
@@ -514,7 +514,7 @@ export default function ProfilePage() {
                     {/* Profile Form */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           {t('firstName')}
                         </label>
                         <input
@@ -525,13 +525,13 @@ export default function ProfilePage() {
                           onChange={handleInputChange}
                           disabled={!isEditing}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:bg-gray-900 disabled:text-gray-500 dark:text-gray-400"
                           placeholder={t('firstNamePlaceholder')}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           {t('lastName')}
                         </label>
                         <input
@@ -542,13 +542,13 @@ export default function ProfilePage() {
                           onChange={handleInputChange}
                           disabled={!isEditing}
                           required
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:bg-gray-900 disabled:text-gray-500 dark:text-gray-400"
                           placeholder={t('lastNamePlaceholder')}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           {t('email')}
                         </label>
                         <div className="relative">
@@ -563,14 +563,14 @@ export default function ProfilePage() {
                             onChange={handleInputChange}
                             disabled={!isEditing}
                             required
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:bg-gray-900 disabled:text-gray-500 dark:text-gray-400"
                             placeholder={t('emailPlaceholder')}
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           {t('dateOfBirth')}
                         </label>
                         <div className="relative">
@@ -584,14 +584,14 @@ export default function ProfilePage() {
                             value={profileData.date_of_birth || ''}
                             onChange={handleInputChange}
                             disabled={!isEditing}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:bg-gray-900 disabled:text-gray-500 dark:text-gray-400"
                             placeholder={t('dateOfBirthPlaceholder')}
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           {t('country')}
                         </label>
                         <input
@@ -601,13 +601,13 @@ export default function ProfilePage() {
                           value={profileData.country}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:bg-gray-900 disabled:text-gray-500 dark:text-gray-400"
                           placeholder={t('countryPlaceholder')}
                         />
                       </div>
 
                       <div className="md:col-span-2">
-                        <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           {t('city')}
                         </label>
                         <input
@@ -617,24 +617,24 @@ export default function ProfilePage() {
                           value={profileData.city}
                           onChange={handleInputChange}
                           disabled={!isEditing}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 dark:bg-gray-900 disabled:text-gray-500 dark:text-gray-400"
                           placeholder={t('cityPlaceholder')}
                         />
                       </div>
                     </div>
 
                     {/* Account Info */}
-                    <div className="mt-8 pt-8 border-t border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('accountInfo')}</h3>
+                    <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('accountInfo')}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-600">{t('joinDate')}</p>
-                          <p className="font-medium text-gray-900">
+                        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{t('joinDate')}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">
                             {user?.created_at ? formatDate(String(user.created_at)) : t('unknown')}
                           </p>
                         </div>
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-600">{t('accountStatus')}</p>
+                        <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{t('accountStatus')}</p>
                           <p className="font-medium text-green-600">{t('active')}</p>
                         </div>
                       </div>
@@ -642,7 +642,7 @@ export default function ProfilePage() {
                     {!isEditing && (
                       <button
                         onClick={() => setShowChangePasswordModal(true)}
-                        className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-700 font-medium transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:text-gray-300 font-medium transition-colors"
                       >
                         <Key className="w-4 h-4" />
                         {t('changePassword')}
@@ -671,7 +671,7 @@ export default function ProfilePage() {
         {/* Modal انتخاب روش دریافت OTP */}
         {showOtpMethodModal && (
           <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 max-w-xs w-full">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-xs w-full">
               <h3 className="text-lg font-semibold mb-4">{t('chooseOtpMethod')}</h3>
               <div className="flex flex-col gap-3 mb-4">
                 <button
@@ -693,13 +693,13 @@ export default function ProfilePage() {
                   {t('sendOtpToPhone', { phone: user?.phone_number || '' })}
                 </button>
               </div>
-              <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg" onClick={() => setShowOtpMethodModal(false)}>{t('cancel')}</button>
+              <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 dark:text-gray-300 rounded-lg" onClick={() => setShowOtpMethodModal(false)}>{t('cancel')}</button>
             </div>
           </div>
         )}
         {/* پیام اگر هیچ راه تایید نیست */}
         {error === t('verifyContactFirst') && (
-          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 rounded-lg">
             <p className="text-yellow-700 text-sm">{t('verifyContactFirst')}</p>
             <div className="flex gap-2 mt-2">
               <button className="px-4 py-2 bg-blue-600 text-white rounded-lg" onClick={handleResendEmailOTP}>{t('verifyEmail')}</button>

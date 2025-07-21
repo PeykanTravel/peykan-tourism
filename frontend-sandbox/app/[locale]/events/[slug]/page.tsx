@@ -316,10 +316,10 @@ export default function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('loadingEvent')}</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('loadingEvent')}</p>
         </div>
       </div>
     );
@@ -327,10 +327,10 @@ export default function EventDetailPage() {
 
   if (error || !event) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('eventNotFound')}</h1>
-          <p className="text-gray-600 mb-6">{error || t('eventNotFoundDescription')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('eventNotFound')}</h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error || t('eventNotFoundDescription')}</p>
           <button
             onClick={() => router.push('/events')}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
@@ -343,14 +343,14 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <button
               onClick={() => router.back()}
-              className="flex items-center text-gray-600 hover:text-gray-900"
+              className="flex items-center text-gray-600 hover:text-gray-900 dark:text-white"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
               {t('back')}
@@ -362,13 +362,13 @@ export default function EventDetailPage() {
                 className={`p-2 rounded-lg ${
                   isFavorite 
                     ? 'bg-red-50 text-red-600' 
-                    : 'bg-gray-100 text-gray-600 hover:text-gray-900'
+                    : 'bg-gray-100 text-gray-600 hover:text-gray-900 dark:text-white'
                 }`}
               >
                 <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
               
-              <button className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:text-gray-900">
+              <button className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:text-gray-900 dark:text-white">
                 <Share2 className="h-5 w-5" />
               </button>
             </div>
@@ -378,7 +378,7 @@ export default function EventDetailPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Event Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
           <div className="relative">
             <Image
               src={event.image || 'https://picsum.photos/800/256?random=event'}
@@ -392,32 +392,32 @@ export default function EventDetailPage() {
               }}
             />
             <div className="absolute top-4 left-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:text-blue-200">
                 {event.category.name}
               </span>
             </div>
           </div>
           
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{event.title}</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-gray-300">
                 <Calendar className="h-5 w-5 mr-2" />
                 <span>{event.performances?.[0] ? formatDate(event.performances[0].date) : t('noPerformances')}</span>
               </div>
               
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-gray-300">
                 <Clock className="h-5 w-5 mr-2" />
                 <span>{event.start_time}</span>
               </div>
               
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-gray-300">
                 <MapPin className="h-5 w-5 mr-2" />
                 <span>{event.venue.name}</span>
               </div>
               
-              <div className="flex items-center text-gray-600">
+              <div className="flex items-center text-gray-600 dark:text-gray-300">
                 <Users className="h-5 w-5 mr-2" />
                 <span>{event.venue.total_capacity} {t('capacity')}</span>
               </div>
@@ -426,26 +426,26 @@ export default function EventDetailPage() {
             <div className="flex items-center space-x-6 mb-6">
               <div className="flex items-center">
                 <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                <span className="ml-1 text-sm text-gray-600">
+                <span className="ml-1 text-sm text-gray-600 dark:text-gray-300">
                   {event.average_rating} ({event.review_count} {t('reviews')})
                 </span>
               </div>
               
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {event.style}
               </div>
             </div>
             
-            <p className="text-gray-700 leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               {event.description}
             </p>
           </div>
         </div>
 
         {/* Booking Steps */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
           <div className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('bookingSteps')}</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('bookingSteps')}</h2>
             <div className="flex items-center justify-between">
               {bookingSteps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
@@ -454,7 +454,7 @@ export default function EventDetailPage() {
                       ? 'bg-green-500 border-green-500 text-white' 
                       : step.isActive 
                         ? 'bg-blue-500 border-blue-500 text-white' 
-                        : 'bg-gray-100 border-gray-300 text-gray-400'
+                        : 'bg-gray-100 border-gray-300 dark:border-gray-600 text-gray-400'
                   }`}>
                     {step.isComplete ? (
                       <CheckCircle className="h-5 w-5" />
@@ -464,11 +464,11 @@ export default function EventDetailPage() {
                   </div>
                   <div className="ml-3">
                     <div className={`text-sm font-medium ${
-                      step.isActive ? 'text-gray-900' : 'text-gray-500'
+                      step.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
                     }`}>
                       {step.title}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {step.description}
                     </div>
                   </div>
@@ -512,18 +512,18 @@ export default function EventDetailPage() {
 
             {/* Options Selection */}
             {selectedSection && event.options && event.options.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {t('additionalOptions')}
                   </h3>
                   <div className="space-y-4">
                     {event.options.map((option) => (
-                      <div key={option.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div key={option.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{option.name}</h4>
-                          <p className="text-sm text-gray-600">{option.description}</p>
-                          <p className="text-sm font-medium text-gray-900 mt-1">
+                          <h4 className="font-medium text-gray-900 dark:text-white">{option.name}</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{option.description}</p>
+                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                             {formatPrice(option.price, option.currency)}
                           </p>
                         </div>
@@ -573,9 +573,9 @@ export default function EventDetailPage() {
 
             {/* Booking Summary */}
             {selectedSeats.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-4 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900">{t('bookingSummary')}</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('bookingSummary')}</h3>
                 </div>
                 <div className="p-4 space-y-3">
                   <div className="flex justify-between text-sm">
@@ -662,7 +662,7 @@ export default function EventDetailPage() {
                     </div>
                   )}
                   {/* Total */}
-                  <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200">
+                  <div className="flex justify-between font-semibold mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                     <span>{t('total') || 'Total'}</span>
                     <span>{formatPrice(
                       selectedSeats.reduce((sum, seat) => sum + Number(seat.price), 0) +
@@ -684,10 +684,10 @@ export default function EventDetailPage() {
             </button>
 
             {/* Security Notice */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
               <div className="flex items-start">
                 <Shield className="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   <p className="font-medium mb-1">{t('secureBooking')}</p>
                   <p>{t('secureBookingDescription')}</p>
                 </div>

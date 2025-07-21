@@ -161,21 +161,21 @@ export default function RegisterPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full mb-4 shadow-lg">
               <User className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {t('registerTitle')}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {t('registerSubtitle')}
             </p>
           </div>
 
           {/* Register Form */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 p-8">
             {!showVerification ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Username Field */}
               <div className="space-y-2">
-                <label htmlFor="username" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="username" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('username')}
                 </label>
                 <div className="relative">
@@ -189,7 +189,7 @@ export default function RegisterPage() {
                     value={formData.username}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                     placeholder={t('usernamePlaceholder')}
                     disabled={isLoading}
                   />
@@ -199,7 +199,7 @@ export default function RegisterPage() {
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label htmlFor="first_name" className="block text-sm font-semibold text-gray-700">
+                  <label htmlFor="first_name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                     {t('firstName')}
                   </label>
                   <input
@@ -209,14 +209,14 @@ export default function RegisterPage() {
                     value={formData.first_name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                                           placeholder={t('firstNamePlaceholder')}
                     disabled={isLoading}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="last_name" className="block text-sm font-semibold text-gray-700">
+                  <label htmlFor="last_name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                     {t('lastName')}
                   </label>
                   <input
@@ -226,7 +226,7 @@ export default function RegisterPage() {
                     value={formData.last_name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                                           placeholder={t('lastNamePlaceholder')}
                     disabled={isLoading}
                   />
@@ -235,7 +235,7 @@ export default function RegisterPage() {
 
               {/* Email Field */}
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('email')}
                 </label>
                 <div className="relative">
@@ -249,7 +249,7 @@ export default function RegisterPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                     placeholder={t('emailPlaceholder')}
                     disabled={isLoading}
                   />
@@ -258,7 +258,7 @@ export default function RegisterPage() {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('password')}
                 </label>
                 <div className="relative">
@@ -272,7 +272,7 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                     placeholder={t('passwordPlaceholder')}
                     disabled={isLoading}
                   />
@@ -283,18 +283,18 @@ export default function RegisterPage() {
                     disabled={isLoading}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300" />
                     )}
                   </button>
                 </div>
-                <div className="mb-1 text-xs text-gray-500">{t('passwordHelp')}</div>
+                <div className="mb-1 text-xs text-gray-500 dark:text-gray-400">{t('passwordHelp')}</div>
               </div>
 
               {/* Confirm Password Field */}
               <div className="space-y-2">
-                <label htmlFor="password_confirm" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="password_confirm" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('passwordConfirm')}
                 </label>
                 <div className="relative">
@@ -308,7 +308,7 @@ export default function RegisterPage() {
                     value={formData.password_confirm}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                     placeholder={t('passwordConfirmPlaceholder')}
                     disabled={isLoading}
                   />
@@ -319,9 +319,9 @@ export default function RegisterPage() {
                     disabled={isLoading}
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300" />
                     )}
                   </button>
                 </div>
@@ -329,13 +329,13 @@ export default function RegisterPage() {
 
               {/* Error/Success Messages */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-xl">
                   <p className="text-red-600 text-sm">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-xl">
                   <p className="text-green-600 text-sm">{success}</p>
                 </div>
               )}
@@ -363,7 +363,7 @@ export default function RegisterPage() {
             <form onSubmit={handleVerification} className="space-y-6">
               {/* Verification Code Field */}
               <div className="space-y-2">
-                <label htmlFor="verificationCode" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="verificationCode" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('verificationCode')}
                 </label>
                 <div className="relative">
@@ -375,25 +375,25 @@ export default function RegisterPage() {
                     onChange={(e) => setVerificationCode(e.target.value)}
                     required
                     maxLength={6}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-center text-2xl tracking-widest"
+                    className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-center text-2xl tracking-widest"
                     placeholder={t('verificationCodePlaceholder')}
                     disabled={isLoading}
                   />
                 </div>
-                <p className="text-sm text-gray-600 text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
                   {t('verificationSent', { email: userEmail })}
                 </p>
               </div>
 
               {/* Error/Success Messages */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-xl">
                   <p className="text-red-600 text-sm">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-xl">
                   <p className="text-green-600 text-sm">{success}</p>
                 </div>
               )}
@@ -421,7 +421,7 @@ export default function RegisterPage() {
 
             {/* Login Link */}
             <div className="mt-6 text-center">
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 {t('alreadyHaveAccount')} 
                 <Link
                   href="/login"

@@ -81,7 +81,7 @@ export default function EventCartItem({
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header with gradient background */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
         <div className="flex items-start justify-between">
@@ -122,7 +122,7 @@ export default function EventCartItem({
           <button
             onClick={() => onRemove(item.id)}
             disabled={isUpdating}
-            className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 disabled:opacity-50 transition-colors"
+            className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white dark:bg-gray-800/10 disabled:opacity-50 transition-colors"
             title={t('removeItem')}
           >
             <Trash2 className="w-5 h-5" />
@@ -150,17 +150,17 @@ export default function EventCartItem({
 
         {/* Seats Information */}
         {seats.length > 0 && (
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Users className="w-5 h-5 text-gray-600" />
-              <h4 className="font-semibold text-gray-900">{t('seats') || 'Seats'} ({seats.length})</h4>
+              <Users className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              <h4 className="font-semibold text-gray-900 dark:text-white">{t('seats') || 'Seats'} ({seats.length})</h4>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {seats.map((seat: any, index: number) => (
-                <div key={seat.seat_id || `seat-${index}`} className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                <div key={seat.seat_id || `seat-${index}`} className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-blue-50 dark:bg-blue-900/200 rounded-full"></div>
                       <span className="font-mono text-sm font-semibold text-gray-800">
                         Row {seat.row_number}, Seat {seat.seat_number}
                       </span>
@@ -170,12 +170,12 @@ export default function EventCartItem({
                     </span>
                   </div>
                   {seat.section && (
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       Section: {seat.section}
                     </div>
                   )}
                   {seat.ticket_type && (
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       Ticket: {seat.ticket_type}
                     </div>
                   )}
@@ -192,11 +192,11 @@ export default function EventCartItem({
               <Info className="w-4 h-4 text-indigo-500" />
               <span className="font-semibold text-gray-800 text-sm">{t('options') || 'Options'}:</span>
             </div>
-            <ul className="pl-6 space-y-0.5 text-sm text-gray-700">
+            <ul className="pl-6 space-y-0.5 text-sm text-gray-700 dark:text-gray-300">
               {options.map((opt: any, index: number) => (
                 <li key={opt.option_id || `option-${index}`} className="flex items-center justify-between">
                   <span className="truncate">
-                    {opt.name} <span className="text-gray-500">×{opt.quantity}</span>
+                    {opt.name} <span className="text-gray-500 dark:text-gray-400">×{opt.quantity}</span>
                   </span>
                   <span className="font-medium text-green-600">
                     {formatPrice((opt.price || 0) * opt.quantity, item.currency)}
@@ -208,27 +208,27 @@ export default function EventCartItem({
         )}
 
         {/* Pricing Summary */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-4">Pricing Summary</h4>
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+          <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Pricing Summary</h4>
           
           <div className="space-y-3">
             {/* Seats Subtotal */}
             {seats.length > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-700">Seats ({seats.length}):</div>
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Seats ({seats.length}):</div>
                 {seats.map((seat: any, index: number) => (
                   <div key={seat.seat_id || `seat-${index}`} className="flex justify-between text-sm pl-4">
-                    <span className="text-gray-600">
+                    <span className="text-gray-600 dark:text-gray-300">
                       Row {seat.row_number}, Seat {seat.seat_number}
                     </span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {formatPrice(seat.price || item.price, item.currency)}
                     </span>
                   </div>
                 ))}
-                <div className="flex justify-between text-sm font-medium border-t border-gray-200 pt-2">
-                  <span className="text-gray-700">Seats Subtotal:</span>
-                  <span className="text-gray-900">
+                <div className="flex justify-between text-sm font-medium border-t border-gray-200 dark:border-gray-700 pt-2">
+                  <span className="text-gray-700 dark:text-gray-300">Seats Subtotal:</span>
+                  <span className="text-gray-900 dark:text-white">
                     {formatPrice(seats.reduce((sum: number, seat: any) => sum + (seat.price || item.price), 0), item.currency)}
                   </span>
                 </div>
@@ -238,20 +238,20 @@ export default function EventCartItem({
             {/* Options Subtotal */}
             {options.length > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-700">Options:</div>
+                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Options:</div>
                 {options.map((opt: any, index: number) => (
                   <div key={opt.option_id || `option-${index}`} className="flex justify-between text-sm pl-4">
-                    <span className="text-gray-600">
+                    <span className="text-gray-600 dark:text-gray-300">
                       {opt.name} × {opt.quantity}
                     </span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 dark:text-white">
                       {formatPrice((opt.price || 0) * opt.quantity, item.currency)}
                     </span>
                   </div>
                 ))}
-                <div className="flex justify-between text-sm font-medium border-t border-gray-200 pt-2">
-                  <span className="text-gray-700">Options Subtotal:</span>
-                  <span className="text-gray-900">
+                <div className="flex justify-between text-sm font-medium border-t border-gray-200 dark:border-gray-700 pt-2">
+                  <span className="text-gray-700 dark:text-gray-300">Options Subtotal:</span>
+                  <span className="text-gray-900 dark:text-white">
                     {formatPrice(options.reduce((sum: number, opt: any) => sum + ((opt.price || 0) * opt.quantity), 0), item.currency)}
                   </span>
                 </div>
@@ -260,8 +260,8 @@ export default function EventCartItem({
 
             {/* Discounts (if any) */}
             {(item.booking_data as any)?.discount_amount && (item.booking_data as any).discount_amount > 0 && (
-              <div className="flex justify-between text-sm border-t border-gray-200 pt-2">
-                <span className="text-gray-600">Discount:</span>
+              <div className="flex justify-between text-sm border-t border-gray-200 dark:border-gray-700 pt-2">
+                <span className="text-gray-600 dark:text-gray-300">Discount:</span>
                 <span className="text-red-600 font-medium">
                   -{formatPrice((item.booking_data as any).discount_amount, item.currency)}
                 </span>
@@ -269,15 +269,15 @@ export default function EventCartItem({
             )}
 
             {/* Final Total */}
-            <div className="border-t-2 border-gray-300 pt-3 mt-3">
+            <div className="border-t-2 border-gray-300 dark:border-gray-600 pt-3 mt-3">
               <div className="flex justify-between text-lg font-bold">
-                <span className="text-gray-900">Total:</span>
+                <span className="text-gray-900 dark:text-white">Total:</span>
                 <span className="text-blue-600">
                   {formatPrice(item.price * item.quantity, item.currency)}
                 </span>
               </div>
               {item.quantity > 1 && (
-                <div className="text-xs text-gray-500 text-right mt-1">
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">
                   ({item.quantity} items)
                 </div>
               )}
@@ -288,16 +288,16 @@ export default function EventCartItem({
 
       {/* Event Tickets */}
       {seats.length > 0 && (
-        <div className="border-t border-gray-200 bg-gray-50 p-6">
+        <div className="border-t border-gray-200 bg-gray-50 dark:bg-gray-900 p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Ticket className="w-5 h-5 text-gray-600" />
-            <h4 className="font-semibold text-gray-900">Event Tickets</h4>
+            <Ticket className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <h4 className="font-semibold text-gray-900 dark:text-white">Event Tickets</h4>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {seats.map((seat: any, idx: number) => (
               <div
                 key={seat.seat_id || `ticket-${idx}`}
-                className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow"
               >
                 {/* Ticket Header */}
                 <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-4">
@@ -319,48 +319,48 @@ export default function EventCartItem({
                   <div className="space-y-2 mb-4">
                     {eventDate && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-700">{formatDate(eventDate)}</span>
+                        <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">{formatDate(eventDate)}</span>
                       </div>
                     )}
                     {eventTime && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-700">{eventTime}</span>
+                        <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">{eventTime}</span>
                       </div>
                     )}
                     {eventLocation && (
                       <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="w-4 h-4 text-gray-500" />
-                        <span className="text-gray-700">{eventLocation}</span>
+                        <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">{eventLocation}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Seat Information */}
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4">
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <span className="text-gray-500">Section:</span>
-                        <div className="font-semibold text-gray-900">{section || 'General'}</div>
+                        <span className="text-gray-500 dark:text-gray-400">Section:</span>
+                        <div className="font-semibold text-gray-900 dark:text-white">{section || 'General'}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Row:</span>
-                        <div className="font-semibold text-gray-900">{seat.row_number}</div>
+                        <span className="text-gray-500 dark:text-gray-400">Row:</span>
+                        <div className="font-semibold text-gray-900 dark:text-white">{seat.row_number}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Seat:</span>
-                        <div className="font-semibold text-gray-900">{seat.seat_number}</div>
+                        <span className="text-gray-500 dark:text-gray-400">Seat:</span>
+                        <div className="font-semibold text-gray-900 dark:text-white">{seat.seat_number}</div>
                       </div>
                       <div>
-                        <span className="text-gray-500">Price:</span>
+                        <span className="text-gray-500 dark:text-gray-400">Price:</span>
                         <div className="font-semibold text-green-600">{formatPrice(seat.price || item.price, item.currency)}</div>
                       </div>
                     </div>
                   </div>
 
                   {/* Barcode */}
-                  <div className="flex items-center justify-center bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-center justify-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                     <div className="flex flex-col items-center">
                       <div className="h-8 w-32 flex items-center justify-between mb-2">
                         {Array.from({ length: 20 }, (_, i) => (
@@ -370,7 +370,7 @@ export default function EventCartItem({
                           />
                         ))}
                       </div>
-                      <div className="text-xs text-gray-500 font-mono">{seat.seat_id?.slice(0, 12) || 'TICKET-123456'}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">{seat.seat_id?.slice(0, 12) || 'TICKET-123456'}</div>
                     </div>
                   </div>
                 </div>

@@ -61,22 +61,22 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
   if (!route_data || !vehicle_type) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {t('selectPassengers')}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {t('step4')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
           <div className="text-center">
             <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('noVehicleSelected')}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               {t('pleaseSelectVehicleFirst')}
             </p>
             <button
@@ -94,17 +94,17 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           {t('selectPassengers')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           {t('step4')}
         </p>
         
         {/* Route and Vehicle Info */}
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center gap-2 text-blue-800 mb-2">
+        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200 mb-2">
             <span className="font-medium">{route_data.origin}</span>
             <ArrowRight className="w-4 h-4" />
             <span className="font-medium">{route_data.destination}</span>
@@ -116,17 +116,17 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
       </div>
 
       {/* Passenger Count */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('passengerCount')}
         </h3>
         
-        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+        <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div className="flex items-center gap-3">
             <Users className="w-6 h-6 text-blue-600" />
             <div>
-              <h4 className="font-medium text-gray-900">{t('passengers')}</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-gray-900 dark:text-white">{t('passengers')}</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {t('maxPassengers')}: {maxPassengers}
               </p>
             </div>
@@ -147,7 +147,7 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
               <Minus className="w-4 h-4" />
             </button>
             
-            <span className="text-xl font-bold text-gray-900 min-w-[2rem] text-center">
+            <span className="text-xl font-bold text-gray-900 dark:text-white min-w-[2rem] text-center">
               {localPassengerCount}
             </span>
             
@@ -169,17 +169,17 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
       </div>
 
       {/* Luggage Count */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('luggageCount')}
         </h3>
         
-        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+        <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
           <div className="flex items-center gap-3">
             <Package className="w-6 h-6 text-blue-600" />
             <div>
-              <h4 className="font-medium text-gray-900">{t('luggage')}</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-gray-900 dark:text-white">{t('luggage')}</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {t('maxLuggage')}: {maxLuggage}
               </p>
             </div>
@@ -200,7 +200,7 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
               <Minus className="w-4 h-4" />
             </button>
             
-            <span className="text-xl font-bold text-gray-900 min-w-[2rem] text-center">
+            <span className="text-xl font-bold text-gray-900 dark:text-white min-w-[2rem] text-center">
               {localLuggageCount}
             </span>
             
@@ -222,22 +222,22 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
       </div>
 
       {/* Summary */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('summary')}
         </h3>
         
         <div className="space-y-3">
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-600">{t('passengers')}</span>
+            <span className="text-gray-600 dark:text-gray-300">{t('passengers')}</span>
             <span className="font-medium">{localPassengerCount}</span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-600">{t('luggage')}</span>
+            <span className="text-gray-600 dark:text-gray-300">{t('luggage')}</span>
             <span className="font-medium">{localLuggageCount}</span>
           </div>
           <div className="flex justify-between items-center py-2">
-            <span className="text-gray-600">{t('totalCapacity')}</span>
+            <span className="text-gray-600 dark:text-gray-300">{t('totalCapacity')}</span>
             <span className="font-medium text-blue-600">
               {localPassengerCount}/{maxPassengers} {t('passengers')}, {localLuggageCount}/{maxLuggage} {t('luggage')}
             </span>
@@ -246,11 +246,11 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
       </div>
 
       {/* Navigation */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex justify-between">
           <button
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             {t('previous')}
@@ -262,7 +262,7 @@ export default function PassengerSelection({ onNext, onBack }: PassengerSelectio
               px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2
               ${isValid
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-300 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }
             `}
           >

@@ -139,20 +139,20 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
               <User className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {t('loginTitle')}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               {t('loginSubtitle')}
             </p>
           </div>
 
           {/* Login Form */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Username/Email Field */}
               <div className="space-y-2">
-                <label htmlFor="username" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="username" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('usernameOrEmail')}
                 </label>
                 <div className="relative">
@@ -166,7 +166,7 @@ export default function LoginPage() {
                     value={formData.username}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                     placeholder={t('enterUsernameOrEmail')}
                     disabled={isLoading}
                   />
@@ -175,7 +175,7 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {t('password')}
                 </label>
                 <div className="relative">
@@ -189,7 +189,7 @@ export default function LoginPage() {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                     placeholder={t('enterPassword')}
                     disabled={isLoading}
                   />
@@ -200,9 +200,9 @@ export default function LoginPage() {
                     disabled={isLoading}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:text-gray-300" />
                     )}
                   </button>
                 </div>
@@ -210,13 +210,13 @@ export default function LoginPage() {
 
               {/* Error/Success Messages */}
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-xl">
                   <p className="text-red-600 text-sm">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-xl">
                   <p className="text-green-600 text-sm">{success}</p>
                 </div>
               )}
@@ -253,7 +253,7 @@ export default function LoginPage() {
                 <div className="text-center">
                   <Link
                     href="/register"
-                    className="text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                    className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 font-medium transition-colors"
                   >
                     {t('noAccount')} <span className="text-blue-600 hover:text-blue-700">{t('registerNow')}</span>
                   </Link>

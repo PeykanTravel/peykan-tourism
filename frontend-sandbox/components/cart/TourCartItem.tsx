@@ -31,7 +31,7 @@ export default function TourCartItem({
   const totalParticipants = participants.adult + participants.child + participants.infant;
 
   return (
-    <div className="p-6 border-b border-gray-200 last:border-b-0">
+    <div className="p-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
       <div className="flex gap-4">
         {/* Item Image */}
         <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0">
@@ -54,18 +54,18 @@ export default function TourCartItem({
         <div className="flex-1">
           {/* Title and Variant */}
           <div className="mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               {item.title}
             </h3>
             {item.location && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {t('location')}: {item.location}
               </p>
             )}
           </div>
 
           {/* Date and Time */}
-          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300 mb-3">
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               {formatDate(item.schedule_id)}
@@ -81,8 +81,8 @@ export default function TourCartItem({
           {/* Participant Breakdown */}
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">
+              <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('participants')} ({totalParticipants})
               </span>
             </div>
@@ -92,7 +92,7 @@ export default function TourCartItem({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm text-gray-600">{t('adults')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">{t('adults')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -121,7 +121,7 @@ export default function TourCartItem({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Smile className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-gray-600">{t('children')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">{t('children')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -150,7 +150,7 @@ export default function TourCartItem({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Baby className="w-4 h-4 text-purple-500" />
-                  <span className="text-sm text-gray-600">{t('infants')}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">{t('infants')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -181,12 +181,12 @@ export default function TourCartItem({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Unit Price */}
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {t('unitPrice')}: {formatPrice(item.unit_price, item.currency)}
               </div>
               
               {/* Total Price */}
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-lg font-semibold text-gray-900 dark:text-white">
                 {formatPrice(item.subtotal, item.currency)}
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function TourCartItem({
             <button
               onClick={() => onRemove(item.id)}
               disabled={isUpdating}
-              className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
               title={t('removeItem')}
             >
               {isUpdating ? (

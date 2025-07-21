@@ -250,7 +250,7 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
       minDate={minDate || undefined}
       maxDate={maxDate || undefined}
       dateFormat="yyyy-MM-dd"
-      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       placeholderText={t('selectDate')}
       showPopperArrow={false}
       autoComplete="off"
@@ -260,18 +260,18 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           {t('selectDateAndTime')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           {t('step3')}
         </p>
       </div>
 
       {/* Trip Type Selection */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('tripType')}
         </h3>
         
@@ -282,15 +282,15 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
               p-4 border rounded-lg cursor-pointer transition-all
               ${trip_type === 'one_way'
                 ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 dark:bg-gray-900'
               }
             `}
           >
             <div className="flex items-center gap-3">
               <Plane className="w-6 h-6 text-blue-600" />
               <div>
-                <h4 className="font-medium text-gray-900">{t('oneWay')}</h4>
-                <p className="text-sm text-gray-600">{t('oneWayDescription')}</p>
+                <h4 className="font-medium text-gray-900 dark:text-white">{t('oneWay')}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('oneWayDescription')}</p>
               </div>
             </div>
           </div>
@@ -301,15 +301,15 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
               p-4 border rounded-lg cursor-pointer transition-all
               ${trip_type === 'round_trip'
                 ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 dark:bg-gray-900'
               }
             `}
           >
             <div className="flex items-center gap-3">
               <PlaneTakeoff className="w-6 h-6 text-blue-600" />
               <div>
-                <h4 className="font-medium text-gray-900">{t('roundTrip')}</h4>
-                <p className="text-sm text-gray-600">{t('roundTripDescription')}</p>
+                <h4 className="font-medium text-gray-900 dark:text-white">{t('roundTrip')}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('roundTripDescription')}</p>
               </div>
             </div>
           </div>
@@ -317,14 +317,14 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
       </div>
 
       {/* Outbound Date & Time */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('outboundDate')} & {t('outboundTime')}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('date')}
             </label>
             <div className="relative">
@@ -334,7 +334,7 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('time')}
             </label>
             <div className="relative">
@@ -352,14 +352,14 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
 
       {/* Return Date & Time (for round trip) */}
       {trip_type === 'round_trip' && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {t('returnDate')} & {t('returnTime')}
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('date')}
               </label>
               <div className="relative">
@@ -369,7 +369,7 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('time')}
               </label>
               <div className="relative">
@@ -387,11 +387,11 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
       )}
 
       {/* Navigation */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex justify-between">
           <button
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             {t('previous')}
@@ -403,7 +403,7 @@ export default function DateTimeSelection({ onNext, onBack }: DateTimeSelectionP
               px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2
               ${isValid
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-300 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }
             `}
           >

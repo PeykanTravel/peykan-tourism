@@ -222,16 +222,16 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
               <ShoppingCart className="w-10 h-10 text-gray-400" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               {t('emptyCart')}
             </h1>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+            <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-md mx-auto">
               {t('emptyCartDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -261,7 +261,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -270,8 +270,8 @@ export default function CartPage() {
               <ShoppingCart className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-              <p className="text-gray-600">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
+              <p className="text-gray-600 dark:text-gray-300">
                 {totalItems} {t('items')} {t('inCart')}
               </p>
             </div>
@@ -291,9 +291,9 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {t('items')} ({totalItems})
                 </h2>
               </div>
@@ -310,25 +310,25 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-8">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
                 {t('orderSummary')}
               </h2>
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('subtotal')}</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('subtotal')}</span>
                   <span className="font-medium">
                     <PriceDisplay amount={totalPrice} currency={currency} />
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('tax')}</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('tax')}</span>
                   <span className="font-medium">
                     <PriceDisplay amount={0} currency={currency} />
                   </span>
                 </div>
-                <div className="border-t border-gray-200 pt-3">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
                   <div className="flex justify-between text-lg font-semibold">
                     <span>{t('total')}</span>
                     <span>
@@ -346,7 +346,7 @@ export default function CartPage() {
               </button>
               
               {!isAuthenticated && (
-                <p className="text-xs text-gray-500 mt-3 text-center">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
                   {t('guestCheckoutNote')}
                 </p>
               )}
@@ -357,16 +357,16 @@ export default function CartPage() {
         {/* Clear Cart Confirmation Modal */}
         {showClearConfirm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md mx-4">
               <div className="flex items-center mb-4">
                 <AlertCircle className="w-6 h-6 text-red-500 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">{t('clearCartConfirm')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('clearCartConfirm')}</h3>
               </div>
-              <p className="text-gray-600 mb-6">{t('clearCartWarning')}</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">{t('clearCartWarning')}</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-gray-900"
                 >
                   {t('cancel')}
                 </button>

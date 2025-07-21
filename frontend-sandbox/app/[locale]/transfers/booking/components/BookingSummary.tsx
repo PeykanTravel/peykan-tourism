@@ -177,7 +177,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
     
     if (route_data?.is_popular) {
       badges.push(
-        <span key="popular" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+        <span key="popular" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-200">
           <Star className="w-3 h-3 mr-1" />
           {t('popularBadge')}
         </span>
@@ -186,7 +186,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
     
     if (route_data?.round_trip_discount_enabled) {
       badges.push(
-        <span key="discount" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span key="discount" className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:text-green-200">
           <Percent className="w-3 h-3 mr-1" />
           {t('discountBadge')}
         </span>
@@ -212,10 +212,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
     
     return (
       <div className="mt-3">
-        <h5 className="text-sm font-medium text-gray-700 mb-2">{t('vehicleFeatures')}:</h5>
+        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('vehicleFeatures')}:</h5>
         <div className="flex flex-wrap gap-1">
           {vehiclePricing.features.map((feature, index) => (
-            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:text-blue-200">
               {feature}
             </span>
           ))}
@@ -231,10 +231,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
     
     return (
       <div className="mt-3">
-        <h5 className="text-sm font-medium text-gray-700 mb-2">{t('vehicleAmenities')}:</h5>
+        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('vehicleAmenities')}:</h5>
         <div className="flex flex-wrap gap-1">
           {vehiclePricing.amenities.map((amenity, index) => (
-            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:text-green-200">
               {amenity}
             </span>
           ))}
@@ -246,22 +246,22 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
   if (!route_data || !vehicle_type) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {t('bookingSummary')}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {t('step7')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
           <div className="text-center">
             <CheckCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('incompleteBooking')}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               {t('pleaseCompletePreviousSteps')}
             </p>
             <button
@@ -284,18 +284,18 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           {t('bookingSummary')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           {t('step7')}
         </p>
       </div>
 
       {/* Route Information */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('routeInformation')}
         </h3>
         
@@ -303,10 +303,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           <div className="flex items-center gap-3">
             <MapPin className="w-5 h-5 text-blue-600" />
             <div className="flex-1">
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 dark:text-white">
                 {route_data.origin} → {route_data.destination}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {vehiclePricing ? formatPrice(parseFloat(vehiclePricing.base_price)) : t('priceOnRequest')}
               </div>
               {renderRouteBadges().length > 0 && (
@@ -320,10 +320,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           <div className="flex items-center gap-3">
             <Calendar className="w-5 h-5 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 dark:text-white">
                 {t('tripType')}: {trip_type === 'one_way' ? t('oneWay') : t('roundTrip')}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {outbound_date} at {outbound_time}
                 {trip_type === 'round_trip' && return_date && return_time && (
                   <span> • {t('return')}: {return_date} at {return_time}</span>
@@ -335,10 +335,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           <div className="flex items-center gap-3">
             <Users className="w-5 h-5 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 dark:text-white">
                 {t('passengers')}: {passenger_count} • {t('luggage')}: {luggage_count}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {t('vehicle')}: {vehiclePricing?.vehicle_name || vehicle_type}
               </div>
             </div>
@@ -346,8 +346,8 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
 
           {/* Route Features */}
           {(route_data.round_trip_discount_enabled || parseFloat(route_data.peak_hour_surcharge) > 0 || parseFloat(route_data.midnight_surcharge) > 0) && (
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">{t('routeFeatures')}:</h4>
+            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('routeFeatures')}:</h4>
               <div className="space-y-2">
                 {route_data.round_trip_discount_enabled && (
                   <div className="flex items-center gap-2 text-sm text-green-600">
@@ -373,15 +373,15 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
 
           {/* Vehicle Details */}
           {vehiclePricing && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">{t('vehicleDetails')}:</h4>
+            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('vehicleDetails')}:</h4>
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <Car className="w-4 h-4" />
                   <span>{vehiclePricing.vehicle_name || vehicle_type}</span>
                 </div>
                 {vehiclePricing.vehicle_description && (
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
                     {vehiclePricing.vehicle_description}
                   </div>
                 )}
@@ -392,12 +392,12 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           )}
 
           {/* Time Information */}
-          <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">{t('timeInfo')}:</h4>
+          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timeInfo')}:</h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="w-4 h-4 text-blue-600" />
-                <span className="text-gray-600">{t('outboundTime')}: {outbound_time} ({outboundTimeInfo.category})</span>
+                <span className="text-gray-600 dark:text-gray-300">{t('outboundTime')}: {outbound_time} ({outboundTimeInfo.category})</span>
                 {parseFloat(outboundTimeInfo.surcharge) > 0 && (
                   <span className="text-orange-600 text-xs">+{outboundTimeInfo.surcharge}%</span>
                 )}
@@ -405,7 +405,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
               {returnTimeInfo && (
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="w-4 h-4 text-green-600" />
-                  <span className="text-gray-600">{t('returnTime')}: {return_time} ({returnTimeInfo.category})</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('returnTime')}: {return_time} ({returnTimeInfo.category})</span>
                   {parseFloat(returnTimeInfo.surcharge) > 0 && (
                     <span className="text-orange-600 text-xs">+{returnTimeInfo.surcharge}%</span>
                   )}
@@ -417,32 +417,32 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
       </div>
 
       {/* Contact Information */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('contactInformation')}
         </h3>
         
         <div className="space-y-3">
           <div>
-            <span className="font-medium text-gray-900">{t('pickupAddress')}:</span>
-            <div className="text-gray-600">{pickup_address}</div>
+            <span className="font-medium text-gray-900 dark:text-white">{t('pickupAddress')}:</span>
+            <div className="text-gray-600 dark:text-gray-300">{pickup_address}</div>
           </div>
           <div>
-            <span className="font-medium text-gray-900">{t('dropoffAddress')}:</span>
-            <div className="text-gray-600">{dropoff_address}</div>
+            <span className="font-medium text-gray-900 dark:text-white">{t('dropoffAddress')}:</span>
+            <div className="text-gray-600 dark:text-gray-300">{dropoff_address}</div>
           </div>
           <div>
-            <span className="font-medium text-gray-900">{t('contactName')}:</span>
-            <div className="text-gray-600">{contact_name}</div>
+            <span className="font-medium text-gray-900 dark:text-white">{t('contactName')}:</span>
+            <div className="text-gray-600 dark:text-gray-300">{contact_name}</div>
           </div>
           <div>
-            <span className="font-medium text-gray-900">{t('contactPhone')}:</span>
-            <div className="text-gray-600">{contact_phone}</div>
+            <span className="font-medium text-gray-900 dark:text-white">{t('contactPhone')}:</span>
+            <div className="text-gray-600 dark:text-gray-300">{contact_phone}</div>
           </div>
           {special_requirements && (
             <div>
-              <span className="font-medium text-gray-900">{t('specialRequirements')}:</span>
-              <div className="text-gray-600">{special_requirements}</div>
+              <span className="font-medium text-gray-900 dark:text-white">{t('specialRequirements')}:</span>
+              <div className="text-gray-600 dark:text-gray-300">{special_requirements}</div>
             </div>
           )}
         </div>
@@ -450,8 +450,8 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
 
       {/* Selected Options */}
       {selected_options.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             {t('selectedOptions')}
           </h3>
           
@@ -465,12 +465,12 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
                       {optionDetails?.name || `Option ${option.option_id.slice(0, 8)}...`}
                     </span>
                     {optionDetails && (
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {t('quantity')}: {optionDetails.quantity} × {formatPrice(optionDetails.price)}
                       </div>
                     )}
                     {!optionDetails && (
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {t('optionDetailsNotAvailable')}
                       </div>
                     )}
@@ -485,10 +485,10 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
           
           {/* Show total options price if available */}
           {pricing_breakdown?.price_breakdown?.options_total && (
-            <div className="mt-4 pt-3 border-t border-gray-200">
+            <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center">
-                <span className="font-medium text-gray-700">{t('optionsTotal')}:</span>
-                <span className="font-bold text-gray-900">
+                <span className="font-medium text-gray-700 dark:text-gray-300">{t('optionsTotal')}:</span>
+                <span className="font-bold text-gray-900 dark:text-white">
                   {formatPrice(pricing_breakdown.price_breakdown.options_total)}
                 </span>
               </div>
@@ -498,15 +498,15 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
       )}
 
       {/* Pricing Breakdown */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('pricingBreakdown')}
         </h3>
         
         {is_calculating_price ? (
           <div className="text-center py-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-2 text-gray-600">{t('calculatingPrice')}</p>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">{t('calculatingPrice')}</p>
           </div>
         ) : price_calculation_error ? (
           <div className="text-center py-4">
@@ -521,39 +521,39 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
         ) : pricing_breakdown ? (
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">{t('basePrice')}</span>
+              <span className="text-gray-600 dark:text-gray-300">{t('basePrice')}</span>
               <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.base_price)}</span>
             </div>
             {pricing_breakdown.price_breakdown.outbound_surcharge > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">{t('timeSurcharge')}</span>
+                <span className="text-gray-600 dark:text-gray-300">{t('timeSurcharge')}</span>
                 <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.outbound_surcharge)}</span>
               </div>
             )}
             {pricing_breakdown.price_breakdown.round_trip_discount > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">{t('roundTripDiscount')}</span>
+                <span className="text-gray-600 dark:text-gray-300">{t('roundTripDiscount')}</span>
                 <span className="font-medium text-green-600">-{formatPrice(pricing_breakdown.price_breakdown.round_trip_discount)}</span>
               </div>
             )}
             {pricing_breakdown.price_breakdown.options_total > 0 && (
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">{t('optionsTotal')}</span>
+                <span className="text-gray-600 dark:text-gray-300">{t('optionsTotal')}</span>
                 <span className="font-medium">{formatPrice(pricing_breakdown.price_breakdown.options_total)}</span>
               </div>
             )}
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-lg font-medium text-gray-900">{t('subtotal')}</span>
-              <span className="text-lg font-medium text-gray-900">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
+              <span className="text-lg font-medium text-gray-900 dark:text-white">{t('subtotal')}</span>
+              <span className="text-lg font-medium text-gray-900 dark:text-white">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-t border-gray-200">
-              <span className="text-lg font-bold text-gray-900">{t('finalPrice')}</span>
+            <div className="flex justify-between items-center py-2 border-t border-gray-200 dark:border-gray-700">
+              <span className="text-lg font-bold text-gray-900 dark:text-white">{t('finalPrice')}</span>
               <span className="text-xl font-bold text-blue-600">{formatPrice(pricing_breakdown.price_breakdown.final_price)}</span>
             </div>
           </div>
         ) : (
           <div className="text-center py-4">
-            <p className="text-gray-600">{t('priceNotCalculated')}</p>
+            <p className="text-gray-600 dark:text-gray-300">{t('priceNotCalculated')}</p>
             <button
               onClick={calculatePrice}
               className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -565,11 +565,11 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
       </div>
 
       {/* Navigation */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex justify-between">
           <button
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             {t('previous')}
@@ -581,7 +581,7 @@ export default function BookingSummary({ onBack }: BookingSummaryProps) {
               px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2
               ${pricing_breakdown
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-300 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }
             `}
           >

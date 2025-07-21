@@ -73,10 +73,10 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
     
     return (
       <div className="mt-3">
-        <h5 className="text-sm font-medium text-gray-700 mb-2">{t('features')}:</h5>
+        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('features')}:</h5>
         <div className="flex flex-wrap gap-1">
           {features.map((feature, index) => (
-            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:text-blue-200">
               {feature}
             </span>
           ))}
@@ -91,10 +91,10 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
     
     return (
       <div className="mt-3">
-        <h5 className="text-sm font-medium text-gray-700 mb-2">{t('amenities')}:</h5>
+        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('amenities')}:</h5>
         <div className="flex flex-wrap gap-1">
           {amenities.map((amenity, index) => (
-            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:text-green-200">
               {amenity}
             </span>
           ))}
@@ -126,22 +126,22 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
   if (!route_data) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {t('selectVehicle')}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {t('step2')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
           <div className="text-center">
             <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('noRouteSelected')}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               {t('pleaseSelectRouteFirst')}
             </p>
             <button
@@ -159,27 +159,27 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
   if (availableVehicles.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {t('selectVehicle')}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {t('step2')}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
           <div className="text-center">
             <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               {t('noVehiclesAvailable')}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               {t('errorFetchingVehicles')}
             </p>
             <button
               onClick={onBack}
-              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-6 py-2 bg-gray-100 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
             >
               {t('previous')}
             </button>
@@ -192,18 +192,18 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           {t('selectVehicle')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           {t('step2')}
         </p>
         
         {/* Route Info */}
         {route_data && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-center gap-2 text-blue-800">
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
               <span className="font-medium">{route_data.origin}</span>
               <ArrowRight className="w-4 h-4" />
               <span className="font-medium">{route_data.destination}</span>
@@ -217,7 +217,7 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
               <div className="mt-2 pt-2 border-t border-blue-200">
                 <div className="flex flex-wrap gap-2 text-xs">
                   {route_data.round_trip_discount_enabled && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800 dark:text-green-200">
                       <span>{t('discountPercentage', { percentage: route_data.round_trip_discount_percentage })}</span>
                     </span>
                   )}
@@ -239,8 +239,8 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
       </div>
 
       {/* Vehicles List */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           {t('availableVehicles')}
         </h3>
 
@@ -253,7 +253,7 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
                 p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md
                 ${vehicle_type === vehicle.type
                   ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                  : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 dark:bg-gray-900'
                 }
               `}
             >
@@ -261,7 +261,7 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
                   {getVehicleIcon(vehicle.type)}
-                  <h4 className="font-medium text-gray-900">{vehicle.name}</h4>
+                  <h4 className="font-medium text-gray-900 dark:text-white">{vehicle.name}</h4>
                 </div>
                 {vehicle_type === vehicle.type && (
                   <CheckCircle className="w-5 h-5 text-blue-600" />
@@ -270,19 +270,19 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
 
               {/* Vehicle Description */}
               {vehicle.description && (
-                <p className="text-sm text-gray-600 mb-3">{vehicle.description}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{vehicle.description}</p>
               )}
 
               {/* Vehicle Details */}
-              <div className="bg-gray-50 rounded-lg p-3 mb-3">
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-3">
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex items-center space-x-2">
-                    <Users className="w-4 h-4 text-gray-500" />
-                    <span className="text-gray-700 font-medium">{vehicle.max_passengers} {t('passengers')}</span>
+                    <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">{vehicle.max_passengers} {t('passengers')}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Package className="w-4 h-4 text-gray-500" />
-                    <span className="text-gray-700 font-medium">{vehicle.max_luggage} {t('luggage')}</span>
+                    <Package className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">{vehicle.max_luggage} {t('luggage')}</span>
                   </div>
                 </div>
               </div>
@@ -294,11 +294,11 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
               {renderAmenities(vehicle.amenities)}
 
               {/* Price */}
-              <div className="text-right mt-3 pt-3 border-t border-gray-200">
+              <div className="text-right mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <div className="text-lg font-bold text-blue-600">
                   {formatPrice(parseFloat(vehicle.base_price))}
                 </div>
-                <div className="text-xs text-gray-500">{t('basePrice')}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{t('basePrice')}</div>
               </div>
 
               {/* Selection Indicator */}
@@ -316,11 +316,11 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
       </div>
 
       {/* Navigation */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
         <div className="flex justify-between">
           <button
             onClick={onBack}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             {t('previous')}
@@ -332,7 +332,7 @@ export default function VehicleSelection({ onNext, onBack }: VehicleSelectionPro
               px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2
               ${isValid
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-300 text-gray-500 dark:text-gray-400 cursor-not-allowed'
               }
             `}
           >

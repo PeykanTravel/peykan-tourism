@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { getOrderDetail } from '../../../lib/api/orders';
+import { orderService } from '../../../../lib/services/orderService';
 import { 
   CheckCircle, 
   Clock, 
@@ -40,17 +40,14 @@ export default function OrderConfirmationPage() {
   useEffect(() => {
     const fetchOrderDetail = async () => {
       if (!orderNumber) return;
-      
       try {
         setIsLoading(true);
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          setError('Authentication required');
-          return;
+        const result = await orderService.getOrderDetails(orderNumber);
+        if (result.success && result.order) {
+          setOrder(result.order);
+        } else {
+          setError(result.message || 'Failed to load order details');
         }
-
-        const response = await getOrderDetail(orderNumber, token);
-        setOrder(response.data);
       } catch (error: any) {
         console.error('Failed to fetch order:', error);
         setError(error.response?.data?.error || 'Failed to load order details');
@@ -58,7 +55,6 @@ export default function OrderConfirmationPage() {
         setIsLoading(false);
       }
     };
-
     fetchOrderDetail();
   }, [orderNumber]);
 

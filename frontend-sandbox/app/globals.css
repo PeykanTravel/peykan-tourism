@@ -283,4 +283,32 @@
   .print-break {
     page-break-before: always;
   }
+}
+
+/* Loading Skeleton Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Enhanced pulse animation */
+@keyframes enhanced-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-enhanced-pulse {
+  animation: enhanced-pulse 1.5s ease-in-out infinite;
 } 

@@ -123,6 +123,43 @@ class OrderService {
   }
 
   /**
+   * Create a new order
+   */
+  async createOrder(orderData: any): Promise<{ success: boolean; order?: Order; message?: string }> {
+    try {
+      const token = tokenService.getAccessToken();
+      if (!token) {
+        throw new Error('No access token available');
+      }
+
+      const response = await fetch(`${this.baseUrl}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create order');
+      }
+
+      return {
+        success: true,
+        order: data,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.message || 'Failed to create order',
+      };
+    }
+  }
+
+  /**
    * Get order status label in Persian
    */
   getOrderStatusLabel(status: string): string {

@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCart } from '../../lib/hooks';
-import { createOrder } from '../../lib/api/orders';
+import { useCart } from '../../../lib/hooks/useCart';
+import { useAuth } from '../../../lib/contexts/AuthContext';
+import { orderService } from '../../../lib/services/orderService';
+// TODO: createOrder را از سرویس صحیح import کن یا پیاده‌سازی کن
 import { useRouter } from 'next/navigation';
 import { 
   CreditCard, 
@@ -36,7 +38,8 @@ interface CheckoutFormData {
 
 export default function CheckoutForm() {
   const router = useRouter();
-  const { cart, items, totalPrice, currency, isAuthenticated, clearCart } = useCart();
+  const { items, totalPrice, currency, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   
   const [formData, setFormData] = useState<CheckoutFormData>({
     customer_name: '',
@@ -91,13 +94,17 @@ export default function CheckoutForm() {
       }
 
       const orderData = {
-        cart_id: (cart as any)?.id || '',
         special_requests: formData.special_requests,
+        // سایر داده‌های لازم برای سفارش را اینجا اضافه کنید
       };
 
-      const response = await createOrder(orderData, token);
-      await clearCart();
-      router.push(`/orders/${response.data.order.order_number}`);
+      const result = await orderService.createOrder(orderData);
+      if (result.success && result.order) {
+        await clearCart();
+        router.push(`/orders/${result.order.order_number}`);
+      } else {
+        setError(result.message || 'خطا در ثبت سفارش');
+      }
       
     } catch (err: any) {
       console.error('Checkout error:', err);

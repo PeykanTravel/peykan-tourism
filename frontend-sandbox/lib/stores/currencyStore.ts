@@ -147,6 +147,11 @@ export const useCurrencyStore = create<CurrencyState>()(
       // Format price
       formatPrice: async (amount: number, currency: string, locale?: string): Promise<string> => {
         try {
+          // Handle invalid inputs
+          if (amount === null || amount === undefined || isNaN(amount)) {
+            return '0';
+          }
+
           const formatData: CurrencyFormatRequest = {
             amount,
             currency,
@@ -157,11 +162,17 @@ export const useCurrencyStore = create<CurrencyState>()(
           return result.formatted_amount;
         } catch (error) {
           console.error('Failed to format price:', error);
-          // Fallback formatting
-          return new Intl.NumberFormat(locale || 'en', {
-            style: 'currency',
-            currency: currency || 'USD'
-          }).format(amount);
+          // Fallback formatting with better error handling
+          try {
+            return new Intl.NumberFormat(locale || 'en', {
+              style: 'currency',
+              currency: currency || 'USD'
+            }).format(amount);
+          } catch (formatError) {
+            console.error('Fallback formatting also failed:', formatError);
+            // Ultimate fallback
+            return `${amount} ${currency || 'USD'}`;
+          }
         }
       },
 

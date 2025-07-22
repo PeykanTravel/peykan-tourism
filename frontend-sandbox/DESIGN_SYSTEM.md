@@ -350,3 +350,147 @@ function ToursList({ loading, tours }) {
 - [ ] Theme customization
 - [ ] Component playground
 - [ ] Storybook integration 
+
+## 🎨 Minimal Color Guideline (Apple/Nike Inspired)
+
+### Allowed Colors
+- **Blue**: Only for primary actions, links, and highlights (e.g. #3b82f6, #2563eb)
+- **Gray**: For backgrounds, borders, secondary text (e.g. #f5f5f5, #a3a3a3, #404040)
+- **White**: Main backgrounds, cards, surfaces (#fff)
+- **Black**: Main text, strong emphasis (#171717, #000)
+
+### Not Allowed
+- No green, red, yellow, orange, purple, pink, etc. (except for icons or very subtle accent in rare cases)
+- No colored backgrounds for badges/alerts (use border or icon only)
+- No gradient backgrounds except for hero/CTA with very low opacity
+
+### Usage Examples
+- **Button (Primary):** Blue background, white text
+- **Button (Secondary):** White background, blue border/text
+- **Card:** White background, gray border, black text
+- **Alert:** White/gray background, blue border or icon, black text
+- **Badge:** Gray outline, black text
+
+### Apple/Nike Inspiration
+- Minimal, clean, high contrast
+- Color only for action, not for decoration
+- Emphasis with size, weight, whitespace, not color
+
+---
+
+## 🟦 Sample Color Tokens
+```js
+primary: {
+  500: '#3b82f6', // blue
+  600: '#2563eb',
+},
+neutral: {
+  100: '#f5f5f5',
+  400: '#a3a3a3',
+  700: '#404040',
+  900: '#171717',
+},
+white: '#fff',
+black: '#000',
+```
+
+---
+
+## ✅ How to Use
+- Only use allowed colors in all components/pages
+- For any new UI, check this guideline before adding color
+- If you need to show status (success, error, ...), use icon or border, not background color
+
+---
+
+## Example: Minimal Button
+```jsx
+<Button className="bg-blue-600 text-white hover:bg-blue-700" />
+<Button className="bg-white border border-blue-600 text-blue-600" />
+```
+
+## Example: Minimal Card
+```jsx
+<Card className="bg-white border border-gray-200 text-black" />
+```
+
+## Example: Minimal Alert
+```jsx
+<div className="border-l-4 border-blue-600 bg-white text-black p-4 flex items-center">
+  <InfoIcon className="text-blue-600 mr-2" />
+  <span>Alert message here</span>
+</div>
+```
+
+---
+
+## 🌙 Dark Mode Guideline
+
+### Principles
+- Always provide a dark background (`bg-gray-900` or `bg-black`) and high-contrast text (`text-white` or `text-gray-100`) in dark mode.
+- Use `dark:` classes in Tailwind or equivalent CSS for all backgrounds, borders, and text.
+- Never use low-contrast color pairs (e.g. blue on blue, gray on gray).
+- For primary actions: `bg-blue-600 text-white dark:bg-blue-400 dark:text-black`
+- For cards: `bg-white text-black dark:bg-gray-900 dark:text-white`
+- For borders: `border-gray-200 dark:border-gray-700`
+- For alerts: `bg-white text-black border-blue-600 dark:bg-gray-900 dark:text-white dark:border-blue-400`
+
+### Example
+```jsx
+<Button className="bg-blue-600 text-white hover:bg-blue-700 border border-blue-600 dark:bg-blue-400 dark:text-black dark:hover:bg-blue-500" />
+<Card className="bg-white border border-gray-200 text-black dark:bg-gray-900 dark:border-gray-700 dark:text-white" />
+<div className="border-l-4 border-blue-600 bg-white text-black p-4 flex items-center dark:bg-gray-900 dark:text-white dark:border-blue-400">
+  <InfoIcon className="text-blue-600 mr-2 dark:text-blue-400" />
+  <span>Alert message here</span>
+</div>
+```
+
+---
+
+## 🌐 RTL (Right-to-Left) Support
+
+### Principles
+- Always use logical properties (`start`, `end`, `inline`, `block`) instead of `left`/`right` for margin, padding, border, etc.
+- Use Tailwind’s `rtl:` and `ltr:` utilities or custom CSS for direction-specific styles.
+- Font: Use a Persian/Arabic font (e.g. Vazirmatn) for RTL, and Inter for LTR.
+- All icons, arrows, and navigation should flip direction in RTL (use `rtl:rotate-180` or RTL icon variant).
+
+### Icon/Arrow Example
+```jsx
+<ArrowRight className="w-5 h-5 rtl:rotate-180" />
+```
+If you use a custom icon set, provide both LTR and RTL versions or use CSS transforms.
+
+### Example
+```jsx
+<div className="text-right rtl:text-left ltr:text-right font-[Vazirmatn] rtl:font-[Vazirmatn] ltr:font-[Inter]">
+  متن نمونه RTL
+</div>
+<Button className="px-4 py-2 border border-blue-600 text-blue-600 rtl:rounded-r-none ltr:rounded-l-none" />
+```
+
+---
+
+## 📱 Responsive Design Guideline
+
+### Principles
+- Always use Tailwind’s responsive utilities (`sm:`, `md:`, `lg:`, `xl:`) for all layout, spacing, and typography.
+- Use `max-w-*`, `px-*`, `py-*`, `gap-*` for consistent spacing.
+- Never hardcode pixel values for width/height; always use relative units or responsive classes.
+- Test all components on mobile, tablet, and desktop.
+
+### Example
+```jsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <Card className="p-4 md:p-6 lg:p-8" />
+</div>
+<h1 className="text-2xl md:text-3xl lg:text-4xl" />
+<Button className="w-full md:w-auto" />
+```
+
+---
+
+## ✅ Summary
+- Always support dark mode, RTL, and responsive layouts in every component and page.
+- Test for contrast, direction, and layout on all devices and languages.
+- Use only the allowed color palette and follow the minimal, modern design principles. 

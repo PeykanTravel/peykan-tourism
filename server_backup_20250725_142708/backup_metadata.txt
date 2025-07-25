@@ -1,0 +1,26 @@
+Peykan Tourism Server Backup
+============================
+Backup Date: Fri Jul 25 02:27:08 PM UTC 2025
+Git Commit: 3833834eaf41810ef9a37d37d2ec4390bd4abaae
+Git Branch: main
+Git Status: 13 uncommitted changes
+
+Server Information:
+- OS: Linux Ubuntu-2204-jammy-amd64-base 6.8.0-63-generic #66-Ubuntu SMP PREEMPT_DYNAMIC Fri Jun 13 20:25:30 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+- Current Directory: /home/djangouser/peykan-tourism
+- User: djangouser
+
+Backup Contents:
+- Complete project files (excluding .git, node_modules, venv)
+- Backend media files (if exists)
+- Backend static files (if exists)
+- Frontend build files (if exists)
+- All uncommitted changes
+
+Instructions for Restoration:
+1. Extract this backup to a clean directory
+2. Run: git init
+3. Run: git remote add origin <your-repo-url>
+4. Run: git fetch origin
+5. Run: git checkout -b server-snapshot-20250725_142708
+6. Restore any additional server-specific configurations

@@ -1,0 +1,47 @@
+import '../globals.css';
+import { ReactNode } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { Metadata } from 'next';
+import Navbar from '../../components/Navbar';
+import { AuthProvider } from '../../lib/contexts/AuthContext';
+import { CartProvider } from '../../lib/contexts/CartContext';
+import type { Locale } from '@/i18n/config';
+
+export const metadata: Metadata = {
+  title: 'Peykan Tourism Platform',
+  description: 'Book tours, events, and transfers with ease',
+  icons: {
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎭</text></svg>',
+  },
+};
+
+type Props = {
+  children: ReactNode;
+  params: {
+    locale: Locale;
+  };
+};
+
+export default async function LocaleLayout({ children, params }: Props) {
+  const messages = await getMessages();
+
+  return (
+    <html lang={params.locale} dir={params.locale === 'fa' ? 'rtl' : 'ltr'}>
+      <body className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white min-h-screen">
+        <NextIntlClientProvider locale={params.locale} messages={messages}>
+          <AuthProvider>
+            <CartProvider>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+            </CartProvider>
+          </AuthProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+} 

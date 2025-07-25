@@ -1,0 +1,41 @@
+"""
+URL configuration for Peykan Tourism Ecommerce Platform.
+"""
+
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    
+    # API Documentation
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # API v1
+    path('api/v1/', include([
+        path('auth/', include('users.urls')),
+        path('tours/', include('tours.urls')),
+        path('events/', include('events.urls')),
+        path('transfers/', include('transfers.urls')),
+        path('cart/', include('cart.urls')),
+        path('orders/', include('orders.urls')),
+        path('payments/', include('payments.urls')),
+        path('agents/', include('agents.urls')),
+    ])),
+]
+
+# Debug toolbar (development only)
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
+    
+    # Serve media files in development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

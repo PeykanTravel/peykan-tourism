@@ -4,12 +4,20 @@ URL configuration for Peykan Tourism Ecommerce Platform.
 
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Lightweight health endpoint for uptime checks
+    path('api/health', lambda request: JsonResponse({
+        'status': 'ok'
+    })),
+    path('api/v1/health', lambda request: JsonResponse({
+        'status': 'ok'
+    })),
     
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

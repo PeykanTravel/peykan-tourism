@@ -84,11 +84,24 @@ services:
       - "443:443"
     volumes:
       - nginx_logs:/var/log/nginx
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/lib/letsencrypt
+      - certbot_webroot:/var/www/certbot
     depends_on:
       - backend
       - frontend
     profiles:
       - production
+
+  # Certbot (manual run when issuing/renewing certificates)
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/lib/letsencrypt
+      - certbot_webroot:/var/www/certbot
+    entrypoint: sh -c
+    command: "sleep infinity"
 
 volumes:
   postgres_data:
@@ -96,6 +109,9 @@ volumes:
   static_volume:
   media_volume:
   nginx_logs:
+  certbot_etc:
+  certbot_var:
+  certbot_webroot:
 
 networks:
   default:
